@@ -2,8 +2,6 @@ import {version} from '../../../package.json';
 import path from 'path';
 import mongoose from 'mongoose';
 
-const Record = require('../../models/Record');
-
 class AppRouter {
 
   constructor(app){
@@ -17,9 +15,7 @@ class AppRouter {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    app.get('/', (req,res,next)=>{
-      var record = Record.createRecord();
-      console.log(record);
+    app.get('/', async (req,res,next)=>{
       return res.status(200).json({
         version: version
       })
