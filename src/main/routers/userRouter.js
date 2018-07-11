@@ -41,6 +41,8 @@ class UserRouter {
       let err, _user, _profile;
 
       [err, _user] = await to(User.findOne({id, pw}));
+      if(err || _user === null){ return res.json({ result: "failed" });}
+
       [err, _profile] = await to(Profile.findOne({belongTo: _user._id}));
 
       return res.json({
