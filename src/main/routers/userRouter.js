@@ -13,13 +13,28 @@ class UserRouter {
   }
 
   initRouter(){
-
     const app = this.app;
-
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    app.get('/user/resetPassword/', async (req,res,next)=>{
+    app.post('/user/update', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+      User.findOneAndUpdate({_id: data._id}, { $set:{
+        type: data.type,
+        id: data.id,
+        pw: data.pw,
+        email: data.email
+      }}, {new: true}, (err, _updatedUser)=>{
+        //console.log(_updatedUser)
+        return res.json({
+          result: (err || !_updatedUser)? 'failed':'success' ,
+          updatedUser: _updatedUser
+        });
+      });
+    });
+
+    app.get('/user/resetPassword/', async (req, res, next)=>{
       const email = req.headers.email;
 
       User.resetPassword(email, _result=>{
@@ -27,7 +42,7 @@ class UserRouter {
       });
     });
 
-    app.get('/user/getNewAccount/', (req,res,next)=>{
+    app.get('/user/getNewAccount/', (req, res, next)=>{
       const email = req.headers.email;
 
       User.acquireNewAccount(email, _result=>{
@@ -35,7 +50,7 @@ class UserRouter {
       });
     });
 
-    app.get('/user/login/', async (req,res,next)=>{
+    app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
       let err, _user, _profile;
@@ -52,11 +67,6 @@ class UserRouter {
       });
     });
 
-    app.get('/user', (req,res,next)=>{
-      return res.status(200).json({ UserRouter: 'ready' });
-    });
-
-    console.log('UserRouter initialized');
   }
 
 }

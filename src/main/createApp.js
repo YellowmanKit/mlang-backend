@@ -7,6 +7,7 @@ import path from 'path';
 
 import AppRouter from './routers/appRouter';
 import UserRouter from './routers/userRouter';
+import ProfileRouter from './routers/profileRouter';
 
 class CreateApp {
 
@@ -28,6 +29,7 @@ class CreateApp {
 
     new AppRouter(app);
     new UserRouter(app);
+    new ProfileRouter(app);
 
     app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
   }

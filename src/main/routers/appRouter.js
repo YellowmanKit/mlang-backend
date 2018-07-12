@@ -11,7 +11,6 @@ class AppRouter {
 
   initRouter(){
     const app = this.app;
-
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
@@ -20,8 +19,6 @@ class AppRouter {
         version: version
       })
     });
-
-    console.log('AppRouter initialized');
   }
 
 }
