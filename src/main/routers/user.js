@@ -1,18 +1,21 @@
 import path from 'path';
 import mongoose from 'mongoose';
+var ObjectId = require('mongoose').Types.ObjectId;
+
 import to from '../../to';
 
 import User from '../../models/User';
 import Profile from '../../models/Profile';
+import Course from '../../models/Course';
 
 class UserRouter {
 
   constructor(app){
     this.app = app;
-    this.initRouter();
+    this.init();
   }
 
-  initRouter(){
+  init(){
     const app = this.app;
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
@@ -53,17 +56,22 @@ class UserRouter {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, _user, _profile;
+      let err, _user, _profile, _teachingCourses;
 
       [err, _user] = await to(User.findOne({id, pw}));
       if(err || _user === null){ return res.json({ result: "failed" });}
 
       [err, _profile] = await to(Profile.findOne({belongTo: _user._id}));
+      if(err || _profile === null){ return res.json({ result: "failed" });}
+
+      [err, _teachingCourses] = await to(Course.find({teacher: new ObjectId(_user._id)}));
+      if(err){ return res.json({ result: "failed" });}
 
       return res.json({
         result: (err || _user === null)? "failed": "success",
         user: _user,
-        profile: _profile
+        profile: _profile,
+        teachingCourses: _teachingCourses
       });
     });
 

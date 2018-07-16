@@ -10,10 +10,9 @@ var profileSchema = mongoose.Schema({
     type: String,
     defaultValue: 'user'
   },
-  joinedCourse: [ObjectId],
-  teachingCourse: [ObjectId],
-  projects: [ObjectId],
-  studentProjects: [ObjectId],
+
+  joinedCourses: [ObjectId],
+
   cardCount: {
     type: Number,
     default: 0

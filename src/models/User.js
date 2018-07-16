@@ -28,11 +28,11 @@ var schema = mongoose.Schema({
 
 var User = module.exports = mongoose.model('user',schema);
 
-module.exports.resetPassword = async (_email, callback)=>{
+module.exports.resetPassword = async (_email, cb)=>{
   let err, user, info;
 
   [err,user] = await to(User.findOne({email: _email}));
-  if(err || user === null){ callback('failed'); return; };
+  if(err || user === null){ cb('failed'); return; };
 
   const randomPassword = randomString.generate(6);
   const mailOptions = {
@@ -50,16 +50,16 @@ module.exports.resetPassword = async (_email, callback)=>{
   };
 
   [err, info] = await to(transporter.sendMail(mailOptions));
-  if(err){ callback('failed'); return; }
+  if(err){ cb('failed'); console.log('err: mail cannot be sent'); return; }
 
   user.set({ pw: randomPassword });
   user.save();
-  callback('success');
+  cb('success');
 }
 
-module.exports.acquireNewAccount = async (_email, callback)=>{
+module.exports.acquireNewAccount = async (_email, cb)=>{
   const existUser = await User.findOne({email: _email});
-  if(existUser !== null){ callback('failed'); return; }
+  if(existUser !== null){ cb('failed'); return; }
 
   const randomPassword = randomString.generate(6);
   const newUser = {
@@ -84,20 +84,19 @@ module.exports.acquireNewAccount = async (_email, callback)=>{
 
   let err, info, user, profile;
 
-  [err, info] = await to(transporter.sendMail(mailOptions));
-
-  if(err){ callback('failed'); return; }
+  /*[err, info] = await to(transporter.sendMail(mailOptions));
+  if(err){ cb('failed'); console.log('err: mail cannot be sent'); return; }*/
 
   [err, user] = await to(User.create(newUser));
-  if(err){ callback('failed'); return; }
+  if(err){ cb('failed'); console.log(err); return; }
 
   var newProfile = {
     belongTo: user._id
   };
 
   [err, profile] = await to(Profile.create(newProfile));
-  if(err){ callback('failed'); return; }
-  callback('success');
+  if(err){ cb('failed'); console.log(err); return; }
+  cb('success');
 }
 
 //console.log(process.env.EMAIL_ID);

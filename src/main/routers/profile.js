@@ -9,10 +9,10 @@ class ProfileRouter {
 
   constructor(app){
     this.app = app;
-    this.initRouter();
+    this.init();
   }
 
-  initRouter(){
+  init(){
     const app = this.app;
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
