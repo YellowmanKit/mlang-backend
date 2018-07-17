@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import randomString from'randomstring';
 import to from'../to';
 
+import Profile from './Profile';
+
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var courseSchema = mongoose.Schema({
   teacher: {
@@ -20,18 +22,37 @@ var courseSchema = mongoose.Schema({
   },
   code: {
     type: String
-  }
-
+  },
+  joinedStudents: [ObjectId]
 });
 
 var Course = module.exports = mongoose.model('course',courseSchema);
+
+module.exports.joinCourse = async (data, cb)=>{
+  let err, courseToJoin, updatedProfile;
+
+  [err, courseToJoin] = await to(Course.findOneAndUpdate({code: data.code}, { $push: {
+    joinedStudents: data.userId
+  }}, {new: true}))
+  if(err || courseToJoin === null){ cb('failed'); };
+
+  [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.userId}, { $push: {
+    joinedCourses: courseToJoin._id
+  }}, {new: true}))
+  if(err || updatedProfile === null){ cb('failed'); };
+
+  cb('success', courseToJoin, updatedProfile)
+}
 
 module.exports.addCourse = async (newCourse, cb)=>{
   let err, course;
 
   var newCode = '';
   for(var i=0;i<99;i++){
-    newCode = randomString.generate(6);
+    newCode = randomString.generate({
+      length: 5,
+      charset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    });
 
     [err,course] = await to(Course.findOne({code: newCode}));
     if(!err && course === null){ break; };

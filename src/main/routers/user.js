@@ -56,13 +56,21 @@ class UserRouter {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, _user, _profile, _teachingCourses;
+      let err, _user, _profile, _teachingCourses, _joinedCourse;
 
       [err, _user] = await to(User.findOne({id, pw}));
       if(err || _user === null){ return res.json({ result: "failed" });}
 
       [err, _profile] = await to(Profile.findOne({belongTo: _user._id}));
       if(err || _profile === null){ return res.json({ result: "failed" });}
+
+      var _joinedCourses = [];
+      const joinedCourses = _profile.joinedCourses;
+      for(var i=0;i<joinedCourses.length;i++){
+        [err, _joinedCourse] = await to(Course.findById(joinedCourses[i]));
+        if(err){ return res.json({ result: "failed" });}
+        _joinedCourses.push(_joinedCourse)
+      }
 
       [err, _teachingCourses] = await to(Course.find({teacher: new ObjectId(_user._id)}));
       if(err){ return res.json({ result: "failed" });}
@@ -71,7 +79,8 @@ class UserRouter {
         result: (err || _user === null)? "failed": "success",
         user: _user,
         profile: _profile,
-        teachingCourses: _teachingCourses
+        teachingCourses: _teachingCourses,
+        joinedCourses: _joinedCourses
       });
     });
 

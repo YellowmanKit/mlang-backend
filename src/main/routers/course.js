@@ -17,6 +17,19 @@ class CourseRouter {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/course/join', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+
+      Course.joinCourse(data, (_result, _joinedCourse, _updatedProfile)=>{
+        return res.json({
+          result: _result,
+          joinedCourse: _joinedCourse,
+          updatedProfile: _updatedProfile
+        })
+      })
+    });
+
     app.post('/course/add', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
@@ -26,8 +39,7 @@ class CourseRouter {
           result: _result,
           newCourse: _newCourse
         })
-      });
-
+      })
     });
 
   }

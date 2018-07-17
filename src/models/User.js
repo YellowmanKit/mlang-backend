@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 import randomString from'randomstring';
 import nodemailer from 'nodemailer';
 import to from'../to';
-import Profile from './Profile';
 import dotenv from'dotenv';
 dotenv.config();
+
+import Profile from './Profile';
 
 var schema = mongoose.Schema({
   id: {
@@ -27,6 +28,7 @@ var schema = mongoose.Schema({
 });
 
 var User = module.exports = mongoose.model('user',schema);
+
 
 module.exports.resetPassword = async (_email, cb)=>{
   let err, user, info;
