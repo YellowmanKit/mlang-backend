@@ -10,6 +10,7 @@ import AppRouter from './routers/app';
 import UserRouter from './routers/user';
 import ProfileRouter from './routers/profile';
 import CourseRouter from './routers/course';
+import ProjectRouter from './routers/project';
 
 const temp = 'C:/data/temp/';
 const storage = 'C:/data/storage/';
@@ -26,7 +27,7 @@ class CreateApp {
         cb(null, temp);
       },
       filename: function (req, file, cb) {
-        cb(null, Date.now() + '.jpg');
+        cb(null, Date.now() + '-' + file.originalname);
       }
     });
 
@@ -50,6 +51,7 @@ class CreateApp {
     new UserRouter(app);
     new ProfileRouter(app);
     new CourseRouter(app);
+    new ProjectRouter(app);
 
     app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
   }

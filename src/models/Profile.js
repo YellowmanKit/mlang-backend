@@ -8,7 +8,7 @@ var profileSchema = mongoose.Schema({
   },
   name: {
     type: String,
-    defaultValue: 'user'
+    default: ''
   },
 
   joinedCourses: [ObjectId],

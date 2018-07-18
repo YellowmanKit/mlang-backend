@@ -23,7 +23,8 @@ var courseSchema = mongoose.Schema({
   code: {
     type: String
   },
-  joinedStudents: [ObjectId]
+  joinedStudents: [ObjectId],
+  projects: [ObjectId]
 });
 
 var Course = module.exports = mongoose.model('course',courseSchema);
