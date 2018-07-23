@@ -22,6 +22,6 @@ var projectSchema = mongoose.Schema({
     default: new Date()
   },
   cards: [ObjectId]
-});
+})
 
 var Project = module.exports = mongoose.model('project',projectSchema);

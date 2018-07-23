@@ -35,6 +35,7 @@ class AppRouter {
 
     app.post('/upload',upload.array('files'), (req,res, next)=>{
       console.log('Uploading ', req.files);
+
       const type = req.headers.type;
       const append = this.getAppend(type);
       var _filenames = [];
@@ -63,8 +64,8 @@ class AppRouter {
 
   getAppend(type){
     return(
-    type === 'courseIcon'? 'courseIcon/':
-    type === 'projectIcon'? 'projectIcon/':
+    type === 'courseIcon'? 'course/icon/':
+    type === 'projectIcon'? 'project/icon/':
     '');
   }
 

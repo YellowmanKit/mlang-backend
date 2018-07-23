@@ -64,12 +64,12 @@ class UserRouter {
       [err, _profile] = await to(Profile.findOne({belongTo: _user._id}));
       if(err || _profile === null){ return res.json({ result: "failed" });}
 
-      var _joinedCourses = [];
+      var _joinedCoursesData = [];
       const joinedCourses = _profile.joinedCourses;
       for(var i=0;i<joinedCourses.length;i++){
         [err, _joinedCourse] = await to(Course.findById(joinedCourses[i]));
         if(err){ return res.json({ result: "failed" });}
-        _joinedCourses.push(_joinedCourse)
+        _joinedCoursesData.push(_joinedCourse)
       }
 
       [err, _teachingCourses] = await to(Course.find({teacher: new ObjectId(_user._id)}));
@@ -80,7 +80,7 @@ class UserRouter {
         user: _user,
         profile: _profile,
         teachingCourses: _teachingCourses,
-        joinedCourses: _joinedCourses
+        joinedCourses: _joinedCoursesData
       });
     });
 

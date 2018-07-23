@@ -21,6 +21,6 @@ var profileSchema = mongoose.Schema({
     type: Number,
     default: 0
   }
-});
+})
 
 var Profile = module.exports = mongoose.model('profile',profileSchema);

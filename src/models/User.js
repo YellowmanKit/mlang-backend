@@ -25,7 +25,7 @@ var schema = mongoose.Schema({
     type: Date,
     default: new Date()
   }
-});
+})
 
 var User = module.exports = mongoose.model('user',schema);
 
