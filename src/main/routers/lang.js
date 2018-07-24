@@ -1,0 +1,31 @@
+import path from 'path';
+import mongoose from 'mongoose';
+var ObjectId = require('mongoose').Types.ObjectId;
+
+import to from '../../to';
+
+import Lang from '../../models/Lang';
+
+class LangRouter {
+
+  constructor(app){
+    this.app = app;
+    this.init();
+  }
+
+  init(){
+    const app = this.app;
+    mongoose.connect('mongodb://localhost/mlang');
+    var db = mongoose.connection;
+
+    app.post('/lang/add', async(req, res, next)=>{
+      const data = req.body.data;
+
+    })
+
+  }
+
+
+}
+
+export default LangRouter;

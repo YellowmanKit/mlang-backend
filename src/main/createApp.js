@@ -11,6 +11,10 @@ import UserRouter from './routers/user';
 import ProfileRouter from './routers/profile';
 import CourseRouter from './routers/course';
 import ProjectRouter from './routers/project';
+import StudentProjectRouter from './routers/studentProject';
+
+import CardRouter from './routers/card';
+import LangRouter from './routers/lang';
 
 const temp = 'C:/data/temp/';
 const storage = 'C:/data/storage/';
@@ -27,6 +31,7 @@ class CreateApp {
         cb(null, temp);
       },
       filename: function (req, file, cb) {
+        console.log(file)
         cb(null, Date.now() + '-' + file.originalname);
       }
     });
@@ -52,6 +57,9 @@ class CreateApp {
     new ProfileRouter(app);
     new CourseRouter(app);
     new ProjectRouter(app);
+    new StudentProjectRouter(app);
+    new CardRouter(app);
+    new LangRouter(app);
 
     app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
   }

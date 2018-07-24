@@ -37,12 +37,16 @@ class AppRouter {
       console.log('Uploading ', req.files);
 
       const type = req.headers.type;
-      const append = this.getAppend(type);
+      var append = this.getAppend(type);
       var _filenames = [];
 
       for(var i=0;i<req.files.length;i++){
         var filename = req.files[i].filename;
         _filenames.splice(0,0,filename);
+
+        if(type === 'card'){
+          append = i === req.files.length - 1? this.getAppend('cardIcon'): this.getAppend('langAudio');
+        }
 
         fs.move(temp + filename, storage + append + filename, (err)=> {
             if(err){console.log(err)}
@@ -64,9 +68,11 @@ class AppRouter {
 
   getAppend(type){
     return(
-    type === 'courseIcon'? 'course/icon/':
-    type === 'projectIcon'? 'project/icon/':
-    '');
+    type === 'courseIcon'? 'courses/icons/':
+    type === 'projectIcon'? 'projects/icons/':
+    type === 'cardIcon'? 'cards/icons/':
+    type === 'langAudio'? 'langs/audios/':
+    type);
   }
 
 }

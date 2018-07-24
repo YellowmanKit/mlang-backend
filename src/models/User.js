@@ -64,8 +64,9 @@ module.exports.acquireNewAccount = async (_email, cb)=>{
   if(existUser !== null){ cb('failed'); return; }
 
   const randomPassword = randomString.generate(6);
+  var defaultId = _email.substring(0, _email.lastIndexOf("@"));
   const newUser = {
-    id: _email,
+    id: defaultId,
     pw: randomPassword,
     email: _email
   }

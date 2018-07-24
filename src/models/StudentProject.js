@@ -9,7 +9,7 @@ var studentProjectSchema = mongoose.Schema({
   student: {
     type: ObjectId,
     required: true
-  }
+  },
   cards: [ObjectId]
 })
 
