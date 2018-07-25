@@ -1,22 +1,32 @@
+import Router from './Router';
 import path from 'path';
 import mongoose from 'mongoose';
 var ObjectId = require('mongoose').Types.ObjectId;
+//import multer from 'multer';
 
+import fs from 'fs-extra';
 import to from '../../to';
 
 import Card from '../../models/Card';
 import Lang from '../../models/Lang';
 import StudentProject from '../../models/StudentProject';
 
-class CardRouter {
+class CardRouter extends Router {
 
   constructor(app){
+    super(app);
     this.app = app;
     this.init();
   }
 
   init(){
     const app = this.app;
+    const upload = app.get('upload');
+    //const config = app.get('config');
+    //var upload = multer({ storage: config }).single('avatar')
+
+    const temp = app.get('temp');
+    const storage = app.get('storage');
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
@@ -91,6 +101,7 @@ class CardRouter {
     })
 
   }
+
 
 
 }

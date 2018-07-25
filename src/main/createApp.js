@@ -48,6 +48,7 @@ class CreateApp {
     app.use(express.static(path.join(__dirname,'' + appName + '/')));
 
     app.set('root',__dirname);
+    app.set('config', storageConfig);
     app.set('upload',upload);
     app.set('temp',temp);
     app.set('storage',storage);

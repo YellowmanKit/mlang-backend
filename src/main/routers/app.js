@@ -1,12 +1,14 @@
+import Router from './Router';
 import {version} from '../../../package.json';
 import path from 'path';
 import mongoose from 'mongoose';
 
 import fs from 'fs-extra';
 
-class AppRouter {
+class AppRouter extends Router{
 
   constructor(app){
+    super(app);
     this.app = app;
     this.init();
   }
@@ -34,7 +36,7 @@ class AppRouter {
     });
 
     app.post('/upload',upload.array('files'), (req,res, next)=>{
-      console.log('Uploading ', req.files);
+      //console.log('Uploaded ', req.files);
 
       const type = req.headers.type;
       var append = this.getAppend(type);
@@ -42,10 +44,12 @@ class AppRouter {
 
       for(var i=0;i<req.files.length;i++){
         var filename = req.files[i].filename;
+        const splted = filename.split('-')
+
         _filenames.splice(0,0,filename);
 
         if(type === 'card'){
-          append = i === req.files.length - 1? this.getAppend('cardIcon'): this.getAppend('langAudio');
+            append = splted[1] === 'cardIcon'? this.getAppend('cardIcon'):this.getAppend('langAudio');
         }
 
         fs.move(temp + filename, storage + append + filename, (err)=> {
@@ -64,15 +68,6 @@ class AppRouter {
         version: version
       })
     });
-  }
-
-  getAppend(type){
-    return(
-    type === 'courseIcon'? 'courses/icons/':
-    type === 'projectIcon'? 'projects/icons/':
-    type === 'cardIcon'? 'cards/icons/':
-    type === 'langAudio'? 'langs/audios/':
-    type);
   }
 
 }

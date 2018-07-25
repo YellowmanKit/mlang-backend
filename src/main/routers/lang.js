@@ -1,3 +1,4 @@
+import Router from './Router';
 import path from 'path';
 import mongoose from 'mongoose';
 var ObjectId = require('mongoose').Types.ObjectId;
@@ -6,9 +7,10 @@ import to from '../../to';
 
 import Lang from '../../models/Lang';
 
-class LangRouter {
+class LangRouter extends Router {
 
   constructor(app){
+    super(app);
     this.app = app;
     this.init();
   }

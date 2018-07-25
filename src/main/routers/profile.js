@@ -1,3 +1,4 @@
+import Router from './Router';
 import path from 'path';
 import mongoose from 'mongoose';
 import to from '../../to';
@@ -5,9 +6,10 @@ import to from '../../to';
 import User from '../../models/User';
 import Profile from '../../models/Profile';
 
-class ProfileRouter {
+class ProfileRouter extends Router {
 
   constructor(app){
+    super(app);
     this.app = app;
     this.init();
   }
