@@ -20,7 +20,8 @@ var projectSchema = mongoose.Schema({
   endDate: {
     type: Date,
     default: new Date()
-  }
+  },
+  studentProjects: [ObjectId]
 })
 
 var Project = module.exports = mongoose.model('project',projectSchema);

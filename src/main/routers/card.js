@@ -9,7 +9,9 @@ import to from '../../to';
 
 import Card from '../../models/Card';
 import Lang from '../../models/Lang';
+import Project from '../../models/Project';
 import StudentProject from '../../models/StudentProject';
+import Profile from '../../models/Profile';
 
 class CardRouter extends Router {
 
@@ -33,12 +35,17 @@ class CardRouter extends Router {
     app.post('/card/getMultiple', async(req, res)=>{
       const list = req.body.data.cards;
       //console.log(list);
-      let err, card, langs;
+      let err, card, langs, profile;
       var _cards = [];
+      var _studentProfiles = [];
       for(var i=0;i<list.length;i++){
         [err, card] = await to(Card.findById(list[i]));
         if(err || card === null){ console.log('no such card!'); return res.json({ result: 'failed' })}
         _cards.splice(0,0,card);
+
+        [err, profile] = await to(Profile.findOne({belongTo: card.author}));
+        if(err || profile === null){ return res.json({ result: 'failed' })}
+        _studentProfiles.splice(0,0, profile);
       }
 
       var _langs = [];
@@ -51,7 +58,8 @@ class CardRouter extends Router {
       return res.json({
         result: 'success',
         cards: _cards,
-        langs: _langs
+        langs: _langs,
+        students: _studentProfiles
       })
     });
 
@@ -60,13 +68,20 @@ class CardRouter extends Router {
       var card = data.card;
       var langs = data.langs;
 
-      let err, _studentProject, createdCard, createdLang;
+      let err, _studentProject, _project, createdCard, createdLang;
 
-      if(card.studentProject.project === undefined){
+      /*if(card.studentProject.project === undefined){
+        console.log('new student project')
         [err, _studentProject] = await to(StudentProject.create({project: data.project, student: card.author}));
         if(err || _studentProject === null){ return res.json({ result: "failed" });}
         card.studentProject = _studentProject;
-      }
+
+        [err, _project] = await to(Project.findOneAndUpdate({_id: data.project._id}, { $push:{
+          studentProjects: _studentProject._id
+        }}, {new: true}));
+        if(err || _project === null){ return res.json({ result: "failed" });}
+        console.log(_project)
+      }*/
 
       [err, createdCard] = await to(Card.create(card))
       if(err || createdCard === null){ return res.json({ result: "failed" });}
