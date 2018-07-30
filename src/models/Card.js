@@ -11,9 +11,10 @@ var cardSchema = mongoose.Schema({
     required: true
   },
   comment: {
-    type: String
+    type: String,
+    default: ''
   },
-  commentAudio: {
+  audioComment: {
     type: String
   },
   grade: {

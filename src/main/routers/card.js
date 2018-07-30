@@ -32,6 +32,27 @@ class CardRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/card/update', async(req, res)=>{
+      const list = req.body.data.cards;
+      console.log(list);
+      let err, card;
+      var _updatedCards = [];
+      for(var i=0;i<list.length;i++){
+        [err, card] = await to(Card.findOneAndUpdate({_id: list[i]}, { $set: {
+          grade: list[i].grade,
+          comment: list[i].comment,
+          audioComment: list[i].audioComment
+        }}, {new: true}));
+        if(err || card === null){ console.log('no such card!'); return res.json({ result: 'failed' })}
+        _updatedCards.splice(0,0,card);
+      }
+
+      return res.json({
+        result: 'success',
+        updatedCards: _updatedCards
+      })
+    });
+
     app.post('/card/getMultiple', async(req, res)=>{
       const list = req.body.data.cards;
       //console.log(list);
