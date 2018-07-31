@@ -87,8 +87,8 @@ module.exports.acquireNewAccount = async (_email, cb)=>{
 
   let err, info, user, profile;
 
-  /*[err, info] = await to(transporter.sendMail(mailOptions));
-  if(err){ cb('failed'); console.log('err: mail cannot be sent'); return; }*/
+  [err, info] = await to(transporter.sendMail(mailOptions));
+  if(err){ cb('failed'); console.log('err: mail cannot be sent'); return; }
 
   [err, user] = await to(User.create(newUser));
   if(err){ cb('failed'); console.log(err); return; }

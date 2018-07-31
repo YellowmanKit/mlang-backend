@@ -8,6 +8,8 @@ import to from '../../to';
 import StudentProject from '../../models/StudentProject';
 import Project from '../../models/Project';
 import Profile from '../../models/Profile';
+import Card from '../../models/Card';
+import Lang from '../../models/Lang';
 
 class StudentProjectRouter extends Router {
 
@@ -25,9 +27,11 @@ class StudentProjectRouter extends Router {
     app.post('/studentProject/getMultiple', async(req, res)=>{
       const list = req.body.data;
       //console.log(list);
-      let err, studentProject, profile;
+      let err, studentProject, profile, card, lang;
       var _studentProjects = [];
       var _studentProfiles = [];
+      var _cards = [];
+      var _langs = [];
       for(var i=0;i<list.length;i++){
         [err, studentProject] = await to(StudentProject.findById(list[i]));
         if(err){ return res.json({ result: 'failed' })}
@@ -36,11 +40,28 @@ class StudentProjectRouter extends Router {
         [err, profile] = await to(Profile.findOne({belongTo: studentProject.student}));
         if(err || profile === null){ return res.json({ result: 'failed' })}
         _studentProfiles.splice(0,0, profile);
+
+        const cardsId = studentProject.cards;
+        for(var j=0;j<cardsId.length;j++){
+          [err, card] = await to(Card.findById(cardsId[j]));
+          if(err || card === null){ return res.json({ result: 'failed' })}
+          _cards.splice(0,0,card);
+
+          const langsId = card.langs;
+          for(var k=0;k<langsId.length;k++){
+            [err, lang] = await to(Lang.findById(langsId[k]));
+            if(err || lang === null){ return res.json({ result: 'failed' })}
+            _langs.splice(0,0,lang);
+          }
+
+        }
       }
       return res.json({
         result:'success',
         studentProjects: _studentProjects,
-        students: _studentProfiles
+        students: _studentProfiles,
+        cards: _cards,
+        langs: _langs
       })
     });
 
