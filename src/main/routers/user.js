@@ -8,6 +8,7 @@ import to from '../../to';
 import User from '../../models/User';
 import Profile from '../../models/Profile';
 import Course from '../../models/Course';
+import Project from '../../models/Project';
 
 class UserRouter extends Router {
 
@@ -30,11 +31,11 @@ class UserRouter extends Router {
         id: data.id,
         pw: data.pw,
         email: data.email
-      }}, {new: true}, (err, _updatedUser)=>{
+      }}, {new: true}, (err, updatedUser)=>{
         //console.log(_updatedUser)
         return res.json({
-          result: (err || !_updatedUser)? 'failed':'success' ,
-          updatedUser: _updatedUser
+          result: (err || !updatedUser)? 'failed':'success' ,
+          updatedUser: updatedUser
         });
       });
     });
@@ -42,48 +43,101 @@ class UserRouter extends Router {
     app.get('/user/resetPassword/', async (req, res, next)=>{
       const email = req.headers.email;
 
-      User.resetPassword(email, _result=>{
-        return res.json({ result: _result });
+      User.resetPassword(email, result=>{
+        return res.json({ result: result });
       });
     });
 
     app.get('/user/getNewAccount/', (req, res, next)=>{
       const email = req.headers.email;
 
-      User.acquireNewAccount(email, _result=>{
-        return res.json({ result: _result });
+      User.acquireNewAccount(email, result=>{
+        return res.json({ result: result });
       });
     });
 
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, _user, _profile, _teachingCourses, _joinedCourse;
+      let err, user, profile, course, project;
 
-      [err, _user] = await to(User.findOne({id, pw}));
-      if(err || _user === null){ return res.json({ result: "failed" });}
+      [err, user] = await to(User.findOne({id, pw}));
+      if(err || user === null){ return res.json({ result: "failed" });}
 
-      [err, _profile] = await to(Profile.findOne({belongTo: _user._id}));
-      if(err || _profile === null){ return res.json({ result: "failed" });}
+      [err, profile] = await to(Profile.findOne({belongTo: user._id}));
+      if(err || profile === null){ return res.json({ result: "failed" });}
 
-      var _joinedCoursesData = [];
-      const joinedCourses = _profile.joinedCourses;
+      var courses = [];
+      var projects = [];
+
+      var joinedCourses = profile.joinedCourses;
+      var joinedProjects = [];
+
+      const today = new Date();
+
       for(var i=0;i<joinedCourses.length;i++){
-        [err, _joinedCourse] = await to(Course.findById(joinedCourses[i]));
-        if(err){ return res.json({ result: "failed" });}
-        _joinedCoursesData.push(_joinedCourse)
+        [err, course] = await to(Course.findById(joinedCourses[i]));
+        if(err || course === null){ return res.json({ result: "failed" });}
+        const endDate = new Date(course.endDate);
+        if(endDate < today){
+          joinedCourses.splice(i, 1);
+          i--;
+          continue;
+        }
+        courses.push(course);
+        joinedProjects = [...joinedProjects, ...course.projects];
       }
 
-      [err, _teachingCourses] = await to(Course.find({teacher: new ObjectId(_user._id)}));
+      for(var j=0;j<joinedProjects.length;j++){
+        [err, project] = await to(Project.findById(joinedProjects[j]));
+        if(err || project === null){ return res.json({ result: "failed" });}
+        projects.push(project);
+      }
+
+
+      var teachingCourses = [];
+      var teachingProjects = [];
+
+      var teachingCoursesData = [];
+      [err, teachingCoursesData] = await to(Course.find({teacher: user._id}));
       if(err){ return res.json({ result: "failed" });}
+      courses = [...courses, ...teachingCoursesData];
+      teachingCoursesData.map(course=>{
+        const endDate = new Date(course.endDate);
+        if(endDate < today){
+          return;
+        }
+        return teachingCourses.push(course._id);
+      })
+
+      for(var k=0;k<teachingCoursesData.length;k++){
+        const endDate = new Date(teachingCoursesData[k].endDate);
+        if(endDate < today){
+          continue;
+        }
+        teachingProjects = [...teachingProjects, ...teachingCoursesData[k].projects];
+      }
+
+      for(var l=0;l<teachingProjects.length;l++){
+        [err, project] = await to(Project.findById(teachingProjects[l]));
+        if(err || project === null){ return res.json({ result: "failed" });}
+        projects.push(project);
+      }
 
       return res.json({
-        result: (err || _user === null)? "failed": "success",
-        user: _user,
-        profile: _profile,
-        teachingCourses: _teachingCourses,
-        joinedCourses: _joinedCoursesData
-      });
+        result: "success",
+        user: user,
+        profile: profile,
+
+        teachingCourses: teachingCourses,
+        joinedCourses: joinedCourses,
+
+        teachingProjects: teachingProjects,
+        joinedProjects: joinedProjects,
+
+        courses: courses,
+        projects: projects
+      })
     });
 
   }

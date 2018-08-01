@@ -49,7 +49,7 @@ class AppRouter extends Router{
         _filenames.splice(0,0,filename);
 
         if(type === 'card'){
-            append = splted[1] === 'cardIcon'? this.getAppend('cardIcon'):this.getAppend('langAudio');
+            append = splted[1] === 'cardIcon.png'? this.getAppend('cardIcon'):this.getAppend('langAudio');
         }
 
         fs.move(temp + filename, storage + append + filename, (err)=> {
