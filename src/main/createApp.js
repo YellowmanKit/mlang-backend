@@ -45,7 +45,7 @@ class CreateApp {
     app.use(cors({exposeHeaders: "*"}));
     app.use(bodyParser.json({limit: '50mb'}));
     app.use(bodyParser.urlencoded({extended: false}));
-    app.use(express.static(path.join(__dirname,'' + appName + '/')));
+    app.use(express.static(path.join(__dirname,'../../' + appName + '/')));
 
     app.set('root',__dirname);
     app.set('config', storageConfig);
