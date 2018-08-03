@@ -5,11 +5,11 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 import to from '../../to';
 
-import StudentProject from '../../models/StudentProject';
-import Project from '../../models/Project';
-import Profile from '../../models/Profile';
-import Card from '../../models/Card';
-import Lang from '../../models/Lang';
+import StudentProject from '../../models/StudentProject.js';
+import Project from '../../models/Project.js';
+import Profile from '../../models/Profile.js';
+import Card from '../../models/Card.js';
+import Lang from '../../models/Lang.js';
 
 class StudentProjectRouter extends Router {
 

@@ -7,11 +7,11 @@ var ObjectId = require('mongoose').Types.ObjectId;
 import fs from 'fs-extra';
 import to from '../../to';
 
-import Card from '../../models/Card';
-import Lang from '../../models/Lang';
-import Project from '../../models/Project';
-import StudentProject from '../../models/StudentProject';
-import Profile from '../../models/Profile';
+import Card from '../../models/Card.js';
+import Lang from '../../models/Lang.js';
+import Project from '../../models/Project.js';
+import StudentProject from '../../models/StudentProject.js';
+import Profile from '../../models/Profile.js';
 
 class CardRouter extends Router {
 

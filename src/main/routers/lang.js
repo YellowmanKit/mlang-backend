@@ -5,7 +5,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 import to from '../../to';
 
-import Lang from '../../models/Lang';
+import Lang from '../../models/Lang.js';
 
 class LangRouter extends Router {
 

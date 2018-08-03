@@ -6,15 +6,15 @@ import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
 
-import AppRouter from './routers/app';
-import UserRouter from './routers/user';
-import ProfileRouter from './routers/profile';
-import CourseRouter from './routers/course';
-import ProjectRouter from './routers/project';
-import StudentProjectRouter from './routers/studentProject';
+import AppRouter from './routers/app.js';
+import UserRouter from './routers/user.js';
+import ProfileRouter from './routers/profile.js';
+import CourseRouter from './routers/course.js';
+import ProjectRouter from './routers/project.js';
+import StudentProjectRouter from './routers/studentProject.js';
 
-import CardRouter from './routers/card';
-import LangRouter from './routers/lang';
+import CardRouter from './routers/card.js';
+import LangRouter from './routers/lang.js';
 
 const temp = 'C:/data/temp/';
 const storage = 'C:/data/storage/';
