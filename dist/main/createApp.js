@@ -34,6 +34,10 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 var _app = require('./routers/app.js');
 
 var _app2 = _interopRequireDefault(_app);
@@ -70,8 +74,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var temp = 'C:/data/temp/';
-var storage = 'C:/data/storage/';
+//const temp = 'C:/data/temp/';
+//const storage = 'C:/data/storage/';
 
 var CreateApp = function () {
   function CreateApp(appName, port) {
@@ -83,6 +87,9 @@ var CreateApp = function () {
   _createClass(CreateApp, [{
     key: 'createApp',
     value: function createApp(appName, port) {
+      var temp = _path2.default.join(__dirname, '../../data/temp/');
+      var storage = _path2.default.join(__dirname, '../../data/storage/');
+
       var storageConfig = _multer2.default.diskStorage({
         destination: function destination(req, file, cb) {
           cb(null, temp);
@@ -97,8 +104,8 @@ var CreateApp = function () {
 
       var app = (0, _express2.default)();
       var httpsOptions = {
-        cert: fs.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.crt')),
-        key: fs.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.key'))
+        cert: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.crt')),
+        key: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.key'))
       };
 
       app.server = _https2.default.createServer(httpsOptions, app);

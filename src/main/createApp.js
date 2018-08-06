@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 import AppRouter from './routers/app.js';
 import UserRouter from './routers/user.js';
@@ -16,8 +17,8 @@ import StudentProjectRouter from './routers/studentProject.js';
 import CardRouter from './routers/card.js';
 import LangRouter from './routers/lang.js';
 
-const temp = 'C:/data/temp/';
-const storage = 'C:/data/storage/';
+//const temp = 'C:/data/temp/';
+//const storage = 'C:/data/storage/';
 
 class CreateApp {
 
@@ -26,6 +27,9 @@ class CreateApp {
   }
 
   createApp(appName,port){
+    const temp = path.join(__dirname, '../../data/temp/');
+    const storage = path.join(__dirname, '../../data/storage/');
+
     var storageConfig = multer.diskStorage({
       destination: function (req, file, cb) {
         cb(null, temp);
