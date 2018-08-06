@@ -1,4 +1,4 @@
-import http from 'http';
+import https from 'https';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -39,8 +39,12 @@ class CreateApp {
     var upload = multer({ storage: storageConfig })
 
     const app = express();
+    const httpsOptions = {
+      cert: fs.readFileSync(path.join(__dirname, '../ssl', 'server.crt' )),
+      key: fs.readFileSync(path.join(__dirname, '../ssl', 'server.key' ))
+    }
 
-    app.server = http.createServer(app);
+    app.server = https.createServer(httpsOptions, app);
     app.use(morgan('dev'));
     app.use(cors({exposeHeaders: "*"}));
     app.use(bodyParser.json({limit: '50mb'}));

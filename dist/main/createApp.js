@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _http = require('http');
+var _https = require('https');
 
-var _http2 = _interopRequireDefault(_http);
+var _https2 = _interopRequireDefault(_https);
 
 var _express = require('express');
 
@@ -96,8 +96,12 @@ var CreateApp = function () {
       var upload = (0, _multer2.default)({ storage: storageConfig });
 
       var app = (0, _express2.default)();
+      var httpsOptions = {
+        cert: fs.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.crt')),
+        key: fs.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.key'))
+      };
 
-      app.server = _http2.default.createServer(app);
+      app.server = _https2.default.createServer(httpsOptions, app);
       app.use((0, _morgan2.default)('dev'));
       app.use((0, _cors2.default)({ exposeHeaders: "*" }));
       app.use(_bodyParser2.default.json({ limit: '50mb' }));
