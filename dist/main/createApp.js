@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+//import http from 'http';
+
 
 var _https = require('https');
 
@@ -109,6 +111,8 @@ var CreateApp = function () {
       };
 
       app.server = _https2.default.createServer(httpsOptions, app);
+      //app.server = http.createServer(app);
+
       app.use((0, _morgan2.default)('dev'));
       app.use((0, _cors2.default)({ exposeHeaders: "*" }));
       app.use(_bodyParser2.default.json({ limit: '50mb' }));

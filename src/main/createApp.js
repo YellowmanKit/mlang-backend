@@ -1,4 +1,5 @@
 import https from 'https';
+//import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -49,6 +50,8 @@ class CreateApp {
     }
 
     app.server = https.createServer(httpsOptions, app);
+    //app.server = http.createServer(app);
+
     app.use(morgan('dev'));
     app.use(cors({exposeHeaders: "*"}));
     app.use(bodyParser.json({limit: '50mb'}));

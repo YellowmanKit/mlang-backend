@@ -1,4 +1,6 @@
 'use strict';
+require("babel-core/register");
+require("babel-polyfill");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
