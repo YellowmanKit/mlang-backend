@@ -16,6 +16,10 @@ var courseSchema = mongoose.Schema({
   title: {
     type: String
   },
+  createdAt: {
+    type: Date,
+    default: new Date()
+  },
   endDate: {
     type: Date,
     default: new Date()

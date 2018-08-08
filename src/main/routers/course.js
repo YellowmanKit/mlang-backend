@@ -32,6 +32,22 @@ class CourseRouter extends Router {
       })
     });
 
+    app.post('/course/edit', async(req, res, next)=>{
+      const course = req.body.data;
+      //console.log(data)
+      let err, editedCourse;
+      [err, editedCourse] = await to(Course.findOneAndUpdate({_id: course._id},{ $set: {
+        icon: course.icon,
+        title: course.title,
+        endDate: course.endDate
+      }}, { new: true }));
+
+      return res.json({
+        result: err? 'failed': 'success',
+        editedCourse: editedCourse
+      })
+    });
+
     app.post('/course/add', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)

@@ -17,6 +17,10 @@ var projectSchema = mongoose.Schema({
     type: String,
     default: ''
   },
+  createdAt: {
+    type: Date,
+    default: new Date()
+  },
   endDate: {
     type: Date,
     default: new Date()

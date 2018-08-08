@@ -36,6 +36,23 @@ class ProjectRouter extends Router {
       })
     });
 
+    app.post('/project/edit', async(req, res, next)=>{
+      const project = req.body.data;
+      //console.log(data)
+      let err, editedProject;
+      [err, editedProject] = await to(Project.findOneAndUpdate({_id: project._id},{ $set: {
+        icon: project.icon,
+        title: project.title,
+        description: project.description,
+        endDate: project.endDate
+      }}, { new: true }));
+
+      return res.json({
+        result: err? 'failed': 'success',
+        editedProject: editedProject
+      })
+    });
+
     app.post('/project/add', async(req, res)=>{
       const project = req.body.data;
       console.log(project);

@@ -1,5 +1,5 @@
 import https from 'https';
-//import http from 'http';
+import http from 'http';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -23,13 +23,13 @@ import LangRouter from './routers/lang.js';
 
 class CreateApp {
 
-  constructor(appName,port){
-    this.createApp(appName,port);
+  constructor(appName, port, useHttps, useUbuntu){
+    this.createApp(appName, port, useHttps, useUbuntu);
   }
 
-  createApp(appName,port){
-    const temp = path.join(__dirname, '../../data/temp/');
-    const storage = path.join(__dirname, '../../data/storage/');
+  createApp(appName, port, useHttps, useUbuntu){
+    const temp = useUbuntu? path.join(__dirname, '../../data/temp/'): 'C:/data/temp/';
+    const storage = useUbuntu? path.join(__dirname, '../../data/storage/'): 'C:/data/storage/';
 
     var storageConfig = multer.diskStorage({
       destination: function (req, file, cb) {
@@ -44,13 +44,16 @@ class CreateApp {
     var upload = multer({ storage: storageConfig })
 
     const app = express();
-    const httpsOptions = {
-      cert: fs.readFileSync(path.join(__dirname, '../ssl', 'server.crt' )),
-      key: fs.readFileSync(path.join(__dirname, '../ssl', 'server.key' ))
+    if(useHttps){
+      const httpsOptions = {
+        cert: fs.readFileSync(path.join(__dirname, '../ssl', 'server.crt' )),
+        key: fs.readFileSync(path.join(__dirname, '../ssl', 'server.key' )),
+        ca: fs.readFileSync(path.join(__dirname, '../ssl', 'server-ca.crt' ))
+      }
+      app.server = https.createServer(httpsOptions, app);
+    }else{
+      app.server = http.createServer(app);
     }
-
-    app.server = https.createServer(httpsOptions, app);
-    //app.server = http.createServer(app);
 
     app.use(morgan('dev'));
     app.use(cors({exposeHeaders: "*"}));
