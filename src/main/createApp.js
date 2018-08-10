@@ -23,11 +23,11 @@ import LangRouter from './routers/lang.js';
 
 class CreateApp {
 
-  constructor(appName, port, useHttps, useUbuntu){
-    this.createApp(appName, port, useHttps, useUbuntu);
+  constructor(appName, port, useHttps, useUbuntu, devMode){
+    this.createApp(appName, port, useHttps, useUbuntu, devMode);
   }
 
-  createApp(appName, port, useHttps, useUbuntu){
+  createApp(appName, port, useHttps, useUbuntu, devMode){
     const temp = useUbuntu? path.join(__dirname, '../../data/temp/'): 'C:/data/temp/';
     const storage = useUbuntu? path.join(__dirname, '../../data/storage/'): 'C:/data/storage/';
 
@@ -41,14 +41,14 @@ class CreateApp {
       }
     });
 
-    var upload = multer({ storage: storageConfig })
+    var upload = multer({ storage: storageConfig });
 
     const app = express();
     if(useHttps){
       const httpsOptions = {
-        cert: fs.readFileSync(path.join(__dirname, '../ssl', 'server.crt' )),
-        key: fs.readFileSync(path.join(__dirname, '../ssl', 'server.key' )),
-        ca: fs.readFileSync(path.join(__dirname, '../ssl', 'server-ca.crt' ))
+        cert: fs.readFileSync(path.join(__dirname, '../ssl', devMode? 'dev-server.crt':'server.crt' )),
+        key: fs.readFileSync(path.join(__dirname, '../ssl',  devMode? 'dev-server.key':'server.key' )),
+        ca: fs.readFileSync(path.join(__dirname, '../ssl', devMode? 'dev-server-ca.crt':'server-ca.crt' ))
       }
       app.server = https.createServer(httpsOptions, app);
     }else{
