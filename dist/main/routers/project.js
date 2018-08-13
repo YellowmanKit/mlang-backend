@@ -132,57 +132,37 @@ var ProjectRouter = function (_Router) {
         };
       }());
 
-      app.post('/project/add', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-          var project, err, _newProject, _updatedCourse, _ref5, _ref6, _ref7, _ref8;
+      app.post('/project/edit', function () {
+        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
+          var project, err, editedProject, _ref5, _ref6;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
                   project = req.body.data;
+                  //console.log(data)
 
-                  console.log(project);
-                  err = void 0, _newProject = void 0, _updatedCourse = void 0;
-                  _context2.next = 5;
-                  return (0, _to2.default)(_Project2.default.create(project));
+                  err = void 0, editedProject = void 0;
+                  _context2.next = 4;
+                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: project._id }, { $set: {
+                      icon: project.icon,
+                      title: project.title,
+                      description: project.description,
+                      endDate: project.endDate
+                    } }, { new: true }));
 
-                case 5:
+                case 4:
                   _ref5 = _context2.sent;
                   _ref6 = _slicedToArray(_ref5, 2);
                   err = _ref6[0];
-                  _newProject = _ref6[1];
-
-                  if (!err) {
-                    _context2.next = 11;
-                    break;
-                  }
-
-                  return _context2.abrupt('return', res.json({ result: 'failed' }));
-
-                case 11:
-                  _context2.next = 13;
-                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: project.course }, { $push: {
-                      projects: _newProject._id
-                    } }, { new: true }));
-
-                case 13:
-                  _ref7 = _context2.sent;
-                  _ref8 = _slicedToArray(_ref7, 2);
-                  err = _ref8[0];
-                  _updatedCourse = _ref8[1];
-
-                  if (err || _updatedCourse === null) {
-                    cb('failed');
-                  };
-
+                  editedProject = _ref6[1];
                   return _context2.abrupt('return', res.json({
-                    result: 'success',
-                    newProject: _newProject,
-                    updatedCourse: _updatedCourse
+                    result: err ? 'failed' : 'success',
+                    editedProject: editedProject
                   }));
 
-                case 20:
+                case 9:
                 case 'end':
                   return _context2.stop();
               }
@@ -190,8 +170,71 @@ var ProjectRouter = function (_Router) {
           }, _callee2, _this2);
         }));
 
-        return function (_x3, _x4) {
+        return function (_x3, _x4, _x5) {
           return _ref4.apply(this, arguments);
+        };
+      }());
+
+      app.post('/project/add', function () {
+        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
+          var project, err, _newProject, _updatedCourse, _ref8, _ref9, _ref10, _ref11;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  project = req.body.data;
+
+                  console.log(project);
+                  err = void 0, _newProject = void 0, _updatedCourse = void 0;
+                  _context3.next = 5;
+                  return (0, _to2.default)(_Project2.default.create(project));
+
+                case 5:
+                  _ref8 = _context3.sent;
+                  _ref9 = _slicedToArray(_ref8, 2);
+                  err = _ref9[0];
+                  _newProject = _ref9[1];
+
+                  if (!err) {
+                    _context3.next = 11;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: 'failed' }));
+
+                case 11:
+                  _context3.next = 13;
+                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: project.course }, { $push: {
+                      projects: _newProject._id
+                    } }, { new: true }));
+
+                case 13:
+                  _ref10 = _context3.sent;
+                  _ref11 = _slicedToArray(_ref10, 2);
+                  err = _ref11[0];
+                  _updatedCourse = _ref11[1];
+
+                  if (err || _updatedCourse === null) {
+                    cb('failed');
+                  };
+
+                  return _context3.abrupt('return', res.json({
+                    result: 'success',
+                    newProject: _newProject,
+                    updatedCourse: _updatedCourse
+                  }));
+
+                case 20:
+                case 'end':
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, _this2);
+        }));
+
+        return function (_x6, _x7) {
+          return _ref7.apply(this, arguments);
         };
       }());
     }

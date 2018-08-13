@@ -170,53 +170,53 @@ module.exports.acquireNewAccount = function () {
             info = _ref8[1];
 
             if (!err) {
-              _context2.next = 21;
+              _context2.next = 22;
               break;
             }
 
-            cb('failed');console.log('err: mail cannot be sent');return _context2.abrupt('return');
+            cb('failed');console.log(err);console.log('err: mail cannot be sent');return _context2.abrupt('return');
 
-          case 21:
-            _context2.next = 23;
+          case 22:
+            _context2.next = 24;
             return (0, _to2.default)(User.create(newUser));
 
-          case 23:
+          case 24:
             _ref9 = _context2.sent;
             _ref10 = _slicedToArray(_ref9, 2);
             err = _ref10[0];
             user = _ref10[1];
 
             if (!err) {
-              _context2.next = 31;
+              _context2.next = 32;
               break;
             }
 
             cb('failed');console.log(err);return _context2.abrupt('return');
 
-          case 31:
+          case 32:
             newProfile = {
               belongTo: user._id
             };
-            _context2.next = 34;
+            _context2.next = 35;
             return (0, _to2.default)(_Profile2.default.create(newProfile));
 
-          case 34:
+          case 35:
             _ref11 = _context2.sent;
             _ref12 = _slicedToArray(_ref11, 2);
             err = _ref12[0];
             profile = _ref12[1];
 
             if (!err) {
-              _context2.next = 42;
+              _context2.next = 43;
               break;
             }
 
             cb('failed');console.log(err);return _context2.abrupt('return');
 
-          case 42:
+          case 43:
             cb('success');
 
-          case 43:
+          case 44:
           case 'end':
             return _context2.stop();
         }

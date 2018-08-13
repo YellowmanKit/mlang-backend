@@ -32,7 +32,40 @@ class CardRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    app.post('/card/update', async(req, res)=>{
+    app.post('/card/edit', async(req, res)=>{
+      const cardToUpdate = req.body.data.card;
+      var langs = req.body.data.langs;
+      //console.log(cardToUpdate);
+      //console.log(langs);
+      let err, lang, card;
+      var langsId = [];
+      for(var i=0;i<langs.length;i++){
+        [err, lang] = await(to(Lang.findOneAndUpdate({_id: new ObjectId(langs[i]._id)},{$set:{
+          key: langs[i].key,
+          text: langs[i].text,
+          audio: langs[i].audio,
+          card: cardToUpdate._id
+        }}, {new: true, upsert: true})));
+        if(err || lang === null){ console.log('failed to update lang'); return res.json({ result: 'failed to update lang'}) }
+        //console.log(lang);
+        langs[i]._id = lang._id;
+        langsId.splice(0,0,langs[i]._id);
+      }
+
+      [err, card] = await(to(Card.findOneAndUpdate({_id: cardToUpdate._id},{$set:{
+        langs: langsId,
+        icon: cardToUpdate.icon
+      }}, {new: true})));
+      if(err || card === null){ console.log('failed to update card'); return res.json({ result: 'failed to update card'}) }
+
+      return res.json({
+        result: 'success',
+        updatedLangs: langs,
+        updatedCard: card
+      })
+    });
+
+    app.post('/card/grade', async(req, res)=>{
       const list = req.body.data.cards;
       console.log(list);
       let err, card;

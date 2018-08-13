@@ -5,12 +5,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-//import http from 'http';
-
 
 var _https = require('https');
 
 var _https2 = _interopRequireDefault(_https);
+
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
 
 var _express = require('express');
 
@@ -80,17 +82,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 //const storage = 'C:/data/storage/';
 
 var CreateApp = function () {
-  function CreateApp(appName, port) {
+  function CreateApp(appName, port, useHttps, useUbuntu, devMode) {
     _classCallCheck(this, CreateApp);
 
-    this.createApp(appName, port);
+    this.createApp(appName, port, useHttps, useUbuntu, devMode);
   }
 
   _createClass(CreateApp, [{
     key: 'createApp',
-    value: function createApp(appName, port) {
-      var temp = _path2.default.join(__dirname, '../../data/temp/');
-      var storage = _path2.default.join(__dirname, '../../data/storage/');
+    value: function createApp(appName, port, useHttps, useUbuntu, devMode) {
+      var temp = useUbuntu ? _path2.default.join(__dirname, '../../../data/temp/') : 'C:/data/temp/';
+      var storage = useUbuntu ? _path2.default.join(__dirname, '../../../data/storage/') : 'C:/data/storage/';
 
       var storageConfig = _multer2.default.diskStorage({
         destination: function destination(req, file, cb) {
@@ -105,13 +107,16 @@ var CreateApp = function () {
       var upload = (0, _multer2.default)({ storage: storageConfig });
 
       var app = (0, _express2.default)();
-      var httpsOptions = {
-        cert: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.crt')),
-        key: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', 'server.key'))
-      };
-
-      app.server = _https2.default.createServer(httpsOptions, app);
-      //app.server = http.createServer(app);
+      if (useHttps) {
+        var httpsOptions = {
+          cert: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server.crt' : 'server.crt')),
+          key: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server.key' : 'server.key')),
+          ca: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server-ca.crt' : 'server-ca.crt'))
+        };
+        app.server = _https2.default.createServer(httpsOptions, app);
+      } else {
+        app.server = _http2.default.createServer(app);
+      }
 
       app.use((0, _morgan2.default)('dev'));
       app.use((0, _cors2.default)({ exposeHeaders: "*" }));

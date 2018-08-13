@@ -23,6 +23,10 @@ var projectSchema = _mongoose2.default.Schema({
     type: String,
     default: ''
   },
+  createdAt: {
+    type: Date,
+    default: new Date()
+  },
   endDate: {
     type: Date,
     default: new Date()

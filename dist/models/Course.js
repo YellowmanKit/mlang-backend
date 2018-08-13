@@ -34,6 +34,10 @@ var courseSchema = _mongoose2.default.Schema({
   title: {
     type: String
   },
+  createdAt: {
+    type: Date,
+    default: new Date()
+  },
   endDate: {
     type: Date,
     default: new Date()

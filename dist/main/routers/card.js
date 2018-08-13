@@ -91,62 +91,88 @@ var CardRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/card/update', function () {
+      app.post('/card/edit', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, card, _updatedCards, i, _ref2, _ref3;
+          var cardToUpdate, langs, err, lang, card, langsId, i, _ref2, _ref3, _ref4, _ref5;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  list = req.body.data.cards;
+                  cardToUpdate = req.body.data.card;
+                  langs = req.body.data.langs;
+                  //console.log(cardToUpdate);
+                  //console.log(langs);
 
-                  console.log(list);
-                  err = void 0, card = void 0;
-                  _updatedCards = [];
+                  err = void 0, lang = void 0, card = void 0;
+                  langsId = [];
                   i = 0;
 
                 case 5:
-                  if (!(i < list.length)) {
-                    _context.next = 19;
+                  if (!(i < langs.length)) {
+                    _context.next = 20;
                     break;
                   }
 
                   _context.next = 8;
-                  return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: list[i] }, { $set: {
-                      grade: list[i].grade,
-                      comment: list[i].comment,
-                      audioComment: list[i].audioComment
-                    } }, { new: true }));
+                  return (0, _to2.default)(_Lang2.default.findOneAndUpdate({ _id: new ObjectId(langs[i]._id) }, { $set: {
+                      key: langs[i].key,
+                      text: langs[i].text,
+                      audio: langs[i].audio,
+                      card: cardToUpdate._id
+                    } }, { new: true, upsert: true }));
 
                 case 8:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  card = _ref3[1];
+                  lang = _ref3[1];
 
-                  if (!(err || card === null)) {
+                  if (!(err || lang === null)) {
                     _context.next = 15;
                     break;
                   }
 
-                  console.log('no such card!');return _context.abrupt('return', res.json({ result: 'failed' }));
+                  console.log('failed to update lang');return _context.abrupt('return', res.json({ result: 'failed to update lang' }));
 
                 case 15:
-                  _updatedCards.splice(0, 0, card);
+                  //console.log(lang);
+                  langs[i]._id = lang._id;
+                  langsId.splice(0, 0, langs[i]._id);
 
-                case 16:
+                case 17:
                   i++;
                   _context.next = 5;
                   break;
 
-                case 19:
+                case 20:
+                  _context.next = 22;
+                  return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: cardToUpdate._id }, { $set: {
+                      langs: langsId,
+                      icon: cardToUpdate.icon
+                    } }, { new: true }));
+
+                case 22:
+                  _ref4 = _context.sent;
+                  _ref5 = _slicedToArray(_ref4, 2);
+                  err = _ref5[0];
+                  card = _ref5[1];
+
+                  if (!(err || card === null)) {
+                    _context.next = 29;
+                    break;
+                  }
+
+                  console.log('failed to update card');return _context.abrupt('return', res.json({ result: 'failed to update card' }));
+
+                case 29:
                   return _context.abrupt('return', res.json({
                     result: 'success',
-                    updatedCards: _updatedCards
+                    updatedLangs: langs,
+                    updatedCard: card
                   }));
 
-                case 20:
+                case 30:
                 case 'end':
                   return _context.stop();
               }
@@ -159,13 +185,81 @@ var CardRouter = function (_Router) {
         };
       }());
 
-      app.post('/card/getMultiple', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-          var list, err, card, langs, profile, _cards, _studentProfiles, i, _ref5, _ref6, _ref7, _ref8, _langs, j, _ref9, _ref10;
+      app.post('/card/grade', function () {
+        var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, card, _updatedCards, i, _ref7, _ref8;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
+                case 0:
+                  list = req.body.data.cards;
+
+                  console.log(list);
+                  err = void 0, card = void 0;
+                  _updatedCards = [];
+                  i = 0;
+
+                case 5:
+                  if (!(i < list.length)) {
+                    _context2.next = 19;
+                    break;
+                  }
+
+                  _context2.next = 8;
+                  return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: list[i] }, { $set: {
+                      grade: list[i].grade,
+                      comment: list[i].comment,
+                      audioComment: list[i].audioComment
+                    } }, { new: true }));
+
+                case 8:
+                  _ref7 = _context2.sent;
+                  _ref8 = _slicedToArray(_ref7, 2);
+                  err = _ref8[0];
+                  card = _ref8[1];
+
+                  if (!(err || card === null)) {
+                    _context2.next = 15;
+                    break;
+                  }
+
+                  console.log('no such card!');return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 15:
+                  _updatedCards.splice(0, 0, card);
+
+                case 16:
+                  i++;
+                  _context2.next = 5;
+                  break;
+
+                case 19:
+                  return _context2.abrupt('return', res.json({
+                    result: 'success',
+                    updatedCards: _updatedCards
+                  }));
+
+                case 20:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, _this2);
+        }));
+
+        return function (_x3, _x4) {
+          return _ref6.apply(this, arguments);
+        };
+      }());
+
+      app.post('/card/getMultiple', function () {
+        var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
+          var list, err, card, langs, profile, _cards, _studentProfiles, i, _ref10, _ref11, _ref12, _ref13, _langs, j, _ref14, _ref15;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
                   list = req.body.data.cards;
                   //console.log(list);
@@ -177,51 +271,51 @@ var CardRouter = function (_Router) {
 
                 case 5:
                   if (!(i < list.length)) {
-                    _context2.next = 28;
+                    _context3.next = 28;
                     break;
                   }
 
-                  _context2.next = 8;
+                  _context3.next = 8;
                   return (0, _to2.default)(_Card2.default.findById(list[i]));
 
                 case 8:
-                  _ref5 = _context2.sent;
-                  _ref6 = _slicedToArray(_ref5, 2);
-                  err = _ref6[0];
-                  card = _ref6[1];
+                  _ref10 = _context3.sent;
+                  _ref11 = _slicedToArray(_ref10, 2);
+                  err = _ref11[0];
+                  card = _ref11[1];
 
                   if (!(err || card === null)) {
-                    _context2.next = 15;
+                    _context3.next = 15;
                     break;
                   }
 
-                  console.log('no such card!');return _context2.abrupt('return', res.json({ result: 'failed' }));
+                  console.log('no such card!');return _context3.abrupt('return', res.json({ result: 'failed' }));
 
                 case 15:
                   _cards.splice(0, 0, card);
 
-                  _context2.next = 18;
+                  _context3.next = 18;
                   return (0, _to2.default)(_Profile2.default.findOne({ belongTo: card.author }));
 
                 case 18:
-                  _ref7 = _context2.sent;
-                  _ref8 = _slicedToArray(_ref7, 2);
-                  err = _ref8[0];
-                  profile = _ref8[1];
+                  _ref12 = _context3.sent;
+                  _ref13 = _slicedToArray(_ref12, 2);
+                  err = _ref13[0];
+                  profile = _ref13[1];
 
                   if (!(err || profile === null)) {
-                    _context2.next = 24;
+                    _context3.next = 24;
                     break;
                   }
 
-                  return _context2.abrupt('return', res.json({ result: 'failed' }));
+                  return _context3.abrupt('return', res.json({ result: 'failed' }));
 
                 case 24:
                   _studentProfiles.splice(0, 0, profile);
 
                 case 25:
                   i++;
-                  _context2.next = 5;
+                  _context3.next = 5;
                   break;
 
                 case 28:
@@ -230,36 +324,36 @@ var CardRouter = function (_Router) {
 
                 case 30:
                   if (!(j < _cards.length)) {
-                    _context2.next = 44;
+                    _context3.next = 44;
                     break;
                   }
 
-                  _context2.next = 33;
+                  _context3.next = 33;
                   return (0, _to2.default)(_Lang2.default.find({ card: list[j] }));
 
                 case 33:
-                  _ref9 = _context2.sent;
-                  _ref10 = _slicedToArray(_ref9, 2);
-                  err = _ref10[0];
-                  langs = _ref10[1];
+                  _ref14 = _context3.sent;
+                  _ref15 = _slicedToArray(_ref14, 2);
+                  err = _ref15[0];
+                  langs = _ref15[1];
 
                   if (!(err || langs === null || langs.length === 0)) {
-                    _context2.next = 40;
+                    _context3.next = 40;
                     break;
                   }
 
-                  console.log('card hv no lang!');return _context2.abrupt('return', res.json({ result: 'failed' }));
+                  console.log('card hv no lang!');return _context3.abrupt('return', res.json({ result: 'failed' }));
 
                 case 40:
                   _langs = [].concat(_toConsumableArray(_langs), _toConsumableArray(langs));
 
                 case 41:
                   j++;
-                  _context2.next = 30;
+                  _context3.next = 30;
                   break;
 
                 case 44:
-                  return _context2.abrupt('return', res.json({
+                  return _context3.abrupt('return', res.json({
                     result: 'success',
                     cards: _cards,
                     langs: _langs,
@@ -268,24 +362,24 @@ var CardRouter = function (_Router) {
 
                 case 45:
                 case 'end':
-                  return _context2.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee2, _this2);
+          }, _callee3, _this2);
         }));
 
-        return function (_x3, _x4) {
-          return _ref4.apply(this, arguments);
+        return function (_x5, _x6) {
+          return _ref9.apply(this, arguments);
         };
       }());
 
       app.post('/card/add', function () {
-        var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var data, card, langs, err, _studentProject, _project, createdCard, createdLang, _ref12, _ref13, createdLangs, createdLangsId, i, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19;
+        var _ref16 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+          var data, card, langs, err, _studentProject, _project, createdCard, createdLang, _ref17, _ref18, createdLangs, createdLangsId, i, _ref19, _ref20, _ref21, _ref22, _ref23, _ref24;
 
-          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
-              switch (_context3.prev = _context3.next) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
                   data = req.body.data;
                   card = data.card;
@@ -304,21 +398,21 @@ var CardRouter = function (_Router) {
                     console.log(_project)
                   }*/
 
-                  _context3.next = 6;
+                  _context4.next = 6;
                   return (0, _to2.default)(_Card2.default.create(card));
 
                 case 6:
-                  _ref12 = _context3.sent;
-                  _ref13 = _slicedToArray(_ref12, 2);
-                  err = _ref13[0];
-                  createdCard = _ref13[1];
+                  _ref17 = _context4.sent;
+                  _ref18 = _slicedToArray(_ref17, 2);
+                  err = _ref18[0];
+                  createdCard = _ref18[1];
 
                   if (!(err || createdCard === null)) {
-                    _context3.next = 12;
+                    _context4.next = 12;
                     break;
                   }
 
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
+                  return _context4.abrupt('return', res.json({ result: "failed" }));
 
                 case 12:
                   createdLangs = [];
@@ -327,26 +421,26 @@ var CardRouter = function (_Router) {
 
                 case 15:
                   if (!(i < langs.length)) {
-                    _context3.next = 30;
+                    _context4.next = 30;
                     break;
                   }
 
                   langs[i].card = createdCard._id;
-                  _context3.next = 19;
+                  _context4.next = 19;
                   return (0, _to2.default)(_Lang2.default.create(langs[i]));
 
                 case 19:
-                  _ref14 = _context3.sent;
-                  _ref15 = _slicedToArray(_ref14, 2);
-                  err = _ref15[0];
-                  createdLang = _ref15[1];
+                  _ref19 = _context4.sent;
+                  _ref20 = _slicedToArray(_ref19, 2);
+                  err = _ref20[0];
+                  createdLang = _ref20[1];
 
                   if (!(err || createdLang === null)) {
-                    _context3.next = 25;
+                    _context4.next = 25;
                     break;
                   }
 
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
+                  return _context4.abrupt('return', res.json({ result: "failed" }));
 
                 case 25:
                   createdLangs.splice(0, 0, createdLang);
@@ -354,46 +448,46 @@ var CardRouter = function (_Router) {
 
                 case 27:
                   i++;
-                  _context3.next = 15;
+                  _context4.next = 15;
                   break;
 
                 case 30:
-                  _context3.next = 32;
+                  _context4.next = 32;
                   return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: createdCard._id }, { $set: {
                       langs: createdLangsId
                     } }, { new: true }));
 
                 case 32:
-                  _ref16 = _context3.sent;
-                  _ref17 = _slicedToArray(_ref16, 2);
-                  err = _ref17[0];
-                  createdCard = _ref17[1];
+                  _ref21 = _context4.sent;
+                  _ref22 = _slicedToArray(_ref21, 2);
+                  err = _ref22[0];
+                  createdCard = _ref22[1];
 
                   if (!(err || createdCard === null)) {
-                    _context3.next = 38;
+                    _context4.next = 38;
                     break;
                   }
 
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
+                  return _context4.abrupt('return', res.json({ result: "failed" }));
 
                 case 38:
-                  _context3.next = 40;
+                  _context4.next = 40;
                   return (0, _to2.default)(_StudentProject2.default.findOneAndUpdate({ _id: card.studentProject._id }, { $push: {
                       cards: createdCard._id
                     } }, { new: true }));
 
                 case 40:
-                  _ref18 = _context3.sent;
-                  _ref19 = _slicedToArray(_ref18, 2);
-                  err = _ref19[0];
-                  _studentProject = _ref19[1];
+                  _ref23 = _context4.sent;
+                  _ref24 = _slicedToArray(_ref23, 2);
+                  err = _ref24[0];
+                  _studentProject = _ref24[1];
 
                   if (!(err || createdCard === null)) {
-                    _context3.next = 46;
+                    _context4.next = 46;
                     break;
                   }
 
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
+                  return _context4.abrupt('return', res.json({ result: "failed" }));
 
                 case 46:
 
@@ -406,14 +500,14 @@ var CardRouter = function (_Router) {
 
                 case 47:
                 case 'end':
-                  return _context3.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee3, _this2);
+          }, _callee4, _this2);
         }));
 
-        return function (_x5, _x6, _x7) {
-          return _ref11.apply(this, arguments);
+        return function (_x7, _x8, _x9) {
+          return _ref16.apply(this, arguments);
         };
       }());
     }
