@@ -66,45 +66,68 @@ class CardRouter extends Router {
     });
 
     app.post('/card/grade', async(req, res)=>{
-      const list = req.body.data.cards;
-      console.log(list);
-      let err, card;
+      const data = req.body.data;
+      const cards = data.cards;
+      //console.log(cards);
+      let err, card, featuredCount, profile, project, studentProject;
       var _updatedCards = [];
-      for(var i=0;i<list.length;i++){
-        [err, card] = await to(Card.findOneAndUpdate({_id: list[i]}, { $set: {
-          grade: list[i].grade,
-          comment: list[i].comment,
-          audioComment: list[i].audioComment
+      for(var i=0;i<cards.length;i++){
+        [err, card] = await to(Card.findOneAndUpdate({_id: cards[i]}, { $set: {
+          grade: cards[i].grade,
+          comment: cards[i].comment,
+          audioComment: cards[i].audioComment
         }}, {new: true}));
         if(err || card === null){ console.log('no such card!'); return res.json({ result: 'failed' })}
         _updatedCards.splice(0,0,card);
       }
 
+      if(cards.length > 0){
+        [err, featuredCount] = await to(Card.count({author: cards[0].author, grade: 'featured'}));
+        if(err || featuredCount === null){ console.log('err on getting featuredCount!'); }
+
+        [err, profile] = await to(Profile.findOneAndUpdate({belongTo: cards[0].author}, { $set:{
+          featuredCount: featuredCount
+        }}, {new: true}))
+        if(err || profile === null){ console.log('err on updating featuredCount!'); }
+      }
+
+      [err, project] = await to(Project.findOneAndUpdate({_id: data.projectId}, {$set: {
+        teacherAlert: false
+      }}, {new: true}))
+      if(err || project === null){ console.log('err on updating teacherAlert!'); }
+
+      [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: data.studentProjectId}, {$set: {
+        studentAlert: true
+      }}, {new: true}))
+      if(err || studentProject === null){ console.log('err on updating teacherAlert!'); }
+
       return res.json({
         result: 'success',
-        updatedCards: _updatedCards
+        updatedCards: _updatedCards,
+        updatedProfile: profile,
+        updatedProject: project
       })
     });
 
     app.post('/card/getMultiple', async(req, res)=>{
-      const list = req.body.data.cards;
-      //console.log(list);
+      const cards = req.body.data.cards;
+      //console.log(cards);
       let err, card, langs, profile;
       var _cards = [];
-      var _studentProfiles = [];
-      for(var i=0;i<list.length;i++){
-        [err, card] = await to(Card.findById(list[i]));
+      var _profiles = [];
+      for(var i=0;i<cards.length;i++){
+        [err, card] = await to(Card.findById(cards[i]));
         if(err || card === null){ console.log('no such card!'); return res.json({ result: 'failed' })}
         _cards.splice(0,0,card);
 
         [err, profile] = await to(Profile.findOne({belongTo: card.author}));
         if(err || profile === null){ return res.json({ result: 'failed' })}
-        _studentProfiles.splice(0,0, profile);
+        _profiles.splice(0,0, profile);
       }
 
       var _langs = [];
       for(var j=0;j<_cards.length;j++){
-        [err, langs] = await to(Lang.find({card: list[j]}));
+        [err, langs] = await to(Lang.find({card: cards[j]}));
         if(err || langs === null || langs.length === 0){ console.log('card hv no lang!'); return res.json({ result: 'failed' })}
         _langs = [..._langs, ...langs]
       }
@@ -113,7 +136,7 @@ class CardRouter extends Router {
         result: 'success',
         cards: _cards,
         langs: _langs,
-        students: _studentProfiles
+        profiles: _profiles
       })
     });
 
@@ -122,20 +145,7 @@ class CardRouter extends Router {
       var card = data.card;
       var langs = data.langs;
 
-      let err, _studentProject, _project, createdCard, createdLang;
-
-      /*if(card.studentProject.project === undefined){
-        console.log('new student project')
-        [err, _studentProject] = await to(StudentProject.create({project: data.project, student: card.author}));
-        if(err || _studentProject === null){ return res.json({ result: "failed" });}
-        card.studentProject = _studentProject;
-
-        [err, _project] = await to(Project.findOneAndUpdate({_id: data.project._id}, { $push:{
-          studentProjects: _studentProject._id
-        }}, {new: true}));
-        if(err || _project === null){ return res.json({ result: "failed" });}
-        console.log(_project)
-      }*/
+      let err, project, studentProject, createdCard, createdLang, cardCount, profile;
 
       [err, createdCard] = await to(Card.create(card))
       if(err || createdCard === null){ return res.json({ result: "failed" });}
@@ -155,16 +165,29 @@ class CardRouter extends Router {
       }}, {new: true}))
       if(err || createdCard === null){ return res.json({ result: "failed" });}
 
-      [err, _studentProject] = await to(StudentProject.findOneAndUpdate({_id: card.studentProject._id}, { $push: {
+      [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: card.studentProject._id}, { $push: {
         cards: createdCard._id
       }}, {new: true}))
       if(err || createdCard === null){ return res.json({ result: "failed" });}
+
+      [err, project] = await to(Project.findOneAndUpdate({_id: studentProject.project}, {$set:{
+        teacherAlert: true
+      }}))
+      if(err || project === null){ console.log('Error when updating project alert!') }
+
+      [err, cardCount] = await to(Card.count({author: card.author}));
+      if(!err && cardCount){
+        [err, profile] = await to(Profile.findOneAndUpdate({belongTo: card.author}, { $set:{
+          cardCount: cardCount
+        }}, {new: true}))
+      }
 
       res.json({
         result: 'success',
         card: createdCard,
         langs: createdLangs,
-        updatedStudentProject: _studentProject
+        updatedStudentProject: studentProject,
+        updatedProfile: profile
       })
 
     })

@@ -9,6 +9,7 @@ import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
 import Course from '../../models/Course.js';
 import Project from '../../models/Project.js';
+import StudentProject from '../../models/StudentProject.js';
 
 class UserRouter extends Router {
 
@@ -59,7 +60,7 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, user, profile, course, project;
+      let err, user, profile, course, project, studentProject;
 
       [err, user] = await to(User.findOne({id, pw}));
       if(err || user === null){ return res.json({ result: "failed" });}
@@ -88,10 +89,14 @@ class UserRouter extends Router {
         joinedProjects = [...joinedProjects, ...course.projects];
       }
 
+      var studentProjects = [];
       for(var j=0;j<joinedProjects.length;j++){
         [err, project] = await to(Project.findById(joinedProjects[j]));
         if(err || project === null){ return res.json({ result: "failed" });}
         projects.push(project);
+
+        [err, studentProject] = await to(StudentProject.findOne({project: project._id, student: user._id}));
+        if(studentProject){ studentProjects.push(studentProject); }
       }
 
 
@@ -134,6 +139,8 @@ class UserRouter extends Router {
 
         teachingProjects: teachingProjects,
         joinedProjects: joinedProjects,
+
+        studentProjects: studentProjects,
 
         courses: courses,
         projects: projects

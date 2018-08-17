@@ -63,7 +63,10 @@ module.exports.acquireNewAccount = async (_email, cb)=>{
   const existUser = await User.findOne({email: _email});
   if(existUser !== null){ cb('failed'); return; }
 
-  const randomPassword = randomString.generate(6);
+  const randomPassword = randomString.generate({
+    length: 6,
+    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+  });
   var defaultId = _email.substring(0, _email.lastIndexOf("@"));
   const newUser = {
     id: defaultId,

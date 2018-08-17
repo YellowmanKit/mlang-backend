@@ -56,7 +56,7 @@ module.exports.addCourse = async (newCourse, cb)=>{
   for(var i=0;i<99;i++){
     newCode = randomString.generate({
       length: 5,
-      charset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+      charset: 'ABCDEFGHJKMNOPQRSTUVWXYZ1234567890'
     });
 
     [err,course] = await to(Course.findOne({code: newCode}));

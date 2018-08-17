@@ -10,6 +10,10 @@ var studentProjectSchema = mongoose.Schema({
     type: ObjectId,
     required: true
   },
+  studentAlert: {
+    type: Boolean,
+    default: false
+  },
   cards: [ObjectId]
 })
 
