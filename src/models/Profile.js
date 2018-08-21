@@ -6,6 +6,9 @@ var profileSchema = mongoose.Schema({
     type: ObjectId,
     required: true
   },
+  icon: {
+    type: String
+  },
   name: {
     type: String,
     default: ''

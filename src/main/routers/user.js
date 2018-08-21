@@ -27,6 +27,11 @@ class UserRouter extends Router {
     app.post('/user/update', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
+      let err, existedUser;
+      [err, existedUser] = await to(User.findOne({id: data.id, pw: data.pw}));
+      if(err){ console.log(err); return res.json({ result: 'failed'})}
+      if(existedUser && existedUser._id.toString() !== data._id){ console.log('user id/pw already used'); return res.json({ result: 'failed'}) }
+
       User.findOneAndUpdate({_id: data._id}, { $set:{
         type: data.type,
         id: data.id,

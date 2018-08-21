@@ -38,8 +38,9 @@ class ProfileRouter extends Router {
     app.post('/profile/update', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
-      Profile.findOneAndUpdate({_id: data._id}, { $set:{
-        name: data.name,
+      Profile.findOneAndUpdate({_id: data.profile._id}, { $set:{
+        name: data.newName? data.newName: data.profile.name,
+        icon: data.newIcon? data.newIcon: data.profile.icon
       }}, {new: true}, (err, _updatedProfile)=>{
         //console.log(_updatedUser)
         return res.json({
