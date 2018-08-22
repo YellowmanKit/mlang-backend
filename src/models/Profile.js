@@ -13,6 +13,10 @@ var profileSchema = mongoose.Schema({
     type: String,
     default: ''
   },
+  description: {
+    type: String,
+    default: ''
+  },
 
   joinedCourses: [ObjectId],
 

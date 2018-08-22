@@ -40,6 +40,7 @@ class ProfileRouter extends Router {
       //console.log(data)
       Profile.findOneAndUpdate({_id: data.profile._id}, { $set:{
         name: data.newName? data.newName: data.profile.name,
+        description: data.newDesc? data.newDesc: data.profile.description,
         icon: data.newIcon? data.newIcon: data.profile.icon
       }}, {new: true}, (err, _updatedProfile)=>{
         //console.log(_updatedUser)
