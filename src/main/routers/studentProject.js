@@ -24,6 +24,20 @@ class StudentProjectRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/studentProject/update', async(req, res)=>{
+      const data = req.body.data;
+      //console.log(data);
+      let err, studentProject;
+      [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: data._id}, {$set: data }, {new: true}));
+      if(err || studentProject === null){ return res.json({ result: 'failed' })}
+      //console.log(studentProject);
+
+      return res.json({
+        result: 'success',
+        updatedStudentProject: studentProject
+      })
+    });
+
     app.post('/studentProject/clearAlert', async(req, res)=>{
       const data = req.body.data;
       //console.log(data);
@@ -107,20 +121,6 @@ class StudentProjectRouter extends Router {
       })
 
     });
-
-    /*app.post('/studentProject/add', async(req, res, next)=>{
-      console.log('studentProject/add')
-      const data = req.body.data;
-      let err, _studentProject;
-      [err, _studentProject] = await to(StudentProject.create({project: data.project, student: data.student}));
-      if(err || _studentProject === null){ return res.json({ result: "failed" });}
-
-      return res.json({
-        result: 'success',
-        studentProject: _studentProject
-      })
-
-    })*/
 
   }
 

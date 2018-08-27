@@ -19,15 +19,28 @@ class CourseRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/course/leave', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+
+      Course.leaveCourse(data, (result, leavedCourse, updatedProfile)=>{
+        return res.json({
+          result: result,
+          leavedCourse: leavedCourse,
+          updatedProfile: updatedProfile
+        })
+      })
+    });
+
     app.post('/course/join', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
 
-      Course.joinCourse(data, (_result, _joinedCourse, _updatedProfile)=>{
+      Course.joinCourse(data, (result, joinedCourse, updatedProfile)=>{
         return res.json({
-          result: _result,
-          joinedCourse: _joinedCourse,
-          updatedProfile: _updatedProfile
+          result: result,
+          joinedCourse: joinedCourse,
+          updatedProfile: updatedProfile
         })
       })
     });

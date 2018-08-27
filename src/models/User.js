@@ -105,11 +105,18 @@ module.exports.acquireNewAccount = async (_email, cb)=>{
   cb('success');
 }
 
-//console.log(process.env.EMAIL_ID);
-//console.log(process.env.EMAIL_PW);
-//console.log(process.env.HOST);
+//console.log(process.env.GMAIL_ID);
+//console.log(process.env.GMAIL_PW);
 
-const transporter = nodemailer.createTransport({
+var transporter = nodemailer.createTransport({
+ service: 'gmail',
+ auth: {
+     user: process.env.GMAIL_ID,
+     pass: process.env.GMAIL_PW
+    }
+});
+
+/*const transporter = nodemailer.createTransport({
     host: process.env.HOST,
     port: 465,
     secure: true,
@@ -118,4 +125,4 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_ID,
         pass: process.env.EMAIL_PW
     }
-});
+});*/

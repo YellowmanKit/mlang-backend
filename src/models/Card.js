@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var cardSchema = mongoose.Schema({
   studentProject: {
-    type: ObjectId,
-    required: true
+    type: ObjectId
   },
   icon: {
     type: String,

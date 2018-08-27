@@ -33,6 +33,22 @@ var courseSchema = mongoose.Schema({
 
 var Course = module.exports = mongoose.model('course',courseSchema);
 
+module.exports.leaveCourse = async (data, cb)=>{
+  let err, courseToLeave, updatedProfile;
+
+  [err, courseToLeave] = await to(Course.findOneAndUpdate({code: data.code}, { $pull: {
+    joinedStudents: data.userId
+  }}, {new: true}))
+  if(err || courseToLeave === null){ cb('failed'); };
+
+  [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.userId}, { $pull: {
+    joinedCourses: courseToLeave._id
+  }}, {new: true}))
+  if(err || updatedProfile === null){ cb('failed'); };
+
+  cb('success', courseToLeave, updatedProfile)
+}
+
 module.exports.joinCourse = async (data, cb)=>{
   let err, courseToJoin, updatedProfile;
 

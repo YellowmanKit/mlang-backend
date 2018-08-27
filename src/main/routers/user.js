@@ -85,11 +85,11 @@ class UserRouter extends Router {
         [err, course] = await to(Course.findById(joinedCourses[i]));
         if(err || course === null){ return res.json({ result: "failed" });}
         const endDate = new Date(course.endDate);
-        if(endDate < today){
+        /*if(endDate < today){
           joinedCourses.splice(i, 1);
           i--;
           continue;
-        }
+        }*/
         courses.push(course);
         joinedProjects = [...joinedProjects, ...course.projects];
       }
@@ -113,18 +113,18 @@ class UserRouter extends Router {
       if(err){ return res.json({ result: "failed" });}
       courses = [...courses, ...teachingCoursesData];
       teachingCoursesData.map(course=>{
-        const endDate = new Date(course.endDate);
+        /*const endDate = new Date(course.endDate);
         if(endDate < today){
           return;
-        }
+        }*/
         return teachingCourses.push(course._id);
       })
 
       for(var k=0;k<teachingCoursesData.length;k++){
         const endDate = new Date(teachingCoursesData[k].endDate);
-        if(endDate < today){
+        /*if(endDate < today){
           continue;
-        }
+        }*/
         teachingProjects = [...teachingProjects, ...teachingCoursesData[k].projects];
       }
 

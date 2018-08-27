@@ -147,15 +147,17 @@ class CardRouter extends Router {
 
       let err, project, studentProject, createdCard, createdLang, cardCount, profile;
 
+      //console.log(card);
+
       [err, createdCard] = await to(Card.create(card))
-      if(err || createdCard === null){ return res.json({ result: "failed" });}
+      if(err || createdCard === null){ console.log(err); return res.json({ result: "failed to create card" });}
 
       var createdLangs = []
       var createdLangsId = [];
       for(var i=0;i<langs.length;i++){
         langs[i].card = createdCard._id;
         [err, createdLang] = await to(Lang.create(langs[i]));
-        if(err || createdLang === null){ return res.json({ result: "failed" });}
+        if(err || createdLang === null){ return res.json({ result: "failed to create lang" });}
         createdLangs.splice(0,0,createdLang);
         createdLangsId.splice(0,0,createdLang._id);
       }
@@ -163,17 +165,35 @@ class CardRouter extends Router {
       [err, createdCard] = await to(Card.findOneAndUpdate({_id: createdCard._id}, { $set: {
         langs: createdLangsId
       }}, {new: true}))
-      if(err || createdCard === null){ return res.json({ result: "failed" });}
+      if(err || createdCard === null){ return res.json({ result: "failed to update langs in card" });}
 
-      [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: card.studentProject._id}, { $push: {
-        cards: createdCard._id
-      }}, {new: true}))
-      if(err || createdCard === null){ return res.json({ result: "failed" });}
+      if(data.isTeacher){
+        [err, studentProject] = await to(StudentProject.findOneAndUpdate({student: card.author, project: data.project }, {$push: {
+          cards: createdCard._id
+        }}, {upsert: true, new: true}))
+        if(err || studentProject === null){ return res.json({ result: "failed to create student project" });}
 
-      [err, project] = await to(Project.findOneAndUpdate({_id: studentProject.project}, {$set:{
-        teacherAlert: true
-      }}))
-      if(err || project === null){ console.log('Error when updating project alert!') }
+        [err, project] = await to(Project.findById(studentProject.project));
+        if(err || project === null){ return res.json({ result: "failed to find project" });}
+
+        if(!project.studentProjects.some(sp=>{return sp.equals(studentProject._id)}) ){
+          [err, project] = await to(Project.findOneAndUpdate({_id: studentProject.project}, { $push:{
+            studentProjects: studentProject._id
+          }}, {new: true}));
+          if(err || project === null){ return res.json({ result: "failed to update project" });}
+        }
+
+      }else{
+        [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: card.studentProject._id}, { $push: {
+          cards: createdCard._id
+        }}, {new: true}))
+        if((err || createdCard === null) && !data.isTeacher){ return res.json({ result: "failed to find student project" });}
+
+        [err, project] = await to(Project.findOneAndUpdate({_id: studentProject.project}, {$set:{
+          teacherAlert: true
+        }}))
+        if(err || project === null){ console.log('Error when updating project alert!') }
+      }
 
       [err, cardCount] = await to(Card.count({author: card.author}));
       if(!err && cardCount){
@@ -182,11 +202,12 @@ class CardRouter extends Router {
         }}, {new: true}))
       }
 
-      res.json({
+      return res.json({
         result: 'success',
         card: createdCard,
         langs: createdLangs,
         updatedStudentProject: studentProject,
+        updatedProject: project,
         updatedProfile: profile
       })
 
