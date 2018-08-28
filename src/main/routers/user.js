@@ -65,13 +65,15 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, user, profile, course, project, studentProject;
+      let err, user, profile, othersProfile, course, project, studentProject;
+      var profiles = [];
 
       [err, user] = await to(User.findOne({id, pw}));
-      if(err || user === null){ return res.json({ result: "failed" });}
-
+      if(err || !user){ console.log(err); console.log(user); return res.json({ result: "failed" });}
+      
       [err, profile] = await to(Profile.findOne({belongTo: user._id}));
       if(err || profile === null){ return res.json({ result: "failed" });}
+      profiles.push(profile);
 
       var courses = [];
       var projects = [];
@@ -92,6 +94,10 @@ class UserRouter extends Router {
         }*/
         courses.push(course);
         joinedProjects = [...joinedProjects, ...course.projects];
+
+        [err, othersProfile] = await to(Profile.findOne({belongTo: course.teacher}));
+        if(err || othersProfile === null){ return res.json({ result: "failed" });}
+        profiles.push(othersProfile);
       }
 
       var studentProjects = [];
@@ -107,18 +113,22 @@ class UserRouter extends Router {
 
       var teachingCourses = [];
       var teachingProjects = [];
-
       var teachingCoursesData = [];
       [err, teachingCoursesData] = await to(Course.find({teacher: user._id}));
       if(err){ return res.json({ result: "failed" });}
       courses = [...courses, ...teachingCoursesData];
-      teachingCoursesData.map(course=>{
-        /*const endDate = new Date(course.endDate);
+
+      for(var i=0;i<teachingCoursesData.length;i++){
+        /*const endDate = new Date(teachingCoursesData[i].endDate);
         if(endDate < today){
           return;
         }*/
-        return teachingCourses.push(course._id);
-      })
+        teachingCourses.push(teachingCoursesData[i]._id);
+
+        [err, othersProfile] = await to(Profile.findOne({belongTo: teachingCoursesData[i].teacher}));
+        if(err || othersProfile === null){ return res.json({ result: "failed" });}
+        profiles.push(othersProfile);
+      }
 
       for(var k=0;k<teachingCoursesData.length;k++){
         const endDate = new Date(teachingCoursesData[k].endDate);
@@ -138,6 +148,7 @@ class UserRouter extends Router {
         result: "success",
         user: user,
         profile: profile,
+        profiles: profiles,
 
         teachingCourses: teachingCourses,
         joinedCourses: joinedCourses,

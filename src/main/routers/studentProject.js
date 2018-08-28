@@ -24,6 +24,30 @@ class StudentProjectRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/studentProject/getByStudent', async (req,res)=>{
+      const profile = req.body.data;
+      //console.log(profile);
+      let err, studentProjects;
+      [err, studentProjects] = await to(StudentProject.find({student: profile.belongTo}));
+      if(err || studentProjects === null){ console.log('failed to get student project'); return res.json({ result: 'failed' })}
+      //console.log(studentProjects);
+
+      var list = [];
+      studentProjects.map(sp=>{
+        list.push(sp._id);
+        return;
+      });
+
+      var updatedProfile = profile;
+      profile.studentProjects = list;
+
+      return res.json({
+        result: 'success',
+        studentProjects: studentProjects,
+        updatedProfile: updatedProfile
+      })
+    });
+
     app.post('/studentProject/update', async(req, res)=>{
       const data = req.body.data;
       //console.log(data);
