@@ -87,7 +87,7 @@ module.exports.resetPassword = function () {
               from: process.env.EMAIL_ID,
               to: _email,
               subject: 'Your mlang account password has been reset!',
-              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + user.id + '</p>' + '<p>and your new password is <b>' + randomPassword + '</b></p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>'
+              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + user.id + '</p>' + '<p>and your new password is <b>' + randomPassword + '</b>.</p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>' + '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
             };
             _context.next = 15;
             return (0, _to2.default)(transporter.sendMail(mailOptions));
@@ -146,7 +146,10 @@ module.exports.acquireNewAccount = function () {
             cb('failed');return _context2.abrupt('return');
 
           case 6:
-            randomPassword = _randomstring2.default.generate(6);
+            randomPassword = _randomstring2.default.generate({
+              length: 6,
+              charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+            });
             defaultId = _email.substring(0, _email.lastIndexOf("@"));
             newUser = {
               id: defaultId,
@@ -157,7 +160,7 @@ module.exports.acquireNewAccount = function () {
               from: process.env.EMAIL_ID,
               to: _email,
               subject: 'Your mlang account is ready!',
-              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + newUser.id + '</p>' + '<p>and your password is <b>' + randomPassword + '</b></p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>'
+              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + newUser.id + '</p>' + '<p>and your password is <b>' + randomPassword + '</b></p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>' + '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
             };
             err = void 0, info = void 0, user = void 0, profile = void 0;
             _context2.next = 13;
@@ -229,18 +232,25 @@ module.exports.acquireNewAccount = function () {
   };
 }();
 
-//console.log(process.env.EMAIL_ID);
-//console.log(process.env.EMAIL_PW);
-//console.log(process.env.HOST);
+//console.log(process.env.GMAIL_ID);
+//console.log(process.env.GMAIL_PW);
 
 var transporter = _nodemailer2.default.createTransport({
-  host: process.env.HOST,
-  port: 465,
-  secure: true,
-  //requireTLS: true,
+  service: 'gmail',
   auth: {
-    user: process.env.EMAIL_ID,
-    pass: process.env.EMAIL_PW
+    user: process.env.GMAIL_ID,
+    pass: process.env.GMAIL_PW
   }
 });
+
+/*const transporter = nodemailer.createTransport({
+    host: process.env.HOST,
+    port: 465,
+    secure: true,
+    //requireTLS: true,
+    auth: {
+        user: process.env.EMAIL_ID,
+        pass: process.env.EMAIL_PW
+    }
+});*/
 //# sourceMappingURL=User.js.map

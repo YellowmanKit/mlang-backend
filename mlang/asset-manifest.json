@@ -1,8 +1,9 @@
 {
   "main.css": "static/css/main.65027555.css",
   "main.css.map": "static/css/main.65027555.css.map",
-  "main.js": "static/js/main.6e5f4cdc.js",
-  "main.js.map": "static/js/main.6e5f4cdc.js.map",
+  "main.js": "static/js/main.2788d904.js",
+  "main.js.map": "static/js/main.2788d904.js.map",
+  "static\\media\\alert2.png": "static/media/alert2.3ec6dd8b.png",
   "static\\media\\background.png": "static/media/background.c8dead68.png",
   "static\\media\\background2.png": "static/media/background2.8b915a4f.png",
   "static\\media\\badge_corner_featured.png": "static/media/badge_corner_featured.149ec2cd.png",
@@ -14,6 +15,9 @@
   "static\\media\\menu_bg.png": "static/media/menu_bg.5281c8aa.png",
   "static\\media\\mlang_green.png": "static/media/mlang_green.ef0a45b0.png",
   "static\\media\\no_image.png": "static/media/no_image.57f701ae.png",
+  "static\\media\\passed.png": "static/media/passed.a4e9302e.png",
   "static\\media\\star2_lightgrey.png": "static/media/star2_lightgrey.826caadb.png",
+  "static\\media\\swipeLeft.png": "static/media/swipeLeft.e9c29b90.png",
+  "static\\media\\swipeRight.png": "static/media/swipeRight.bcb1d0eb.png",
   "static\\media\\top_bar.png": "static/media/top_bar.d0fd8405.png"
 }

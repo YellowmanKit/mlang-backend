@@ -12,7 +12,14 @@ var profileSchema = _mongoose2.default.Schema({
     type: ObjectId,
     required: true
   },
+  icon: {
+    type: String
+  },
   name: {
+    type: String,
+    default: ''
+  },
+  description: {
     type: String,
     default: ''
   },

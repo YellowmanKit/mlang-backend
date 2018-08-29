@@ -9,8 +9,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var ObjectId = _mongoose2.default.Schema.Types.ObjectId;
 var cardSchema = _mongoose2.default.Schema({
   studentProject: {
-    type: ObjectId,
-    required: true
+    type: ObjectId
   },
   icon: {
     type: String,

@@ -64,7 +64,7 @@ var CourseRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/course/join', function () {
+      app.post('/course/leave', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
           var data;
           return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -74,11 +74,11 @@ var CourseRouter = function (_Router) {
                   data = req.body.data;
                   //console.log(data)
 
-                  _Course2.default.joinCourse(data, function (_result, _joinedCourse, _updatedProfile) {
+                  _Course2.default.leaveCourse(data, function (result, leavedCourse, updatedProfile) {
                     return res.json({
-                      result: _result,
-                      joinedCourse: _joinedCourse,
-                      updatedProfile: _updatedProfile
+                      result: result,
+                      leavedCourse: leavedCourse,
+                      updatedProfile: updatedProfile
                     });
                   });
 
@@ -95,36 +95,25 @@ var CourseRouter = function (_Router) {
         };
       }());
 
-      app.post('/course/edit', function () {
+      app.post('/course/join', function () {
         var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var course, err, editedCourse, _ref3, _ref4;
-
+          var data;
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  course = req.body.data;
+                  data = req.body.data;
                   //console.log(data)
 
-                  err = void 0, editedCourse = void 0;
-                  _context2.next = 4;
-                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: course._id }, { $set: {
-                      icon: course.icon,
-                      title: course.title,
-                      endDate: course.endDate
-                    } }, { new: true }));
+                  _Course2.default.joinCourse(data, function (result, joinedCourse, updatedProfile) {
+                    return res.json({
+                      result: result,
+                      joinedCourse: joinedCourse,
+                      updatedProfile: updatedProfile
+                    });
+                  });
 
-                case 4:
-                  _ref3 = _context2.sent;
-                  _ref4 = _slicedToArray(_ref3, 2);
-                  err = _ref4[0];
-                  editedCourse = _ref4[1];
-                  return _context2.abrupt('return', res.json({
-                    result: err ? 'failed' : 'success',
-                    editedCourse: editedCourse
-                  }));
-
-                case 9:
+                case 2:
                 case 'end':
                   return _context2.stop();
               }
@@ -137,12 +126,54 @@ var CourseRouter = function (_Router) {
         };
       }());
 
-      app.post('/course/add', function () {
-        var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var data;
+      app.post('/course/edit', function () {
+        var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var course, err, editedCourse, _ref4, _ref5;
+
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
               switch (_context3.prev = _context3.next) {
+                case 0:
+                  course = req.body.data;
+                  //console.log(data)
+
+                  err = void 0, editedCourse = void 0;
+                  _context3.next = 4;
+                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: course._id }, { $set: {
+                      icon: course.icon,
+                      title: course.title,
+                      endDate: course.endDate
+                    } }, { new: true }));
+
+                case 4:
+                  _ref4 = _context3.sent;
+                  _ref5 = _slicedToArray(_ref4, 2);
+                  err = _ref5[0];
+                  editedCourse = _ref5[1];
+                  return _context3.abrupt('return', res.json({
+                    result: err ? 'failed' : 'success',
+                    editedCourse: editedCourse
+                  }));
+
+                case 9:
+                case 'end':
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, _this2);
+        }));
+
+        return function (_x7, _x8, _x9) {
+          return _ref3.apply(this, arguments);
+        };
+      }());
+
+      app.post('/course/add', function () {
+        var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+          var data;
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
                   data = req.body.data;
                   //console.log(data)
@@ -156,14 +187,14 @@ var CourseRouter = function (_Router) {
 
                 case 2:
                 case 'end':
-                  return _context3.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee3, _this2);
+          }, _callee4, _this2);
         }));
 
-        return function (_x7, _x8, _x9) {
-          return _ref5.apply(this, arguments);
+        return function (_x10, _x11, _x12) {
+          return _ref6.apply(this, arguments);
         };
       }());
     }

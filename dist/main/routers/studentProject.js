@@ -78,13 +78,200 @@ var StudentProjectRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/studentProject/getMultiple', function () {
+      app.post('/studentProject/getByStudent', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, studentProject, profile, card, lang, _studentProjects, _studentProfiles, _cards, _langs, i, _ref2, _ref3, _ref4, _ref5, cardsId, j, _ref6, _ref7, langsId, k, _ref8, _ref9;
+          var profile, err, studentProjects, project, projects, _ref2, _ref3, list, i, _ref4, _ref5, updatedProfile;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
+                case 0:
+                  profile = req.body.data;
+                  //console.log(profile);
+
+                  err = void 0, studentProjects = void 0, project = void 0;
+                  projects = [];
+                  _context.next = 5;
+                  return (0, _to2.default)(_StudentProject2.default.find({ student: profile.belongTo }));
+
+                case 5:
+                  _ref2 = _context.sent;
+                  _ref3 = _slicedToArray(_ref2, 2);
+                  err = _ref3[0];
+                  studentProjects = _ref3[1];
+
+                  if (!(err || studentProjects === null)) {
+                    _context.next = 12;
+                    break;
+                  }
+
+                  console.log('failed to get student project');return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 12:
+                  //console.log(studentProjects);
+
+                  list = [];
+                  i = 0;
+
+                case 14:
+                  if (!(i < studentProjects.length)) {
+                    _context.next = 29;
+                    break;
+                  }
+
+                  _context.next = 17;
+                  return (0, _to2.default)(_Project2.default.findById(studentProjects[i].project));
+
+                case 17:
+                  _ref4 = _context.sent;
+                  _ref5 = _slicedToArray(_ref4, 2);
+                  err = _ref5[0];
+                  project = _ref5[1];
+
+                  if (!(err || project === null)) {
+                    _context.next = 24;
+                    break;
+                  }
+
+                  console.log('failed to get project');return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 24:
+                  projects.push(project);
+                  list.push(studentProjects[i]._id);
+
+                case 26:
+                  i++;
+                  _context.next = 14;
+                  break;
+
+                case 29:
+                  updatedProfile = profile;
+
+                  profile.studentProjects = list;
+
+                  return _context.abrupt('return', res.json({
+                    result: 'success',
+                    projects: projects,
+                    studentProjects: studentProjects,
+                    updatedProfile: updatedProfile
+                  }));
+
+                case 32:
+                case 'end':
+                  return _context.stop();
+              }
+            }
+          }, _callee, _this2);
+        }));
+
+        return function (_x, _x2) {
+          return _ref.apply(this, arguments);
+        };
+      }());
+
+      app.post('/studentProject/update', function () {
+        var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var data, err, studentProject, _ref7, _ref8;
+
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  data = req.body.data;
+                  //console.log(data);
+
+                  err = void 0, studentProject = void 0;
+                  _context2.next = 4;
+                  return (0, _to2.default)(_StudentProject2.default.findOneAndUpdate({ _id: data._id }, { $set: data }, { new: true }));
+
+                case 4:
+                  _ref7 = _context2.sent;
+                  _ref8 = _slicedToArray(_ref7, 2);
+                  err = _ref8[0];
+                  studentProject = _ref8[1];
+
+                  if (!(err || studentProject === null)) {
+                    _context2.next = 10;
+                    break;
+                  }
+
+                  return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 10:
+                  return _context2.abrupt('return', res.json({
+                    result: 'success',
+                    updatedStudentProject: studentProject
+                  }));
+
+                case 11:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, _this2);
+        }));
+
+        return function (_x3, _x4) {
+          return _ref6.apply(this, arguments);
+        };
+      }());
+
+      app.post('/studentProject/clearAlert', function () {
+        var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
+          var data, err, studentProject, _ref10, _ref11;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  data = req.body.data;
+                  //console.log(data);
+
+                  err = void 0, studentProject = void 0;
+                  _context3.next = 4;
+                  return (0, _to2.default)(_StudentProject2.default.findOneAndUpdate({ _id: data.studentProjectId }, { $set: {
+                      studentAlert: false
+                    } }, { new: true }));
+
+                case 4:
+                  _ref10 = _context3.sent;
+                  _ref11 = _slicedToArray(_ref10, 2);
+                  err = _ref11[0];
+                  studentProject = _ref11[1];
+
+                  if (!(err || studentProject === null)) {
+                    _context3.next = 10;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: 'failed' }));
+
+                case 10:
+                  return _context3.abrupt('return', res.json({
+                    result: 'success',
+                    updatedStudentProject: studentProject
+                  }));
+
+                case 11:
+                case 'end':
+                  return _context3.stop();
+              }
+            }
+          }, _callee3, _this2);
+        }));
+
+        return function (_x5, _x6) {
+          return _ref9.apply(this, arguments);
+        };
+      }());
+
+      app.post('/studentProject/getMultiple', function () {
+        var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
+          var list, err, studentProject, profile, card, lang, _studentProjects, _studentProfiles, _cards, _langs, i, _ref13, _ref14, _ref15, _ref16, cardsId, j, _ref17, _ref18, langsId, k, _ref19, _ref20;
+
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
                 case 0:
                   list = req.body.data;
                   //console.log(list);
@@ -98,44 +285,44 @@ var StudentProjectRouter = function (_Router) {
 
                 case 7:
                   if (!(i < list.length)) {
-                    _context.next = 59;
+                    _context4.next = 59;
                     break;
                   }
 
-                  _context.next = 10;
+                  _context4.next = 10;
                   return (0, _to2.default)(_StudentProject2.default.findById(list[i]));
 
                 case 10:
-                  _ref2 = _context.sent;
-                  _ref3 = _slicedToArray(_ref2, 2);
-                  err = _ref3[0];
-                  studentProject = _ref3[1];
+                  _ref13 = _context4.sent;
+                  _ref14 = _slicedToArray(_ref13, 2);
+                  err = _ref14[0];
+                  studentProject = _ref14[1];
 
                   if (!err) {
-                    _context.next = 16;
+                    _context4.next = 16;
                     break;
                   }
 
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
 
                 case 16:
                   _studentProjects.splice(0, 0, studentProject);
 
-                  _context.next = 19;
+                  _context4.next = 19;
                   return (0, _to2.default)(_Profile2.default.findOne({ belongTo: studentProject.student }));
 
                 case 19:
-                  _ref4 = _context.sent;
-                  _ref5 = _slicedToArray(_ref4, 2);
-                  err = _ref5[0];
-                  profile = _ref5[1];
+                  _ref15 = _context4.sent;
+                  _ref16 = _slicedToArray(_ref15, 2);
+                  err = _ref16[0];
+                  profile = _ref16[1];
 
                   if (!(err || profile === null)) {
-                    _context.next = 25;
+                    _context4.next = 25;
                     break;
                   }
 
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
 
                 case 25:
                   _studentProfiles.splice(0, 0, profile);
@@ -145,25 +332,25 @@ var StudentProjectRouter = function (_Router) {
 
                 case 28:
                   if (!(j < cardsId.length)) {
-                    _context.next = 56;
+                    _context4.next = 56;
                     break;
                   }
 
-                  _context.next = 31;
+                  _context4.next = 31;
                   return (0, _to2.default)(_Card2.default.findById(cardsId[j]));
 
                 case 31:
-                  _ref6 = _context.sent;
-                  _ref7 = _slicedToArray(_ref6, 2);
-                  err = _ref7[0];
-                  card = _ref7[1];
+                  _ref17 = _context4.sent;
+                  _ref18 = _slicedToArray(_ref17, 2);
+                  err = _ref18[0];
+                  card = _ref18[1];
 
                   if (!(err || card === null)) {
-                    _context.next = 37;
+                    _context4.next = 37;
                     break;
                   }
 
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
 
                 case 37:
                   _cards.splice(0, 0, card);
@@ -173,73 +360,73 @@ var StudentProjectRouter = function (_Router) {
 
                 case 40:
                   if (!(k < langsId.length)) {
-                    _context.next = 53;
+                    _context4.next = 53;
                     break;
                   }
 
-                  _context.next = 43;
+                  _context4.next = 43;
                   return (0, _to2.default)(_Lang2.default.findById(langsId[k]));
 
                 case 43:
-                  _ref8 = _context.sent;
-                  _ref9 = _slicedToArray(_ref8, 2);
-                  err = _ref9[0];
-                  lang = _ref9[1];
+                  _ref19 = _context4.sent;
+                  _ref20 = _slicedToArray(_ref19, 2);
+                  err = _ref20[0];
+                  lang = _ref20[1];
 
                   if (!(err || lang === null)) {
-                    _context.next = 49;
+                    _context4.next = 49;
                     break;
                   }
 
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
 
                 case 49:
                   _langs.splice(0, 0, lang);
 
                 case 50:
                   k++;
-                  _context.next = 40;
+                  _context4.next = 40;
                   break;
 
                 case 53:
                   j++;
-                  _context.next = 28;
+                  _context4.next = 28;
                   break;
 
                 case 56:
                   i++;
-                  _context.next = 7;
+                  _context4.next = 7;
                   break;
 
                 case 59:
-                  return _context.abrupt('return', res.json({
+                  return _context4.abrupt('return', res.json({
                     result: 'success',
                     studentProjects: _studentProjects,
-                    students: _studentProfiles,
+                    profiles: _studentProfiles,
                     cards: _cards,
                     langs: _langs
                   }));
 
                 case 60:
                 case 'end':
-                  return _context.stop();
+                  return _context4.stop();
               }
             }
-          }, _callee, _this2);
+          }, _callee4, _this2);
         }));
 
-        return function (_x, _x2) {
-          return _ref.apply(this, arguments);
+        return function (_x7, _x8) {
+          return _ref12.apply(this, arguments);
         };
       }());
 
       app.get('/studentProject/get/', function () {
-        var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var studentId, projectId, err, _studentProject, _project, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16;
+        var _ref21 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
+          var studentId, projectId, err, _studentProject, _project, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27;
 
-          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
-              switch (_context2.prev = _context2.next) {
+              switch (_context5.prev = _context5.next) {
                 case 0:
                   studentId = req.headers.student;
                   projectId = req.headers.project;
@@ -247,67 +434,67 @@ var StudentProjectRouter = function (_Router) {
                   //console.log(projectId)
 
                   err = void 0, _studentProject = void 0, _project = void 0;
-                  _context2.next = 5;
+                  _context5.next = 5;
                   return (0, _to2.default)(_StudentProject2.default.findOneAndUpdate({ student: studentId, project: projectId }, {}, { upsert: true, new: true }));
 
                 case 5:
-                  _ref11 = _context2.sent;
-                  _ref12 = _slicedToArray(_ref11, 2);
-                  err = _ref12[0];
-                  _studentProject = _ref12[1];
+                  _ref22 = _context5.sent;
+                  _ref23 = _slicedToArray(_ref22, 2);
+                  err = _ref23[0];
+                  _studentProject = _ref23[1];
 
                   if (!(err || _studentProject === null)) {
-                    _context2.next = 11;
+                    _context5.next = 11;
                     break;
                   }
 
-                  return _context2.abrupt('return', res.json({ result: "failed" }));
+                  return _context5.abrupt('return', res.json({ result: "failed" }));
 
                 case 11:
-                  _context2.next = 13;
+                  _context5.next = 13;
                   return (0, _to2.default)(_Project2.default.findById(projectId));
 
                 case 13:
-                  _ref13 = _context2.sent;
-                  _ref14 = _slicedToArray(_ref13, 2);
-                  err = _ref14[0];
-                  _project = _ref14[1];
+                  _ref24 = _context5.sent;
+                  _ref25 = _slicedToArray(_ref24, 2);
+                  err = _ref25[0];
+                  _project = _ref25[1];
 
                   if (!(err || _project === null)) {
-                    _context2.next = 19;
+                    _context5.next = 19;
                     break;
                   }
 
-                  return _context2.abrupt('return', res.json({ result: "failed" }));
+                  return _context5.abrupt('return', res.json({ result: "failed" }));
 
                 case 19:
                   if (_project.studentProjects.some(function (sp) {
                     return sp.equals(_studentProject._id);
                   })) {
-                    _context2.next = 28;
+                    _context5.next = 28;
                     break;
                   }
 
-                  _context2.next = 22;
+                  _context5.next = 22;
                   return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: projectId }, { $push: {
                       studentProjects: _studentProject._id
                     } }, { new: true }));
 
                 case 22:
-                  _ref15 = _context2.sent;
-                  _ref16 = _slicedToArray(_ref15, 2);
-                  err = _ref16[0];
-                  _project = _ref16[1];
+                  _ref26 = _context5.sent;
+                  _ref27 = _slicedToArray(_ref26, 2);
+                  err = _ref27[0];
+                  _project = _ref27[1];
 
                   if (!(err || _project === null)) {
-                    _context2.next = 28;
+                    _context5.next = 28;
                     break;
                   }
 
-                  return _context2.abrupt('return', res.json({ result: "failed" }));
+                  return _context5.abrupt('return', res.json({ result: "failed" }));
 
                 case 28:
-                  return _context2.abrupt('return', res.json({
+                  return _context5.abrupt('return', res.json({
                     result: 'success',
                     updatedProject: _project,
                     studentProject: _studentProject
@@ -315,28 +502,16 @@ var StudentProjectRouter = function (_Router) {
 
                 case 29:
                 case 'end':
-                  return _context2.stop();
+                  return _context5.stop();
               }
             }
-          }, _callee2, _this2);
+          }, _callee5, _this2);
         }));
 
-        return function (_x3, _x4, _x5) {
-          return _ref10.apply(this, arguments);
+        return function (_x9, _x10, _x11) {
+          return _ref21.apply(this, arguments);
         };
       }());
-
-      /*app.post('/studentProject/add', async(req, res, next)=>{
-        console.log('studentProject/add')
-        const data = req.body.data;
-        let err, _studentProject;
-        [err, _studentProject] = await to(StudentProject.create({project: data.project, student: data.student}));
-        if(err || _studentProject === null){ return res.json({ result: "failed" });}
-          return res.json({
-          result: 'success',
-          studentProject: _studentProject
-        })
-        })*/
     }
   }]);
 

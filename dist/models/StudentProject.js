@@ -16,6 +16,10 @@ var studentProjectSchema = _mongoose2.default.Schema({
     type: ObjectId,
     required: true
   },
+  studentAlert: {
+    type: Boolean,
+    default: false
+  },
   cards: [ObjectId]
 });
 

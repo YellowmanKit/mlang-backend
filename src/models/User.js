@@ -45,10 +45,11 @@ module.exports.resetPassword = async (_email, cb)=>{
       '<p>Dear user,</p>' +
       '<p>Thanks for using mlang!</p>' +
       '<p>Your account id is ' +  user.id + '</p>' +
-      '<p>and your new password is <b>' + randomPassword + '</b></p>'+
+      '<p>and your new password is <b>' + randomPassword + '</b>.</p>'+
       '<p>Have fun!</p>' +
       '<p>Regard,</p>' +
-      '<p>mlang developer team</p>'
+      '<p>mlang developer team</p>'+
+      '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
   };
 
   [err, info] = await to(transporter.sendMail(mailOptions));
@@ -85,7 +86,8 @@ module.exports.acquireNewAccount = async (_email, cb)=>{
       '<p>and your password is <b>' + randomPassword + '</b></p>'+
       '<p>Have fun!</p>' +
       '<p>Regard,</p>' +
-      '<p>mlang developer team</p>'
+      '<p>mlang developer team</p>' +
+      '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
   };
 
   let err, info, user, profile;

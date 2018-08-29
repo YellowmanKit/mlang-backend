@@ -138,8 +138,10 @@ var ProfileRouter = function (_Router) {
                   data = req.body.data;
                   //console.log(data)
 
-                  _Profile2.default.findOneAndUpdate({ _id: data._id }, { $set: {
-                      name: data.name
+                  _Profile2.default.findOneAndUpdate({ _id: data.profile._id }, { $set: {
+                      name: data.newName ? data.newName : data.profile.name,
+                      description: data.newDesc ? data.newDesc : data.profile.description,
+                      icon: data.newIcon ? data.newIcon : data.profile.icon
                     } }, { new: true }, function (err, _updatedProfile) {
                     //console.log(_updatedUser)
                     return res.json({

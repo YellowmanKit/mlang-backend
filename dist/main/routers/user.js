@@ -40,6 +40,10 @@ var _Project = require('../../models/Project.js');
 
 var _Project2 = _interopRequireDefault(_Project);
 
+var _StudentProject = require('../../models/StudentProject.js');
+
+var _StudentProject2 = _interopRequireDefault(_StudentProject);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -78,13 +82,41 @@ var UserRouter = function (_Router) {
 
       app.post('/user/update', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
-          var data;
+          var data, err, existedUser, _ref2, _ref3;
+
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
                   data = req.body.data;
                   //console.log(data)
+
+                  err = void 0, existedUser = void 0;
+                  _context.next = 4;
+                  return (0, _to2.default)(_User2.default.findOne({ id: data.id, pw: data.pw }));
+
+                case 4:
+                  _ref2 = _context.sent;
+                  _ref3 = _slicedToArray(_ref2, 2);
+                  err = _ref3[0];
+                  existedUser = _ref3[1];
+
+                  if (!err) {
+                    _context.next = 11;
+                    break;
+                  }
+
+                  console.log(err);return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 11:
+                  if (!(existedUser && existedUser._id.toString() !== data._id)) {
+                    _context.next = 14;
+                    break;
+                  }
+
+                  console.log('user id/pw already used');return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 14:
 
                   _User2.default.findOneAndUpdate({ _id: data._id }, { $set: {
                       type: data.type,
@@ -99,7 +131,7 @@ var UserRouter = function (_Router) {
                     });
                   });
 
-                case 2:
+                case 15:
                 case 'end':
                   return _context.stop();
               }
@@ -113,7 +145,7 @@ var UserRouter = function (_Router) {
       }());
 
       app.get('/user/resetPassword/', function () {
-        var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
+        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
           var email;
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -135,7 +167,7 @@ var UserRouter = function (_Router) {
         }));
 
         return function (_x4, _x5, _x6) {
-          return _ref2.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       }());
 
@@ -148,8 +180,8 @@ var UserRouter = function (_Router) {
       });
 
       app.get('/user/login/', function () {
-        var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var id, pw, err, user, profile, course, project, _ref4, _ref5, _ref6, _ref7, courses, projects, joinedCourses, joinedProjects, today, i, _ref8, _ref9, endDate, j, _ref10, _ref11, teachingCourses, teachingProjects, teachingCoursesData, _ref12, _ref13, k, _endDate, l, _ref14, _ref15;
+        var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var id, pw, err, user, profile, othersProfile, course, project, studentProject, profiles, _ref6, _ref7, _ref8, _ref9, courses, projects, joinedCourses, joinedProjects, today, i, _ref10, _ref11, endDate, _ref12, _ref13, studentProjects, j, _ref14, _ref15, _ref16, _ref17, teachingCourses, teachingProjects, teachingCoursesData, _ref18, _ref19, _ref20, _ref21, k, _endDate, l, _ref22, _ref23;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -157,41 +189,44 @@ var UserRouter = function (_Router) {
                 case 0:
                   id = req.headers.id;
                   pw = req.headers.pw;
-                  err = void 0, user = void 0, profile = void 0, course = void 0, project = void 0;
-                  _context3.next = 5;
+                  err = void 0, user = void 0, profile = void 0, othersProfile = void 0, course = void 0, project = void 0, studentProject = void 0;
+                  profiles = [];
+                  _context3.next = 6;
                   return (0, _to2.default)(_User2.default.findOne({ id: id, pw: pw }));
 
-                case 5:
-                  _ref4 = _context3.sent;
-                  _ref5 = _slicedToArray(_ref4, 2);
-                  err = _ref5[0];
-                  user = _ref5[1];
-
-                  if (!(err || user === null)) {
-                    _context3.next = 11;
-                    break;
-                  }
-
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
-
-                case 11:
-                  _context3.next = 13;
-                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: user._id }));
-
-                case 13:
+                case 6:
                   _ref6 = _context3.sent;
                   _ref7 = _slicedToArray(_ref6, 2);
                   err = _ref7[0];
-                  profile = _ref7[1];
+                  user = _ref7[1];
+
+                  if (!(err || !user)) {
+                    _context3.next = 14;
+                    break;
+                  }
+
+                  console.log(err);console.log(user);return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 14:
+                  _context3.next = 16;
+                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: user._id }));
+
+                case 16:
+                  _ref8 = _context3.sent;
+                  _ref9 = _slicedToArray(_ref8, 2);
+                  err = _ref9[0];
+                  profile = _ref9[1];
 
                   if (!(err || profile === null)) {
-                    _context3.next = 19;
+                    _context3.next = 22;
                     break;
                   }
 
                   return _context3.abrupt('return', res.json({ result: "failed" }));
 
-                case 19:
+                case 22:
+                  profiles.push(profile);
+
                   courses = [];
                   projects = [];
                   joinedCourses = profile.joinedCourses;
@@ -199,175 +234,220 @@ var UserRouter = function (_Router) {
                   today = new Date();
                   i = 0;
 
-                case 25:
+                case 29:
                   if (!(i < joinedCourses.length)) {
-                    _context3.next = 44;
+                    _context3.next = 53;
                     break;
                   }
 
-                  _context3.next = 28;
+                  _context3.next = 32;
                   return (0, _to2.default)(_Course2.default.findById(joinedCourses[i]));
 
-                case 28:
-                  _ref8 = _context3.sent;
-                  _ref9 = _slicedToArray(_ref8, 2);
-                  err = _ref9[0];
-                  course = _ref9[1];
-
-                  if (!(err || course === null)) {
-                    _context3.next = 34;
-                    break;
-                  }
-
-                  return _context3.abrupt('return', res.json({ result: "failed" }));
-
-                case 34:
-                  endDate = new Date(course.endDate);
-
-                  if (!(endDate < today)) {
-                    _context3.next = 39;
-                    break;
-                  }
-
-                  joinedCourses.splice(i, 1);
-                  i--;
-                  return _context3.abrupt('continue', 41);
-
-                case 39:
-                  courses.push(course);
-                  joinedProjects = [].concat(_toConsumableArray(joinedProjects), _toConsumableArray(course.projects));
-
-                case 41:
-                  i++;
-                  _context3.next = 25;
-                  break;
-
-                case 44:
-                  j = 0;
-
-                case 45:
-                  if (!(j < joinedProjects.length)) {
-                    _context3.next = 58;
-                    break;
-                  }
-
-                  _context3.next = 48;
-                  return (0, _to2.default)(_Project2.default.findById(joinedProjects[j]));
-
-                case 48:
+                case 32:
                   _ref10 = _context3.sent;
                   _ref11 = _slicedToArray(_ref10, 2);
                   err = _ref11[0];
-                  project = _ref11[1];
+                  course = _ref11[1];
 
-                  if (!(err || project === null)) {
-                    _context3.next = 54;
+                  if (!(err || course === null)) {
+                    _context3.next = 38;
                     break;
                   }
 
                   return _context3.abrupt('return', res.json({ result: "failed" }));
 
-                case 54:
-                  projects.push(project);
+                case 38:
+                  endDate = new Date(course.endDate);
+                  /*if(endDate < today){
+                    joinedCourses.splice(i, 1);
+                    i--;
+                    continue;
+                  }*/
 
-                case 55:
-                  j++;
-                  _context3.next = 45;
-                  break;
+                  courses.push(course);
+                  joinedProjects = [].concat(_toConsumableArray(joinedProjects), _toConsumableArray(course.projects));
 
-                case 58:
-                  teachingCourses = [];
-                  teachingProjects = [];
-                  teachingCoursesData = [];
-                  _context3.next = 63;
-                  return (0, _to2.default)(_Course2.default.find({ teacher: user._id }));
+                  _context3.next = 43;
+                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: course.teacher }));
 
-                case 63:
+                case 43:
                   _ref12 = _context3.sent;
                   _ref13 = _slicedToArray(_ref12, 2);
                   err = _ref13[0];
-                  teachingCoursesData = _ref13[1];
+                  othersProfile = _ref13[1];
 
-                  if (!err) {
-                    _context3.next = 69;
+                  if (!(err || othersProfile === null)) {
+                    _context3.next = 49;
                     break;
                   }
 
                   return _context3.abrupt('return', res.json({ result: "failed" }));
 
-                case 69:
-                  courses = [].concat(_toConsumableArray(courses), _toConsumableArray(teachingCoursesData));
-                  teachingCoursesData.map(function (course) {
-                    var endDate = new Date(course.endDate);
-                    if (endDate < today) {
-                      return;
-                    }
-                    return teachingCourses.push(course._id);
-                  });
+                case 49:
+                  profiles.push(othersProfile);
 
-                  k = 0;
-
-                case 72:
-                  if (!(k < teachingCoursesData.length)) {
-                    _context3.next = 80;
-                    break;
-                  }
-
-                  _endDate = new Date(teachingCoursesData[k].endDate);
-
-                  if (!(_endDate < today)) {
-                    _context3.next = 76;
-                    break;
-                  }
-
-                  return _context3.abrupt('continue', 77);
-
-                case 76:
-                  teachingProjects = [].concat(_toConsumableArray(teachingProjects), _toConsumableArray(teachingCoursesData[k].projects));
-
-                case 77:
-                  k++;
-                  _context3.next = 72;
+                case 50:
+                  i++;
+                  _context3.next = 29;
                   break;
 
-                case 80:
-                  l = 0;
+                case 53:
+                  studentProjects = [];
+                  j = 0;
 
-                case 81:
-                  if (!(l < teachingProjects.length)) {
-                    _context3.next = 94;
+                case 55:
+                  if (!(j < joinedProjects.length)) {
+                    _context3.next = 75;
                     break;
                   }
 
-                  _context3.next = 84;
-                  return (0, _to2.default)(_Project2.default.findById(teachingProjects[l]));
+                  _context3.next = 58;
+                  return (0, _to2.default)(_Project2.default.findById(joinedProjects[j]));
 
-                case 84:
+                case 58:
                   _ref14 = _context3.sent;
                   _ref15 = _slicedToArray(_ref14, 2);
                   err = _ref15[0];
                   project = _ref15[1];
 
                   if (!(err || project === null)) {
-                    _context3.next = 90;
+                    _context3.next = 64;
                     break;
                   }
 
                   return _context3.abrupt('return', res.json({ result: "failed" }));
 
-                case 90:
+                case 64:
                   projects.push(project);
 
-                case 91:
-                  l++;
-                  _context3.next = 81;
+                  _context3.next = 67;
+                  return (0, _to2.default)(_StudentProject2.default.findOne({ project: project._id, student: user._id }));
+
+                case 67:
+                  _ref16 = _context3.sent;
+                  _ref17 = _slicedToArray(_ref16, 2);
+                  err = _ref17[0];
+                  studentProject = _ref17[1];
+
+                  if (studentProject) {
+                    studentProjects.push(studentProject);
+                  }
+
+                case 72:
+                  j++;
+                  _context3.next = 55;
                   break;
 
-                case 94:
+                case 75:
+                  teachingCourses = [];
+                  teachingProjects = [];
+                  teachingCoursesData = [];
+                  _context3.next = 80;
+                  return (0, _to2.default)(_Course2.default.find({ teacher: user._id }));
+
+                case 80:
+                  _ref18 = _context3.sent;
+                  _ref19 = _slicedToArray(_ref18, 2);
+                  err = _ref19[0];
+                  teachingCoursesData = _ref19[1];
+
+                  if (!err) {
+                    _context3.next = 86;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 86:
+                  courses = [].concat(_toConsumableArray(courses), _toConsumableArray(teachingCoursesData));
+
+                  i = 0;
+
+                case 88:
+                  if (!(i < teachingCoursesData.length)) {
+                    _context3.next = 102;
+                    break;
+                  }
+
+                  /*const endDate = new Date(teachingCoursesData[i].endDate);
+                  if(endDate < today){
+                    return;
+                  }*/
+                  teachingCourses.push(teachingCoursesData[i]._id);
+
+                  _context3.next = 92;
+                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: teachingCoursesData[i].teacher }));
+
+                case 92:
+                  _ref20 = _context3.sent;
+                  _ref21 = _slicedToArray(_ref20, 2);
+                  err = _ref21[0];
+                  othersProfile = _ref21[1];
+
+                  if (!(err || othersProfile === null)) {
+                    _context3.next = 98;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 98:
+                  profiles.push(othersProfile);
+
+                case 99:
+                  i++;
+                  _context3.next = 88;
+                  break;
+
+                case 102:
+
+                  for (k = 0; k < teachingCoursesData.length; k++) {
+                    _endDate = new Date(teachingCoursesData[k].endDate);
+                    /*if(endDate < today){
+                      continue;
+                    }*/
+
+                    teachingProjects = [].concat(_toConsumableArray(teachingProjects), _toConsumableArray(teachingCoursesData[k].projects));
+                  }
+
+                  l = 0;
+
+                case 104:
+                  if (!(l < teachingProjects.length)) {
+                    _context3.next = 117;
+                    break;
+                  }
+
+                  _context3.next = 107;
+                  return (0, _to2.default)(_Project2.default.findById(teachingProjects[l]));
+
+                case 107:
+                  _ref22 = _context3.sent;
+                  _ref23 = _slicedToArray(_ref22, 2);
+                  err = _ref23[0];
+                  project = _ref23[1];
+
+                  if (!(err || project === null)) {
+                    _context3.next = 113;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 113:
+                  projects.push(project);
+
+                case 114:
+                  l++;
+                  _context3.next = 104;
+                  break;
+
+                case 117:
                   return _context3.abrupt('return', res.json({
                     result: "success",
                     user: user,
                     profile: profile,
+                    profiles: profiles,
 
                     teachingCourses: teachingCourses,
                     joinedCourses: joinedCourses,
@@ -375,11 +455,13 @@ var UserRouter = function (_Router) {
                     teachingProjects: teachingProjects,
                     joinedProjects: joinedProjects,
 
+                    studentProjects: studentProjects,
+
                     courses: courses,
                     projects: projects
                   }));
 
-                case 95:
+                case 118:
                 case 'end':
                   return _context3.stop();
               }
@@ -388,7 +470,7 @@ var UserRouter = function (_Router) {
         }));
 
         return function (_x7, _x8, _x9) {
-          return _ref3.apply(this, arguments);
+          return _ref5.apply(this, arguments);
         };
       }());
     }
