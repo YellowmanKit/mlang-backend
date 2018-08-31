@@ -12,6 +12,7 @@ import AppRouter from './routers/app.js';
 import UserRouter from './routers/user.js';
 import ProfileRouter from './routers/profile.js';
 import CourseRouter from './routers/course.js';
+import SubjectRouter from './routers/subject.js';
 import ProjectRouter from './routers/project.js';
 import StudentProjectRouter from './routers/studentProject.js';
 
@@ -75,6 +76,7 @@ class CreateApp {
     new StudentProjectRouter(app);
     new CardRouter(app);
     new LangRouter(app);
+    new SubjectRouter(app);
 
     app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
   }

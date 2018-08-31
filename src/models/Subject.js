@@ -1,10 +1,13 @@
 import mongoose from 'mongoose';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
-var projectSchema = mongoose.Schema({
-  subject: {
+var subjectSchema = mongoose.Schema({
+  course: {
     type: ObjectId,
     required: true
+  },
+  projects: {
+    type: [ObjectId]
   },
   icon: {
     type: String
@@ -20,16 +23,7 @@ var projectSchema = mongoose.Schema({
   createdAt: {
     type: Date,
     default: new Date()
-  },
-  endDate: {
-    type: Date,
-    default: new Date()
-  },
-  teacherAlert:{
-    type: Boolean,
-    default: false
-  },
-  studentProjects: [ObjectId]
+  }
 })
 
-var Project = module.exports = mongoose.model('project',projectSchema);
+var Subject = module.exports = mongoose.model('subject',subjectSchema);

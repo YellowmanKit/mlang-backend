@@ -8,6 +8,7 @@ class Router {
     type === 'langAudio'? 'langs/audios/':
     type === 'audioComment'? 'cards/audioComments/':
     type === 'profileIcon'? 'profiles/icons/':
+    type === 'subjectIcon'? 'subjects/icons/':
     type);
   }
 }

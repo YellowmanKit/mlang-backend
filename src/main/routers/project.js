@@ -6,6 +6,7 @@ import to from '../../to';
 import User from '../../models/User.js';
 import Course from '../../models/Course.js';
 import Project from '../../models/Project.js';
+import Subject from '../../models/Subject.js';
 
 class ProjectRouter extends Router {
 
@@ -40,12 +41,7 @@ class ProjectRouter extends Router {
       const project = req.body.data;
       //console.log(data)
       let err, editedProject;
-      [err, editedProject] = await to(Project.findOneAndUpdate({_id: project._id},{ $set: {
-        icon: project.icon,
-        title: project.title,
-        description: project.description,
-        endDate: project.endDate
-      }}, { new: true }));
+      [err, editedProject] = await to(Project.findOneAndUpdate({_id: project._id},{ $set: project }, { new: true }));
 
       return res.json({
         result: err? 'failed': 'success',
@@ -56,19 +52,19 @@ class ProjectRouter extends Router {
     app.post('/project/add', async(req, res)=>{
       const project = req.body.data;
       console.log(project);
-      let err, _newProject, _updatedCourse;
-      [err, _newProject] = await to(Project.create(project))
+      let err, newProject, updatedSubject;
+      [err, newProject] = await to(Project.create(project))
       if(err){ return res.json({ result: 'failed' })}
 
-      [err, _updatedCourse] = await to(Course.findOneAndUpdate({_id: project.course}, { $push: {
-        projects: _newProject._id
+      [err, updatedSubject] = await to(Subject.findOneAndUpdate({_id: project.subject}, { $push: {
+        projects: newProject._id
       }}, {new: true}))
-      if(err || _updatedCourse === null){ cb('failed'); };
+      if(err || updatedSubject === null){ cb('failed'); };
 
       return res.json({
         result:'success',
-        newProject: _newProject,
-        updatedCourse: _updatedCourse
+        newProject: newProject,
+        updatedSubject: updatedSubject
       })
     });
 

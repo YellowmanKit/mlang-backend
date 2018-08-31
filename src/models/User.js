@@ -29,7 +29,6 @@ var schema = mongoose.Schema({
 
 var User = module.exports = mongoose.model('user',schema);
 
-
 module.exports.resetPassword = async (_email, cb)=>{
   let err, user, info;
 

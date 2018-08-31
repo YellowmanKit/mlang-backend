@@ -8,6 +8,7 @@ import to from '../../to';
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
 import Course from '../../models/Course.js';
+import Subject from '../../models/Subject.js';
 import Project from '../../models/Project.js';
 import StudentProject from '../../models/StudentProject.js';
 
@@ -65,84 +66,68 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, user, profile, othersProfile, course, project, studentProject;
+      let err, user, profile, othersProfile, course, subject, project, studentProject;
       var profiles = [];
 
       [err, user] = await to(User.findOne({id, pw}));
       if(err || !user){ console.log(err); console.log(user); return res.json({ result: "failed" });}
-      
+
       [err, profile] = await to(Profile.findOne({belongTo: user._id}));
       if(err || profile === null){ return res.json({ result: "failed" });}
       profiles.push(profile);
 
       var courses = [];
-      var projects = [];
+      var subjects = [];
 
       var joinedCourses = profile.joinedCourses;
-      var joinedProjects = [];
+      var joinedSubjects = [];
 
       const today = new Date();
 
       for(var i=0;i<joinedCourses.length;i++){
         [err, course] = await to(Course.findById(joinedCourses[i]));
         if(err || course === null){ return res.json({ result: "failed" });}
-        const endDate = new Date(course.endDate);
-        /*if(endDate < today){
-          joinedCourses.splice(i, 1);
-          i--;
-          continue;
-        }*/
+
         courses.push(course);
-        joinedProjects = [...joinedProjects, ...course.projects];
 
         [err, othersProfile] = await to(Profile.findOne({belongTo: course.teacher}));
         if(err || othersProfile === null){ return res.json({ result: "failed" });}
         profiles.push(othersProfile);
+
+        const endDate = new Date(course.endDate);
+        if(endDate < today){ continue; }
+        joinedSubjects = [...joinedSubjects, ...course.subjects];
       }
 
-      var studentProjects = [];
-      for(var j=0;j<joinedProjects.length;j++){
-        [err, project] = await to(Project.findById(joinedProjects[j]));
-        if(err || project === null){ return res.json({ result: "failed" });}
-        projects.push(project);
-
-        [err, studentProject] = await to(StudentProject.findOne({project: project._id, student: user._id}));
-        if(studentProject){ studentProjects.push(studentProject); }
+      for(var i=0;i<joinedSubjects.length;i++){
+        [err, subject] = await to(Subject.findById(joinedSubjects[i]._id));
+        if(err || subject === null){ return res.json({ result: "failed" });}
+        subjects.push(subject)
       }
-
 
       var teachingCourses = [];
-      var teachingProjects = [];
+      var teachingSubjects = [];
+
       var teachingCoursesData = [];
       [err, teachingCoursesData] = await to(Course.find({teacher: user._id}));
       if(err){ return res.json({ result: "failed" });}
       courses = [...courses, ...teachingCoursesData];
 
       for(var i=0;i<teachingCoursesData.length;i++){
-        /*const endDate = new Date(teachingCoursesData[i].endDate);
-        if(endDate < today){
-          return;
-        }*/
         teachingCourses.push(teachingCoursesData[i]._id);
-
-        [err, othersProfile] = await to(Profile.findOne({belongTo: teachingCoursesData[i].teacher}));
-        if(err || othersProfile === null){ return res.json({ result: "failed" });}
-        profiles.push(othersProfile);
+        const endDate = new Date(teachingCoursesData[i].endDate);
+        if(endDate < today){ continue; }
+        teachingSubjects = [...teachingSubjects, ...teachingCoursesData[i].subjects];
       }
 
-      for(var k=0;k<teachingCoursesData.length;k++){
-        const endDate = new Date(teachingCoursesData[k].endDate);
-        /*if(endDate < today){
-          continue;
-        }*/
-        teachingProjects = [...teachingProjects, ...teachingCoursesData[k].projects];
+      for(var i=0;i<teachingSubjects.length;i++){
+        [err, subject] = await to(Subject.findById(teachingSubjects[i]._id));
+        if(err || subject === null){ return res.json({ result: "failed" });}
+        subjects.push(subject)
       }
 
-      for(var l=0;l<teachingProjects.length;l++){
-        [err, project] = await to(Project.findById(teachingProjects[l]));
-        if(err || project === null){ return res.json({ result: "failed" });}
-        projects.push(project);
-      }
+      var studentProjects = [];
+      [err, studentProjects] = await to(StudentProject.find({student: user._id}));
 
       return res.json({
         result: "success",
@@ -153,13 +138,12 @@ class UserRouter extends Router {
         teachingCourses: teachingCourses,
         joinedCourses: joinedCourses,
 
-        teachingProjects: teachingProjects,
-        joinedProjects: joinedProjects,
-
-        studentProjects: studentProjects,
+        teachingSubjects: teachingSubjects,
+        joinedSubjects: joinedSubjects,
 
         courses: courses,
-        projects: projects
+        subjects: subjects,
+        studentProjects: studentProjects
       })
     });
 
