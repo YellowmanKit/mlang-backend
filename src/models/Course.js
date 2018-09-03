@@ -25,7 +25,8 @@ var courseSchema = mongoose.Schema({
     default: new Date()
   },
   code: {
-    type: String
+    type: String,
+    required: true
   },
   joinedStudents: [ObjectId],
   subjects: [ObjectId]

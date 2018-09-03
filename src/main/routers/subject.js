@@ -7,6 +7,7 @@ import User from '../../models/User.js';
 import Course from '../../models/Course.js';
 import Project from '../../models/Project.js';
 import Subject from '../../models/Subject.js';
+import StudentProject from '../../models/StudentProject.js';
 
 class SubjectRouter extends Router {
 
@@ -20,6 +21,46 @@ class SubjectRouter extends Router {
     const app = this.app;
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
+
+    app.post('/subject/getAllOfUser', async(req, res)=>{
+      const profile = req.body.data;
+      //console.log(profile);
+      let err, studentProjects, project, subject;
+      var projects = [];
+      var subjects = [];
+
+      [err, studentProjects] = await to(StudentProject.find({student: profile.belongTo}));
+      if(err || studentProjects === null){ console.log('failed to get student project'); return res.json({ result: 'failed' })}
+      //console.log(studentProjects);
+      var studentProjectsList = [];
+      var subjectsList = [];
+      for(var i=0;i<studentProjects.length;i++){
+        studentProjectsList.push(studentProjects[i]._id);
+
+        [err, project] = await to(Project.findById(studentProjects[i].project));
+        if(err || project === null){ console.log('failed to get project'); return res.json({ result: 'failed' })}
+        projects.push(project);
+
+        [err, subject] = await to(Subject.findById(project.subject));
+        if(err || subject === null){ console.log('failed to get subject'); return res.json({ result: 'failed' })}
+        subjects.push(subject);
+        if(!(subjectsList.indexOf('' + subject._id) > -1)){
+          subjectsList.push('' + subject._id);
+        }
+      }
+
+      var updatedProfile = profile;
+      updatedProfile.subjects = subjectsList;
+      updatedProfile.studentProjects = studentProjectsList;
+
+      return res.json({
+        result: 'success',
+        subjects: subjects,
+        projects: projects,
+        studentProjects: studentProjects,
+        profile: updatedProfile
+      })
+    });
 
     app.post('/subject/getMultiple', async(req, res)=>{
       const list = req.body.data;

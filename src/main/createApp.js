@@ -9,6 +9,7 @@ import path from 'path';
 import fs from 'fs';
 
 import AppRouter from './routers/app.js';
+import SchoolRouter from './routers/school.js';
 import UserRouter from './routers/user.js';
 import ProfileRouter from './routers/profile.js';
 import CourseRouter from './routers/course.js';
@@ -69,6 +70,7 @@ class CreateApp {
     app.set('storage',storage);
 
     new AppRouter(app);
+    new SchoolRouter(app);
     new UserRouter(app);
     new ProfileRouter(app);
     new CourseRouter(app);
