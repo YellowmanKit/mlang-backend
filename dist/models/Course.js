@@ -46,7 +46,7 @@ var courseSchema = _mongoose2.default.Schema({
     type: String
   },
   joinedStudents: [ObjectId],
-  projects: [ObjectId]
+  subjects: [ObjectId]
 });
 
 var Course = module.exports = _mongoose2.default.model('course', courseSchema);

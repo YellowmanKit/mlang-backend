@@ -58,6 +58,10 @@ var _course = require('./routers/course.js');
 
 var _course2 = _interopRequireDefault(_course);
 
+var _subject = require('./routers/subject.js');
+
+var _subject2 = _interopRequireDefault(_subject);
+
 var _project = require('./routers/project.js');
 
 var _project2 = _interopRequireDefault(_project);
@@ -138,6 +142,7 @@ var CreateApp = function () {
       new _studentProject2.default(app);
       new _card2.default(app);
       new _lang2.default(app);
+      new _subject2.default(app);
 
       app.server.listen(port, function () {
         console.log('App is running on port ' + app.server.address().port);

@@ -50,20 +50,20 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ProjectRouter = function (_Router) {
-  _inherits(ProjectRouter, _Router);
+var SubjectRouter = function (_Router) {
+  _inherits(SubjectRouter, _Router);
 
-  function ProjectRouter(app) {
-    _classCallCheck(this, ProjectRouter);
+  function SubjectRouter(app) {
+    _classCallCheck(this, SubjectRouter);
 
-    var _this = _possibleConstructorReturn(this, (ProjectRouter.__proto__ || Object.getPrototypeOf(ProjectRouter)).call(this, app));
+    var _this = _possibleConstructorReturn(this, (SubjectRouter.__proto__ || Object.getPrototypeOf(SubjectRouter)).call(this, app));
 
     _this.app = app;
     _this.init();
     return _this;
   }
 
-  _createClass(ProjectRouter, [{
+  _createClass(SubjectRouter, [{
     key: 'init',
     value: function init() {
       var _this2 = this;
@@ -72,9 +72,9 @@ var ProjectRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/project/getMultiple', function () {
+      app.post('/subject/getMultiple', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, project, _projects, i, _ref2, _ref3;
+          var list, err, subject, subjects, i, _ref2, _ref3;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
@@ -83,8 +83,8 @@ var ProjectRouter = function (_Router) {
                   list = req.body.data;
                   //console.log(list);
 
-                  err = void 0, project = void 0;
-                  _projects = [];
+                  err = void 0, subject = void 0;
+                  subjects = [];
                   i = 0;
 
                 case 4:
@@ -94,13 +94,13 @@ var ProjectRouter = function (_Router) {
                   }
 
                   _context.next = 7;
-                  return (0, _to2.default)(_Project2.default.findById(list[i]));
+                  return (0, _to2.default)(_Subject2.default.findById(list[i]));
 
                 case 7:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  project = _ref3[1];
+                  subject = _ref3[1];
 
                   if (!err) {
                     _context.next = 13;
@@ -110,7 +110,7 @@ var ProjectRouter = function (_Router) {
                   return _context.abrupt('return', res.json({ result: 'failed' }));
 
                 case 13:
-                  _projects.splice(0, 0, project);
+                  subjects.splice(0, 0, subject);
 
                 case 14:
                   i++;
@@ -120,7 +120,7 @@ var ProjectRouter = function (_Router) {
                 case 17:
                   return _context.abrupt('return', res.json({
                     result: 'success',
-                    projects: _projects
+                    subjects: subjects
                   }));
 
                 case 18:
@@ -136,29 +136,29 @@ var ProjectRouter = function (_Router) {
         };
       }());
 
-      app.post('/project/edit', function () {
+      app.post('/subject/edit', function () {
         var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var project, err, editedProject, _ref5, _ref6;
+          var subject, err, editedSubject, _ref5, _ref6;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  project = req.body.data;
+                  subject = req.body.data;
                   //console.log(data)
 
-                  err = void 0, editedProject = void 0;
+                  err = void 0, editedSubject = void 0;
                   _context2.next = 4;
-                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: project._id }, { $set: project }, { new: true }));
+                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project._id }, { $set: subject }, { new: true }));
 
                 case 4:
                   _ref5 = _context2.sent;
                   _ref6 = _slicedToArray(_ref5, 2);
                   err = _ref6[0];
-                  editedProject = _ref6[1];
+                  editedSubject = _ref6[1];
                   return _context2.abrupt('return', res.json({
                     result: err ? 'failed' : 'success',
-                    editedProject: editedProject
+                    editedSubject: editedSubject
                   }));
 
                 case 9:
@@ -174,26 +174,26 @@ var ProjectRouter = function (_Router) {
         };
       }());
 
-      app.post('/project/add', function () {
+      app.post('/subject/add', function () {
         var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
-          var project, err, newProject, updatedSubject, _ref8, _ref9, _ref10, _ref11;
+          var subject, err, newSubject, updatedCourse, _ref8, _ref9, _ref10, _ref11;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
               switch (_context3.prev = _context3.next) {
                 case 0:
-                  project = req.body.data;
+                  subject = req.body.data;
 
-                  console.log(project);
-                  err = void 0, newProject = void 0, updatedSubject = void 0;
+                  console.log(subject);
+                  err = void 0, newSubject = void 0, updatedCourse = void 0;
                   _context3.next = 5;
-                  return (0, _to2.default)(_Project2.default.create(project));
+                  return (0, _to2.default)(_Subject2.default.create(subject));
 
                 case 5:
                   _ref8 = _context3.sent;
                   _ref9 = _slicedToArray(_ref8, 2);
                   err = _ref9[0];
-                  newProject = _ref9[1];
+                  newSubject = _ref9[1];
 
                   if (!err) {
                     _context3.next = 11;
@@ -204,24 +204,24 @@ var ProjectRouter = function (_Router) {
 
                 case 11:
                   _context3.next = 13;
-                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project.subject }, { $push: {
-                      projects: newProject._id
+                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: subject.course }, { $push: {
+                      subjects: newSubject._id
                     } }, { new: true }));
 
                 case 13:
                   _ref10 = _context3.sent;
                   _ref11 = _slicedToArray(_ref10, 2);
                   err = _ref11[0];
-                  updatedSubject = _ref11[1];
+                  updatedCourse = _ref11[1];
 
-                  if (err || updatedSubject === null) {
+                  if (err || updatedCourse === null) {
                     cb('failed');
                   };
 
                   return _context3.abrupt('return', res.json({
                     result: 'success',
-                    newProject: newProject,
-                    updatedSubject: updatedSubject
+                    newSubject: newSubject,
+                    updatedCourse: updatedCourse
                   }));
 
                 case 20:
@@ -239,8 +239,8 @@ var ProjectRouter = function (_Router) {
     }
   }]);
 
-  return ProjectRouter;
+  return SubjectRouter;
 }(_Router3.default);
 
-exports.default = ProjectRouter;
-//# sourceMappingURL=project.js.map
+exports.default = SubjectRouter;
+//# sourceMappingURL=subject.js.map

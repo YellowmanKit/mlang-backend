@@ -16,7 +16,7 @@ var Router = function () {
   _createClass(Router, [{
     key: 'getAppend',
     value: function getAppend(type) {
-      return type === 'courseIcon' ? 'courses/icons/' : type === 'projectIcon' ? 'projects/icons/' : type === 'cardIcon' ? 'cards/icons/' : type === 'langAudio' ? 'langs/audios/' : type === 'audioComment' ? 'cards/audioComments/' : type === 'profileIcon' ? 'profiles/icons/' : type;
+      return type === 'courseIcon' ? 'courses/icons/' : type === 'projectIcon' ? 'projects/icons/' : type === 'cardIcon' ? 'cards/icons/' : type === 'langAudio' ? 'langs/audios/' : type === 'audioComment' ? 'cards/audioComments/' : type === 'profileIcon' ? 'profiles/icons/' : type === 'subjectIcon' ? 'subjects/icons/' : type;
     }
   }]);
 
