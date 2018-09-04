@@ -7,6 +7,7 @@ import to from '../../to';
 
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
+import School from '../../models/School.js';
 import Course from '../../models/Course.js';
 import Subject from '../../models/Subject.js';
 import Project from '../../models/Project.js';
@@ -66,7 +67,7 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-      let err, user, profile, othersProfile, course, subject, project, studentProject;
+      let err, user, profile, othersProfile, course, subject, project, studentProject, school;
       var profiles = [];
 
       [err, user] = await to(User.findOne({id, pw}));
@@ -129,11 +130,29 @@ class UserRouter extends Router {
       var studentProjects = [];
       [err, studentProjects] = await to(StudentProject.find({student: user._id}));
 
+      var schools = [];
+      var supervisingSchools = [];
+      [err, schools] = await(to(School.find({admin: user._id})));
+      if(err || schools === null){ return res.json({ result: "failed" });}
+      schools.map(school=>{
+        supervisingSchools.push(school._id);
+        return null;
+      });
+
+      const joinedSchools = profile.joinedSchools;
+      for(var i=0;i<joinedSchools.length;i++){
+        [err, school] = await to(School.findById(joinedSchools[i]));
+        if(err || school === null){ return res.json({ result: "failed" });}
+        schools.push(school);
+      }
+
       return res.json({
         result: "success",
         user: user,
         profile: profile,
         profiles: profiles,
+
+        supervisingSchools: supervisingSchools,
 
         teachingCourses: teachingCourses,
         joinedCourses: joinedCourses,
@@ -141,6 +160,7 @@ class UserRouter extends Router {
         teachingSubjects: teachingSubjects,
         joinedSubjects: joinedSubjects,
 
+        schools: schools,
         courses: courses,
         subjects: subjects,
         studentProjects: studentProjects

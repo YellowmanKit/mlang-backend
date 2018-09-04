@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
+import School from '../../models/School.js';
 
 class SchoolRouter extends Router {
 
@@ -48,11 +49,7 @@ class SchoolRouter extends Router {
       const school = req.body.data;
       //console.log(data)
       let err, editedSchool;
-      [err, editedSchool] = await to(School.findOneAndUpdate({_id: school._id},{ $set: {
-        icon: school.icon,
-        name: school.name,
-        endDate: school.endDate
-      }}, { new: true }));
+      [err, editedSchool] = await to(School.findOneAndUpdate({_id: school._id},{ $set: school}, { new: true }));
 
       return res.json({
         result: err? 'failed': 'success',

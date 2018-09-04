@@ -30,8 +30,8 @@ class CreateApp {
   }
 
   createApp(appName, port, useHttps, useUbuntu, devMode){
-    const temp = useUbuntu? path.join(__dirname, '../../../data/temp/'): 'C:/data/temp/';
-    const storage = useUbuntu? path.join(__dirname, '../../../data/storage/'): 'C:/data/storage/';
+    const temp = useUbuntu? path.join(__dirname, '../../../data/temp/'): '../data/temp/';
+    const storage = useUbuntu? path.join(__dirname, '../../../data/storage/'): '../data/storage/';
 
     var storageConfig = multer.diskStorage({
       destination: function (req, file, cb) {

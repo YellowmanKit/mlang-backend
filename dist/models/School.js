@@ -23,22 +23,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var ObjectId = _mongoose2.default.Schema.Types.ObjectId;
-var courseSchema = _mongoose2.default.Schema({
-  teacher: {
+var schoolSchema = _mongoose2.default.Schema({
+  admin: {
     type: ObjectId,
     required: true
   },
   icon: {
     type: String
   },
-  title: {
-    type: String
+  name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    default: ''
   },
   createdAt: {
-    type: Date,
-    default: new Date()
-  },
-  endDate: {
     type: Date,
     default: new Date()
   },
@@ -46,39 +47,38 @@ var courseSchema = _mongoose2.default.Schema({
     type: String,
     required: true
   },
-  joinedStudents: [ObjectId],
-  subjects: [ObjectId]
+  joinedTeachers: [ObjectId]
 });
 
-var Course = module.exports = _mongoose2.default.model('course', courseSchema);
+var School = module.exports = _mongoose2.default.model('school', schoolSchema);
 
-module.exports.leaveCourse = function () {
+module.exports.leaveSchool = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(data, cb) {
-    var err, courseToLeave, updatedProfile, _ref2, _ref3, _ref4, _ref5;
+    var err, schoolToLeave, updatedProfile, _ref2, _ref3, _ref4, _ref5;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            err = void 0, courseToLeave = void 0, updatedProfile = void 0;
+            err = void 0, schoolToLeave = void 0, updatedProfile = void 0;
             _context.next = 3;
-            return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $pull: {
-                joinedStudents: data.userId
+            return (0, _to2.default)(School.findOneAndUpdate({ code: data.code }, { $pull: {
+                joinedTeachers: data.userId
               } }, { new: true }));
 
           case 3:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
-            courseToLeave = _ref3[1];
+            schoolToLeave = _ref3[1];
 
-            if (err || courseToLeave === null) {
+            if (err || schoolToLeave === null) {
               cb('failed');
             };
 
             _context.next = 11;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $pull: {
-                joinedCourses: courseToLeave._id
+                joinedSchools: schoolToLeave._id
               } }, { new: true }));
 
           case 11:
@@ -91,7 +91,7 @@ module.exports.leaveCourse = function () {
               cb('failed');
             };
 
-            cb('success', courseToLeave, updatedProfile);
+            cb('success', schoolToLeave, updatedProfile);
 
           case 18:
           case 'end':
@@ -106,33 +106,33 @@ module.exports.leaveCourse = function () {
   };
 }();
 
-module.exports.joinCourse = function () {
+module.exports.joinSchool = function () {
   var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data, cb) {
-    var err, courseToJoin, updatedProfile, _ref7, _ref8, _ref9, _ref10;
+    var err, schoolToJoin, updatedProfile, _ref7, _ref8, _ref9, _ref10;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            err = void 0, courseToJoin = void 0, updatedProfile = void 0;
+            err = void 0, schoolToJoin = void 0, updatedProfile = void 0;
             _context2.next = 3;
-            return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $push: {
-                joinedStudents: data.userId
+            return (0, _to2.default)(School.findOneAndUpdate({ code: data.code }, { $push: {
+                joinedTeachers: data.userId
               } }, { new: true }));
 
           case 3:
             _ref7 = _context2.sent;
             _ref8 = _slicedToArray(_ref7, 2);
             err = _ref8[0];
-            courseToJoin = _ref8[1];
+            schoolToJoin = _ref8[1];
 
-            if (err || courseToJoin === null) {
+            if (err || schoolToJoin === null) {
               cb('failed');
             };
 
             _context2.next = 11;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $push: {
-                joinedCourses: courseToJoin._id
+                joinedSchools: schoolToJoin._id
               } }, { new: true }));
 
           case 11:
@@ -145,7 +145,7 @@ module.exports.joinCourse = function () {
               cb('failed');
             };
 
-            cb('success', courseToJoin, updatedProfile);
+            cb('success', schoolToJoin, updatedProfile);
 
           case 18:
           case 'end':
@@ -160,15 +160,15 @@ module.exports.joinCourse = function () {
   };
 }();
 
-module.exports.addCourse = function () {
-  var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(newCourse, cb) {
-    var err, course, newCode, i, _ref12, _ref13, _ref14, _ref15;
+module.exports.addSchool = function () {
+  var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(newSchool, cb) {
+    var err, school, newCode, i, _ref12, _ref13, _ref14, _ref15;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            err = void 0, course = void 0;
+            err = void 0, school = void 0;
             newCode = '';
             i = 0;
 
@@ -184,15 +184,15 @@ module.exports.addCourse = function () {
             });
 
             _context3.next = 7;
-            return (0, _to2.default)(Course.findOne({ code: newCode }));
+            return (0, _to2.default)(School.findOne({ code: newCode }));
 
           case 7:
             _ref12 = _context3.sent;
             _ref13 = _slicedToArray(_ref12, 2);
             err = _ref13[0];
-            course = _ref13[1];
+            school = _ref13[1];
 
-            if (!(!err && course === null)) {
+            if (!(!err && school === null)) {
               _context3.next = 13;
               break;
             }
@@ -209,16 +209,16 @@ module.exports.addCourse = function () {
 
           case 17:
 
-            newCourse['code'] = newCode;
+            newSchool['code'] = newCode;
 
             _context3.next = 20;
-            return (0, _to2.default)(Course.create(newCourse));
+            return (0, _to2.default)(School.create(newSchool));
 
           case 20:
             _ref14 = _context3.sent;
             _ref15 = _slicedToArray(_ref14, 2);
             err = _ref15[0];
-            course = _ref15[1];
+            school = _ref15[1];
 
             if (!err) {
               _context3.next = 28;
@@ -229,8 +229,8 @@ module.exports.addCourse = function () {
 
           case 28:
 
-            //console.log(course)
-            cb('success', course);
+            //console.log(School)
+            cb('success', school);
 
           case 29:
           case 'end':
@@ -244,4 +244,4 @@ module.exports.addCourse = function () {
     return _ref11.apply(this, arguments);
   };
 }();
-//# sourceMappingURL=Course.js.map
+//# sourceMappingURL=School.js.map

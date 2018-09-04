@@ -40,6 +40,10 @@ var _Subject = require('../../models/Subject.js');
 
 var _Subject2 = _interopRequireDefault(_Subject);
 
+var _StudentProject = require('../../models/StudentProject.js');
+
+var _StudentProject2 = _interopRequireDefault(_StudentProject);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -72,58 +76,111 @@ var SubjectRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/subject/getMultiple', function () {
+      app.post('/subject/getAllOfUser', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, subject, subjects, i, _ref2, _ref3;
+          var profile, err, studentProjects, project, subject, projects, subjects, _ref2, _ref3, studentProjectsList, subjectsList, i, _ref4, _ref5, _ref6, _ref7, updatedProfile;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  list = req.body.data;
-                  //console.log(list);
+                  profile = req.body.data;
+                  //console.log(profile);
 
-                  err = void 0, subject = void 0;
+                  err = void 0, studentProjects = void 0, project = void 0, subject = void 0;
+                  projects = [];
                   subjects = [];
-                  i = 0;
+                  _context.next = 6;
+                  return (0, _to2.default)(_StudentProject2.default.find({ student: profile.belongTo }));
 
-                case 4:
-                  if (!(i < list.length)) {
-                    _context.next = 17;
-                    break;
-                  }
-
-                  _context.next = 7;
-                  return (0, _to2.default)(_Subject2.default.findById(list[i]));
-
-                case 7:
+                case 6:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  subject = _ref3[1];
+                  studentProjects = _ref3[1];
 
-                  if (!err) {
+                  if (!(err || studentProjects === null)) {
                     _context.next = 13;
                     break;
                   }
 
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
+                  console.log('failed to get student project');return _context.abrupt('return', res.json({ result: 'failed' }));
 
                 case 13:
-                  subjects.splice(0, 0, subject);
+                  //console.log(studentProjects);
+                  studentProjectsList = [];
+                  subjectsList = [];
+                  i = 0;
 
-                case 14:
+                case 16:
+                  if (!(i < studentProjects.length)) {
+                    _context.next = 42;
+                    break;
+                  }
+
+                  studentProjectsList.push(studentProjects[i]._id);
+
+                  _context.next = 20;
+                  return (0, _to2.default)(_Project2.default.findById(studentProjects[i].project));
+
+                case 20:
+                  _ref4 = _context.sent;
+                  _ref5 = _slicedToArray(_ref4, 2);
+                  err = _ref5[0];
+                  project = _ref5[1];
+
+                  if (!(err || project === null)) {
+                    _context.next = 27;
+                    break;
+                  }
+
+                  console.log('failed to get project');return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 27:
+                  projects.push(project);
+
+                  _context.next = 30;
+                  return (0, _to2.default)(_Subject2.default.findById(project.subject));
+
+                case 30:
+                  _ref6 = _context.sent;
+                  _ref7 = _slicedToArray(_ref6, 2);
+                  err = _ref7[0];
+                  subject = _ref7[1];
+
+                  if (!(err || subject === null)) {
+                    _context.next = 37;
+                    break;
+                  }
+
+                  console.log('failed to get subject');return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 37:
+                  subjects.push(subject);
+                  if (!(subjectsList.indexOf('' + subject._id) > -1)) {
+                    subjectsList.push('' + subject._id);
+                  }
+
+                case 39:
                   i++;
-                  _context.next = 4;
+                  _context.next = 16;
                   break;
 
-                case 17:
+                case 42:
+                  updatedProfile = profile;
+
+                  updatedProfile.subjects = subjectsList;
+                  updatedProfile.studentProjects = studentProjectsList;
+
                   return _context.abrupt('return', res.json({
                     result: 'success',
-                    subjects: subjects
+                    subjects: subjects,
+                    projects: projects,
+                    studentProjects: studentProjects,
+                    profile: updatedProfile
                   }));
 
-                case 18:
+                case 46:
                 case 'end':
                   return _context.stop();
               }
@@ -136,32 +193,58 @@ var SubjectRouter = function (_Router) {
         };
       }());
 
-      app.post('/subject/edit', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var subject, err, editedSubject, _ref5, _ref6;
+      app.post('/subject/getMultiple', function () {
+        var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, subject, subjects, i, _ref9, _ref10;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  subject = req.body.data;
-                  //console.log(data)
+                  list = req.body.data;
+                  //console.log(list);
 
-                  err = void 0, editedSubject = void 0;
-                  _context2.next = 4;
-                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project._id }, { $set: subject }, { new: true }));
+                  err = void 0, subject = void 0;
+                  subjects = [];
+                  i = 0;
 
                 case 4:
-                  _ref5 = _context2.sent;
-                  _ref6 = _slicedToArray(_ref5, 2);
-                  err = _ref6[0];
-                  editedSubject = _ref6[1];
+                  if (!(i < list.length)) {
+                    _context2.next = 17;
+                    break;
+                  }
+
+                  _context2.next = 7;
+                  return (0, _to2.default)(_Subject2.default.findById(list[i]));
+
+                case 7:
+                  _ref9 = _context2.sent;
+                  _ref10 = _slicedToArray(_ref9, 2);
+                  err = _ref10[0];
+                  subject = _ref10[1];
+
+                  if (!err) {
+                    _context2.next = 13;
+                    break;
+                  }
+
+                  return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 13:
+                  subjects.splice(0, 0, subject);
+
+                case 14:
+                  i++;
+                  _context2.next = 4;
+                  break;
+
+                case 17:
                   return _context2.abrupt('return', res.json({
-                    result: err ? 'failed' : 'success',
-                    editedSubject: editedSubject
+                    result: 'success',
+                    subjects: subjects
                   }));
 
-                case 9:
+                case 18:
                 case 'end':
                   return _context2.stop();
               }
@@ -169,62 +252,37 @@ var SubjectRouter = function (_Router) {
           }, _callee2, _this2);
         }));
 
-        return function (_x3, _x4, _x5) {
-          return _ref4.apply(this, arguments);
+        return function (_x3, _x4) {
+          return _ref8.apply(this, arguments);
         };
       }());
 
-      app.post('/subject/add', function () {
-        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
-          var subject, err, newSubject, updatedCourse, _ref8, _ref9, _ref10, _ref11;
+      app.post('/subject/edit', function () {
+        var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var subject, err, editedSubject, _ref12, _ref13;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
               switch (_context3.prev = _context3.next) {
                 case 0:
                   subject = req.body.data;
+                  //console.log(data)
 
-                  console.log(subject);
-                  err = void 0, newSubject = void 0, updatedCourse = void 0;
-                  _context3.next = 5;
-                  return (0, _to2.default)(_Subject2.default.create(subject));
+                  err = void 0, editedSubject = void 0;
+                  _context3.next = 4;
+                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project._id }, { $set: subject }, { new: true }));
 
-                case 5:
-                  _ref8 = _context3.sent;
-                  _ref9 = _slicedToArray(_ref8, 2);
-                  err = _ref9[0];
-                  newSubject = _ref9[1];
-
-                  if (!err) {
-                    _context3.next = 11;
-                    break;
-                  }
-
-                  return _context3.abrupt('return', res.json({ result: 'failed' }));
-
-                case 11:
-                  _context3.next = 13;
-                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: subject.course }, { $push: {
-                      subjects: newSubject._id
-                    } }, { new: true }));
-
-                case 13:
-                  _ref10 = _context3.sent;
-                  _ref11 = _slicedToArray(_ref10, 2);
-                  err = _ref11[0];
-                  updatedCourse = _ref11[1];
-
-                  if (err || updatedCourse === null) {
-                    cb('failed');
-                  };
-
+                case 4:
+                  _ref12 = _context3.sent;
+                  _ref13 = _slicedToArray(_ref12, 2);
+                  err = _ref13[0];
+                  editedSubject = _ref13[1];
                   return _context3.abrupt('return', res.json({
-                    result: 'success',
-                    newSubject: newSubject,
-                    updatedCourse: updatedCourse
+                    result: err ? 'failed' : 'success',
+                    editedSubject: editedSubject
                   }));
 
-                case 20:
+                case 9:
                 case 'end':
                   return _context3.stop();
               }
@@ -232,8 +290,71 @@ var SubjectRouter = function (_Router) {
           }, _callee3, _this2);
         }));
 
-        return function (_x6, _x7) {
-          return _ref7.apply(this, arguments);
+        return function (_x5, _x6, _x7) {
+          return _ref11.apply(this, arguments);
+        };
+      }());
+
+      app.post('/subject/add', function () {
+        var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
+          var subject, err, newSubject, updatedCourse, _ref15, _ref16, _ref17, _ref18;
+
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  subject = req.body.data;
+
+                  console.log(subject);
+                  err = void 0, newSubject = void 0, updatedCourse = void 0;
+                  _context4.next = 5;
+                  return (0, _to2.default)(_Subject2.default.create(subject));
+
+                case 5:
+                  _ref15 = _context4.sent;
+                  _ref16 = _slicedToArray(_ref15, 2);
+                  err = _ref16[0];
+                  newSubject = _ref16[1];
+
+                  if (!err) {
+                    _context4.next = 11;
+                    break;
+                  }
+
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
+
+                case 11:
+                  _context4.next = 13;
+                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: subject.course }, { $push: {
+                      subjects: newSubject._id
+                    } }, { new: true }));
+
+                case 13:
+                  _ref17 = _context4.sent;
+                  _ref18 = _slicedToArray(_ref17, 2);
+                  err = _ref18[0];
+                  updatedCourse = _ref18[1];
+
+                  if (err || updatedCourse === null) {
+                    cb('failed');
+                  };
+
+                  return _context4.abrupt('return', res.json({
+                    result: 'success',
+                    newSubject: newSubject,
+                    updatedCourse: updatedCourse
+                  }));
+
+                case 20:
+                case 'end':
+                  return _context4.stop();
+              }
+            }
+          }, _callee4, _this2);
+        }));
+
+        return function (_x8, _x9) {
+          return _ref14.apply(this, arguments);
         };
       }());
     }

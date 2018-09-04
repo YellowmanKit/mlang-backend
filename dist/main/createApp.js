@@ -46,6 +46,10 @@ var _app = require('./routers/app.js');
 
 var _app2 = _interopRequireDefault(_app);
 
+var _school = require('./routers/school.js');
+
+var _school2 = _interopRequireDefault(_school);
+
 var _user = require('./routers/user.js');
 
 var _user2 = _interopRequireDefault(_user);
@@ -95,8 +99,8 @@ var CreateApp = function () {
   _createClass(CreateApp, [{
     key: 'createApp',
     value: function createApp(appName, port, useHttps, useUbuntu, devMode) {
-      var temp = useUbuntu ? _path2.default.join(__dirname, '../../../data/temp/') : 'C:/data/temp/';
-      var storage = useUbuntu ? _path2.default.join(__dirname, '../../../data/storage/') : 'C:/data/storage/';
+      var temp = useUbuntu ? _path2.default.join(__dirname, '../../../data/temp/') : '../data/temp/';
+      var storage = useUbuntu ? _path2.default.join(__dirname, '../../../data/storage/') : '../data/storage/';
 
       var storageConfig = _multer2.default.diskStorage({
         destination: function destination(req, file, cb) {
@@ -135,6 +139,7 @@ var CreateApp = function () {
       app.set('storage', storage);
 
       new _app2.default(app);
+      new _school2.default(app);
       new _user2.default(app);
       new _profile2.default(app);
       new _course2.default(app);

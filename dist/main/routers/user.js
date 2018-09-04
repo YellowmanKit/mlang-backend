@@ -32,6 +32,10 @@ var _Profile = require('../../models/Profile.js');
 
 var _Profile2 = _interopRequireDefault(_Profile);
 
+var _School = require('../../models/School.js');
+
+var _School2 = _interopRequireDefault(_School);
+
 var _Course = require('../../models/Course.js');
 
 var _Course2 = _interopRequireDefault(_Course);
@@ -185,7 +189,7 @@ var UserRouter = function (_Router) {
 
       app.get('/user/login/', function () {
         var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var id, pw, err, user, profile, othersProfile, course, subject, project, studentProject, profiles, _ref6, _ref7, _ref8, _ref9, courses, subjects, joinedCourses, joinedSubjects, today, i, _ref10, _ref11, _ref12, _ref13, endDate, _ref14, _ref15, teachingCourses, teachingSubjects, teachingCoursesData, _ref16, _ref17, _endDate, _ref18, _ref19, studentProjects, _ref20, _ref21;
+          var id, pw, err, user, profile, othersProfile, course, subject, project, studentProject, school, profiles, _ref6, _ref7, _ref8, _ref9, courses, subjects, joinedCourses, joinedSubjects, today, i, _ref10, _ref11, _ref12, _ref13, endDate, _ref14, _ref15, teachingCourses, teachingSubjects, teachingCoursesData, _ref16, _ref17, _endDate, _ref18, _ref19, studentProjects, _ref20, _ref21, schools, supervisingSchools, _ref22, _ref23, joinedSchools, _ref24, _ref25;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -193,7 +197,7 @@ var UserRouter = function (_Router) {
                 case 0:
                   id = req.headers.id;
                   pw = req.headers.pw;
-                  err = void 0, user = void 0, profile = void 0, othersProfile = void 0, course = void 0, subject = void 0, project = void 0, studentProject = void 0;
+                  err = void 0, user = void 0, profile = void 0, othersProfile = void 0, course = void 0, subject = void 0, project = void 0, studentProject = void 0, school = void 0;
                   profiles = [];
                   _context3.next = 6;
                   return (0, _to2.default)(_User2.default.findOne({ id: id, pw: pw }));
@@ -425,11 +429,71 @@ var UserRouter = function (_Router) {
                   _ref21 = _slicedToArray(_ref20, 2);
                   err = _ref21[0];
                   studentProjects = _ref21[1];
+                  schools = [];
+                  supervisingSchools = [];
+                  _context3.next = 116;
+                  return (0, _to2.default)(_School2.default.find({ admin: user._id }));
+
+                case 116:
+                  _ref22 = _context3.sent;
+                  _ref23 = _slicedToArray(_ref22, 2);
+                  err = _ref23[0];
+                  schools = _ref23[1];
+
+                  if (!(err || schools === null)) {
+                    _context3.next = 122;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 122:
+                  schools.map(function (school) {
+                    supervisingSchools.push(school._id);
+                    return null;
+                  });
+
+                  joinedSchools = profile.joinedSchools;
+                  i = 0;
+
+                case 125:
+                  if (!(i < joinedSchools.length)) {
+                    _context3.next = 138;
+                    break;
+                  }
+
+                  _context3.next = 128;
+                  return (0, _to2.default)(_School2.default.findById(joinedSchools[i]));
+
+                case 128:
+                  _ref24 = _context3.sent;
+                  _ref25 = _slicedToArray(_ref24, 2);
+                  err = _ref25[0];
+                  school = _ref25[1];
+
+                  if (!(err || school === null)) {
+                    _context3.next = 134;
+                    break;
+                  }
+
+                  return _context3.abrupt('return', res.json({ result: "failed" }));
+
+                case 134:
+                  schools.push(school);
+
+                case 135:
+                  i++;
+                  _context3.next = 125;
+                  break;
+
+                case 138:
                   return _context3.abrupt('return', res.json({
                     result: "success",
                     user: user,
                     profile: profile,
                     profiles: profiles,
+
+                    supervisingSchools: supervisingSchools,
 
                     teachingCourses: teachingCourses,
                     joinedCourses: joinedCourses,
@@ -437,12 +501,13 @@ var UserRouter = function (_Router) {
                     teachingSubjects: teachingSubjects,
                     joinedSubjects: joinedSubjects,
 
+                    schools: schools,
                     courses: courses,
                     subjects: subjects,
                     studentProjects: studentProjects
                   }));
 
-                case 113:
+                case 139:
                 case 'end':
                   return _context3.stop();
               }

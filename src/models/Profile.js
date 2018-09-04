@@ -17,7 +17,7 @@ var profileSchema = mongoose.Schema({
     type: String,
     default: ''
   },
-
+  joinedSchools: [ObjectId],
   joinedCourses: [ObjectId],
 
   cardCount: {

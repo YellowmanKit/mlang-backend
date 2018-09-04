@@ -23,7 +23,7 @@ var profileSchema = _mongoose2.default.Schema({
     type: String,
     default: ''
   },
-
+  joinedSchools: [ObjectId],
   joinedCourses: [ObjectId],
 
   cardCount: {

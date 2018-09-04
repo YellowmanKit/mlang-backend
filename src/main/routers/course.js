@@ -19,6 +19,30 @@ class CourseRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/course/getAllOfTeacher', async(req, res, next)=>{
+      const profile = req.body.data;
+      //console.log(data)
+
+      let err, course, subject, project, studentProject;
+      var courses = [];
+      var teachingCourses = [];
+
+      [err, courses] = await to(Course.find({teacher: profile.belongTo}));
+      if(err || courses === null){ console.log('failed to getcourses'); return res.json({ result: 'failed' })}
+
+      for(var i=0;i<courses.length;i++){
+        teachingCourses.push(courses[i]._id);
+      }
+      profile['teachingCourses'] = teachingCourses;
+
+      return res.json({
+        result: 'success',
+        courses: courses,
+        profile: profile
+      })
+
+    });
+
     app.post('/course/leave', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)

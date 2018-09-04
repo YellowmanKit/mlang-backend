@@ -9,6 +9,7 @@ class Router {
     type === 'audioComment'? 'cards/audioComments/':
     type === 'profileIcon'? 'profiles/icons/':
     type === 'subjectIcon'? 'subjects/icons/':
+    type === 'schoolIcon'? 'schools/icons/':
     type);
   }
 }
