@@ -42,7 +42,10 @@ class SubjectRouter extends Router {
         projects.push(project);
 
         [err, subject] = await to(Subject.findById(project.subject));
-        if(err || subject === null){ console.log('failed to get subject'); return res.json({ result: 'failed' })}
+        if(err || subject === null){
+          console.log('failed to get subject');
+          continue;
+        }
         subjects.push(subject);
         if(!(subjectsList.indexOf('' + subject._id) > -1)){
           subjectsList.push('' + subject._id);

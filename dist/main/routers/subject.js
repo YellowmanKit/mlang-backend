@@ -153,7 +153,8 @@ var SubjectRouter = function (_Router) {
                     break;
                   }
 
-                  console.log('failed to get subject');return _context.abrupt('return', res.json({ result: 'failed' }));
+                  console.log('failed to get subject');
+                  return _context.abrupt('continue', 39);
 
                 case 37:
                   subjects.push(subject);
