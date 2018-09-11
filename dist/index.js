@@ -1,10 +1,14 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createApp = require('./main/createApp.js');
+require("babel-core/register");
+
+require("babel-polyfill");
+
+var _createApp = require("./main/createApp.js");
 
 var _createApp2 = _interopRequireDefault(_createApp);
 
