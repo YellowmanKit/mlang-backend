@@ -85,7 +85,7 @@ class SubjectRouter extends Router {
       const subject = req.body.data;
       //console.log(data)
       let err, editedSubject;
-      [err, editedSubject] = await to(Subject.findOneAndUpdate({_id: project._id},{ $set: subject }, { new: true }));
+      [err, editedSubject] = await to(Subject.findOneAndUpdate({_id: subject._id},{ $set: subject }, { new: true }));
 
       return res.json({
         result: err? 'failed': 'success',
