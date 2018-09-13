@@ -271,7 +271,7 @@ var SubjectRouter = function (_Router) {
 
                   err = void 0, editedSubject = void 0;
                   _context3.next = 4;
-                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project._id }, { $set: subject }, { new: true }));
+                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: subject._id }, { $set: subject }, { new: true }));
 
                 case 4:
                   _ref12 = _context3.sent;
