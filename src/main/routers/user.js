@@ -67,6 +67,7 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
+  
       let err, user, profile, othersProfile, course, subject, project, studentProject, school;
       var profiles = [];
 
