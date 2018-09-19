@@ -342,7 +342,7 @@ var UserRouter = function (_Router) {
                   teachingSubjects = [];
                   teachingCoursesData = [];
                   _context3.next = 74;
-                  return (0, _to2.default)(_Course2.default.find({ teacher: user._id }));
+                  return (0, _to2.default)(_Course2.default.find({ teacher: user._id }, null, { sort: { endDate: 'ascending' } }));
 
                 case 74:
                   _ref16 = _context3.sent;

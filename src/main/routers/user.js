@@ -67,7 +67,7 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
-  
+
       let err, user, profile, othersProfile, course, subject, project, studentProject, school;
       var profiles = [];
 
@@ -111,7 +111,7 @@ class UserRouter extends Router {
       var teachingSubjects = [];
 
       var teachingCoursesData = [];
-      [err, teachingCoursesData] = await to(Course.find({teacher: user._id}));
+      [err, teachingCoursesData] = await to(Course.find({teacher: user._id}, null, {sort: {endDate: 'ascending'}}));
       if(err){ return res.json({ result: "failed" });}
       courses = [...courses, ...teachingCoursesData];
 
