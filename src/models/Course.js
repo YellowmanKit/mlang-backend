@@ -53,6 +53,11 @@ module.exports.leaveCourse = async (data, cb)=>{
 module.exports.joinCourse = async (data, cb)=>{
   let err, courseToJoin, updatedProfile;
 
+  [err, courseToJoin] = await to(Course.findOne({code: data.code}));
+  if(err || courseToJoin === null){ cb('failed'); };
+
+  if(courseToJoin.joinedStudents.indexOf(data.userId) > -1){ cb('failed - course already joined'); return; }
+
   [err, courseToJoin] = await to(Course.findOneAndUpdate({code: data.code}, { $push: {
     joinedStudents: data.userId
   }}, {new: true}))
@@ -63,7 +68,7 @@ module.exports.joinCourse = async (data, cb)=>{
   }}, {new: true}))
   if(err || updatedProfile === null){ cb('failed'); };
 
-  cb('success', courseToJoin, updatedProfile)
+  cb('success', courseToJoin, updatedProfile);
 }
 
 module.exports.addCourse = async (newCourse, cb)=>{

@@ -40,6 +40,18 @@ var _Subject = require('../../models/Subject.js');
 
 var _Subject2 = _interopRequireDefault(_Subject);
 
+var _StudentProject = require('../../models/StudentProject.js');
+
+var _StudentProject2 = _interopRequireDefault(_StudentProject);
+
+var _Card = require('../../models/Card.js');
+
+var _Card2 = _interopRequireDefault(_Card);
+
+var _Profile = require('../../models/Profile.js');
+
+var _Profile2 = _interopRequireDefault(_Profile);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -72,37 +84,30 @@ var ProjectRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/project/getMultiple', function () {
+      app.post('/project/getRanking', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, project, _projects, i, _ref2, _ref3;
+          var projectId, err, project, studentProjects, card, profile, profiles, rankings, _ref2, _ref3, i, student, cards, total, featured, j, _ref4, _ref5, _ref6, _ref7;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  list = req.body.data;
-                  //console.log(list);
+                  projectId = req.body.data;
 
-                  err = void 0, project = void 0;
-                  _projects = [];
-                  i = 0;
-
-                case 4:
-                  if (!(i < list.length)) {
-                    _context.next = 17;
-                    break;
-                  }
-
+                  console.log(projectId);
+                  err = void 0, project = void 0, studentProjects = void 0, card = void 0, profile = void 0;
+                  profiles = [];
+                  rankings = [];
                   _context.next = 7;
-                  return (0, _to2.default)(_Project2.default.findById(list[i]));
+                  return (0, _to2.default)(_StudentProject2.default.find({ project: projectId }));
 
                 case 7:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  project = _ref3[1];
+                  studentProjects = _ref3[1];
 
-                  if (!err) {
+                  if (!(err || !studentProjects)) {
                     _context.next = 13;
                     break;
                   }
@@ -110,20 +115,100 @@ var ProjectRouter = function (_Router) {
                   return _context.abrupt('return', res.json({ result: 'failed' }));
 
                 case 13:
-                  _projects.splice(0, 0, project);
+                  i = 0;
 
                 case 14:
-                  i++;
-                  _context.next = 4;
+                  if (!(i < studentProjects.length)) {
+                    _context.next = 48;
+                    break;
+                  }
+
+                  student = studentProjects[i].student;
+                  cards = studentProjects[i].cards;
+                  total = 0;
+                  featured = 0;
+                  j = 0;
+
+                case 20:
+                  if (!(j < cards.length)) {
+                    _context.next = 35;
+                    break;
+                  }
+
+                  _context.next = 23;
+                  return (0, _to2.default)(_Card2.default.findById(cards[j]._id));
+
+                case 23:
+                  _ref4 = _context.sent;
+                  _ref5 = _slicedToArray(_ref4, 2);
+                  err = _ref5[0];
+                  card = _ref5[1];
+
+                  if (!(err || !card)) {
+                    _context.next = 29;
+                    break;
+                  }
+
+                  return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 29:
+                  total += card.grade === 'passed' ? 1 : 0;
+                  total += card.grade === 'featured' ? 1 : 0;
+                  featured += card.grade === 'featured' ? 1 : 0;
+
+                case 32:
+                  j++;
+                  _context.next = 20;
                   break;
 
-                case 17:
+                case 35:
+                  _context.next = 37;
+                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: student }));
+
+                case 37:
+                  _ref6 = _context.sent;
+                  _ref7 = _slicedToArray(_ref6, 2);
+                  err = _ref7[0];
+                  profile = _ref7[1];
+
+                  if (!(err || !profile)) {
+                    _context.next = 43;
+                    break;
+                  }
+
+                  return _context.abrupt('return', res.json({ result: 'failed' }));
+
+                case 43:
+
+                  profiles.push(profile);
+
+                  rankings.push({
+                    student: student,
+                    total: total,
+                    featured: featured,
+                    score: total + featured * 2
+                  });
+
+                case 45:
+                  i++;
+                  _context.next = 14;
+                  break;
+
+                case 48:
+
+                  rankings.sort(function (a, b) {
+                    return b.score - a.score;
+                  });
+
+                  //console.log(rankings);
+
                   return _context.abrupt('return', res.json({
                     result: 'success',
-                    projects: _projects
+                    ranking: rankings,
+                    profiles: profiles
                   }));
 
-                case 18:
+                case 50:
                 case 'end':
                   return _context.stop();
               }
@@ -136,32 +221,58 @@ var ProjectRouter = function (_Router) {
         };
       }());
 
-      app.post('/project/edit', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var project, err, editedProject, _ref5, _ref6;
+      app.post('/project/getMultiple', function () {
+        var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, project, _projects, i, _ref9, _ref10;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
-                  project = req.body.data;
-                  //console.log(data)
+                  list = req.body.data;
+                  //console.log(list);
 
-                  err = void 0, editedProject = void 0;
-                  _context2.next = 4;
-                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: project._id }, { $set: project }, { new: true }));
+                  err = void 0, project = void 0;
+                  _projects = [];
+                  i = 0;
 
                 case 4:
-                  _ref5 = _context2.sent;
-                  _ref6 = _slicedToArray(_ref5, 2);
-                  err = _ref6[0];
-                  editedProject = _ref6[1];
+                  if (!(i < list.length)) {
+                    _context2.next = 17;
+                    break;
+                  }
+
+                  _context2.next = 7;
+                  return (0, _to2.default)(_Project2.default.findById(list[i]));
+
+                case 7:
+                  _ref9 = _context2.sent;
+                  _ref10 = _slicedToArray(_ref9, 2);
+                  err = _ref10[0];
+                  project = _ref10[1];
+
+                  if (!err) {
+                    _context2.next = 13;
+                    break;
+                  }
+
+                  return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 13:
+                  _projects.splice(0, 0, project);
+
+                case 14:
+                  i++;
+                  _context2.next = 4;
+                  break;
+
+                case 17:
                   return _context2.abrupt('return', res.json({
-                    result: err ? 'failed' : 'success',
-                    editedProject: editedProject
+                    result: 'success',
+                    projects: _projects
                   }));
 
-                case 9:
+                case 18:
                 case 'end':
                   return _context2.stop();
               }
@@ -169,62 +280,37 @@ var ProjectRouter = function (_Router) {
           }, _callee2, _this2);
         }));
 
-        return function (_x3, _x4, _x5) {
-          return _ref4.apply(this, arguments);
+        return function (_x3, _x4) {
+          return _ref8.apply(this, arguments);
         };
       }());
 
-      app.post('/project/add', function () {
-        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
-          var project, err, newProject, updatedSubject, _ref8, _ref9, _ref10, _ref11;
+      app.post('/project/edit', function () {
+        var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var project, err, editedProject, _ref12, _ref13;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
               switch (_context3.prev = _context3.next) {
                 case 0:
                   project = req.body.data;
+                  //console.log(data)
 
-                  console.log(project);
-                  err = void 0, newProject = void 0, updatedSubject = void 0;
-                  _context3.next = 5;
-                  return (0, _to2.default)(_Project2.default.create(project));
+                  err = void 0, editedProject = void 0;
+                  _context3.next = 4;
+                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: project._id }, { $set: project }, { new: true }));
 
-                case 5:
-                  _ref8 = _context3.sent;
-                  _ref9 = _slicedToArray(_ref8, 2);
-                  err = _ref9[0];
-                  newProject = _ref9[1];
-
-                  if (!err) {
-                    _context3.next = 11;
-                    break;
-                  }
-
-                  return _context3.abrupt('return', res.json({ result: 'failed' }));
-
-                case 11:
-                  _context3.next = 13;
-                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project.subject }, { $push: {
-                      projects: newProject._id
-                    } }, { new: true }));
-
-                case 13:
-                  _ref10 = _context3.sent;
-                  _ref11 = _slicedToArray(_ref10, 2);
-                  err = _ref11[0];
-                  updatedSubject = _ref11[1];
-
-                  if (err || updatedSubject === null) {
-                    cb('failed');
-                  };
-
+                case 4:
+                  _ref12 = _context3.sent;
+                  _ref13 = _slicedToArray(_ref12, 2);
+                  err = _ref13[0];
+                  editedProject = _ref13[1];
                   return _context3.abrupt('return', res.json({
-                    result: 'success',
-                    newProject: newProject,
-                    updatedSubject: updatedSubject
+                    result: err ? 'failed' : 'success',
+                    editedProject: editedProject
                   }));
 
-                case 20:
+                case 9:
                 case 'end':
                   return _context3.stop();
               }
@@ -232,8 +318,71 @@ var ProjectRouter = function (_Router) {
           }, _callee3, _this2);
         }));
 
-        return function (_x6, _x7) {
-          return _ref7.apply(this, arguments);
+        return function (_x5, _x6, _x7) {
+          return _ref11.apply(this, arguments);
+        };
+      }());
+
+      app.post('/project/add', function () {
+        var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
+          var project, err, newProject, updatedSubject, _ref15, _ref16, _ref17, _ref18;
+
+          return regeneratorRuntime.wrap(function _callee4$(_context4) {
+            while (1) {
+              switch (_context4.prev = _context4.next) {
+                case 0:
+                  project = req.body.data;
+
+                  console.log(project);
+                  err = void 0, newProject = void 0, updatedSubject = void 0;
+                  _context4.next = 5;
+                  return (0, _to2.default)(_Project2.default.create(project));
+
+                case 5:
+                  _ref15 = _context4.sent;
+                  _ref16 = _slicedToArray(_ref15, 2);
+                  err = _ref16[0];
+                  newProject = _ref16[1];
+
+                  if (!err) {
+                    _context4.next = 11;
+                    break;
+                  }
+
+                  return _context4.abrupt('return', res.json({ result: 'failed' }));
+
+                case 11:
+                  _context4.next = 13;
+                  return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: project.subject }, { $push: {
+                      projects: newProject._id
+                    } }, { new: true }));
+
+                case 13:
+                  _ref17 = _context4.sent;
+                  _ref18 = _slicedToArray(_ref17, 2);
+                  err = _ref18[0];
+                  updatedSubject = _ref18[1];
+
+                  if (err || updatedSubject === null) {
+                    cb('failed');
+                  };
+
+                  return _context4.abrupt('return', res.json({
+                    result: 'success',
+                    newProject: newProject,
+                    updatedSubject: updatedSubject
+                  }));
+
+                case 20:
+                case 'end':
+                  return _context4.stop();
+              }
+            }
+          }, _callee4, _this2);
+        }));
+
+        return function (_x8, _x9) {
+          return _ref14.apply(this, arguments);
         };
       }());
     }

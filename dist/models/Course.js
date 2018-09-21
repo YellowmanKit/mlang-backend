@@ -108,7 +108,7 @@ module.exports.leaveCourse = function () {
 
 module.exports.joinCourse = function () {
   var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data, cb) {
-    var err, courseToJoin, updatedProfile, _ref7, _ref8, _ref9, _ref10;
+    var err, courseToJoin, updatedProfile, _ref7, _ref8, _ref9, _ref10, _ref11, _ref12;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
@@ -116,9 +116,7 @@ module.exports.joinCourse = function () {
           case 0:
             err = void 0, courseToJoin = void 0, updatedProfile = void 0;
             _context2.next = 3;
-            return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $push: {
-                joinedStudents: data.userId
-              } }, { new: true }));
+            return (0, _to2.default)(Course.findOne({ code: data.code }));
 
           case 3:
             _ref7 = _context2.sent;
@@ -130,16 +128,39 @@ module.exports.joinCourse = function () {
               cb('failed');
             };
 
-            _context2.next = 11;
+            if (!(courseToJoin.joinedStudents.indexOf(data.userId) > -1)) {
+              _context2.next = 12;
+              break;
+            }
+
+            cb('failed - course already joined');return _context2.abrupt('return');
+
+          case 12:
+            _context2.next = 14;
+            return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $push: {
+                joinedStudents: data.userId
+              } }, { new: true }));
+
+          case 14:
+            _ref9 = _context2.sent;
+            _ref10 = _slicedToArray(_ref9, 2);
+            err = _ref10[0];
+            courseToJoin = _ref10[1];
+
+            if (err || courseToJoin === null) {
+              cb('failed');
+            };
+
+            _context2.next = 22;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $push: {
                 joinedCourses: courseToJoin._id
               } }, { new: true }));
 
-          case 11:
-            _ref9 = _context2.sent;
-            _ref10 = _slicedToArray(_ref9, 2);
-            err = _ref10[0];
-            updatedProfile = _ref10[1];
+          case 22:
+            _ref11 = _context2.sent;
+            _ref12 = _slicedToArray(_ref11, 2);
+            err = _ref12[0];
+            updatedProfile = _ref12[1];
 
             if (err || updatedProfile === null) {
               cb('failed');
@@ -147,7 +168,7 @@ module.exports.joinCourse = function () {
 
             cb('success', courseToJoin, updatedProfile);
 
-          case 18:
+          case 29:
           case 'end':
             return _context2.stop();
         }
@@ -161,8 +182,8 @@ module.exports.joinCourse = function () {
 }();
 
 module.exports.addCourse = function () {
-  var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(newCourse, cb) {
-    var err, course, newCode, i, _ref12, _ref13, _ref14, _ref15;
+  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(newCourse, cb) {
+    var err, course, newCode, i, _ref14, _ref15, _ref16, _ref17;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
@@ -187,10 +208,10 @@ module.exports.addCourse = function () {
             return (0, _to2.default)(Course.findOne({ code: newCode }));
 
           case 7:
-            _ref12 = _context3.sent;
-            _ref13 = _slicedToArray(_ref12, 2);
-            err = _ref13[0];
-            course = _ref13[1];
+            _ref14 = _context3.sent;
+            _ref15 = _slicedToArray(_ref14, 2);
+            err = _ref15[0];
+            course = _ref15[1];
 
             if (!(!err && course === null)) {
               _context3.next = 13;
@@ -215,10 +236,10 @@ module.exports.addCourse = function () {
             return (0, _to2.default)(Course.create(newCourse));
 
           case 20:
-            _ref14 = _context3.sent;
-            _ref15 = _slicedToArray(_ref14, 2);
-            err = _ref15[0];
-            course = _ref15[1];
+            _ref16 = _context3.sent;
+            _ref17 = _slicedToArray(_ref16, 2);
+            err = _ref17[0];
+            course = _ref17[1];
 
             if (!err) {
               _context3.next = 28;
@@ -241,7 +262,7 @@ module.exports.addCourse = function () {
   }));
 
   return function (_x5, _x6) {
-    return _ref11.apply(this, arguments);
+    return _ref13.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Course.js.map
