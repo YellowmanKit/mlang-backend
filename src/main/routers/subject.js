@@ -8,6 +8,7 @@ import Course from '../../models/Course.js';
 import Project from '../../models/Project.js';
 import Subject from '../../models/Subject.js';
 import StudentProject from '../../models/StudentProject.js';
+import Card from '../../models/Card.js';
 
 class SubjectRouter extends Router {
 
@@ -25,7 +26,7 @@ class SubjectRouter extends Router {
     app.post('/subject/getAllOfUser', async(req, res)=>{
       const profile = req.body.data;
       //console.log(profile);
-      let err, studentProjects, project, subject;
+      let err, studentProjects, project, subject, card;
       var projects = [];
       var subjects = [];
 
@@ -35,6 +36,18 @@ class SubjectRouter extends Router {
       var studentProjectsList = [];
       var subjectsList = [];
       for(var i=0;i<studentProjects.length;i++){
+        const cards = studentProjects[i].cards;
+        if(cards.length === 0){ continue; }
+
+        var skip = false;
+        for(var j=0;j<cards.length;j++){
+          [err, card] = await to(Card.findById(cards[j]._id));
+          if(err || !card){ continue; }
+          if(card.grade === 'featured'){ break; }
+          if(j === cards.length - 1){ skip = true; }
+        }
+        if(skip){ continue; }
+
         studentProjectsList.push(studentProjects[i]._id);
 
         [err, project] = await to(Project.findById(studentProjects[i].project));

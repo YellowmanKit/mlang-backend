@@ -23,11 +23,12 @@ class SchoolRouter extends Router {
       const data = req.body.data;
       //console.log(data)
 
-      School.leaveSchool(data, (result, leavedSchool, updatedProfile)=>{
+      School.leaveSchool(data, (result, leavedSchool, updatedProfile, updatedUser)=>{
         return res.json({
           result: result,
           leavedSchool: leavedSchool,
-          updatedProfile: updatedProfile
+          updatedProfile: updatedProfile,
+          updatedUser: updatedUser
         })
       })
     });

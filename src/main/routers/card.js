@@ -215,8 +215,6 @@ class CardRouter extends Router {
 
   }
 
-
-
 }
 
 export default CardRouter;

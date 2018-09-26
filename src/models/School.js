@@ -3,6 +3,7 @@ import randomString from'randomstring';
 import to from'../to';
 
 import Profile from './Profile';
+import User from './User';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var schoolSchema = mongoose.Schema({
@@ -34,8 +35,28 @@ var schoolSchema = mongoose.Schema({
 
 var School = module.exports = mongoose.model('school',schoolSchema);
 
+module.exports.getByUser = async (userId, profile) =>{
+  let err, school;
+  let schools = [];
+  let supervisingSchools = [];
+  let joinedSchools = profile.joinedSchools;
+
+  [err, schools] = await(to(School.find({admin: userId})));
+  if(err || schools === null){ return res.json({ result: "failed" });}
+  for(var i=0;i<schools.length;i++){
+    supervisingSchools.push(schools[i]._id);
+  }
+
+  for(var i=0;i<joinedSchools.length;i++){
+    [err, school] = await to(School.findById(joinedSchools[i]));
+    schools = [...schools, school];
+  }
+
+  return [err, schools, supervisingSchools];
+}
+
 module.exports.leaveSchool = async (data, cb)=>{
-  let err, schoolToLeave, updatedProfile;
+  let err, schoolToLeave, updatedProfile, updatedUser;
 
   [err, schoolToLeave] = await to(School.findOneAndUpdate({code: data.code}, { $pull: {
     joinedTeachers: data.userId
@@ -47,7 +68,14 @@ module.exports.leaveSchool = async (data, cb)=>{
   }}, {new: true}))
   if(err || updatedProfile === null){ cb('failed'); };
 
-  cb('success', schoolToLeave, updatedProfile)
+  if(updatedProfile.joinedSchools.length === 0){
+    [err, updatedUser] = await to(User.findOneAndUpdate({_id: data.userId}, { $set: {
+      type: 'student'
+    }}, {new: true}))
+    if(err || updatedUser === null){ cb('failed'); };
+  }
+
+  cb('success', schoolToLeave, updatedProfile, updatedUser)
 }
 
 module.exports.joinSchool = async (data, cb)=>{

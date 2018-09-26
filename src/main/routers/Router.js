@@ -12,6 +12,13 @@ class Router {
     type === 'schoolIcon'? 'schools/icons/':
     type);
   }
+
+  outDated(date){
+    const today = new Date();
+    const endDate = new Date(date);
+    return date < today;
+  }
+  
 }
 
 export default Router;

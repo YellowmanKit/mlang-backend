@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Model from './Model';
+import to from '../to';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var subjectSchema = mongoose.Schema({
@@ -27,3 +29,21 @@ var subjectSchema = mongoose.Schema({
 })
 
 var Subject = module.exports = mongoose.model('subject',subjectSchema);
+
+module.exports.getByCourses = async (courses) =>{
+  let err, subject;
+  let subjectsId = [];
+  let subjects = [];
+
+  for(var i=0;i<courses.length;i++){
+    if(Model.outDated(courses[i].endDate)){ continue; }
+    subjectsId = [...subjectsId, ...courses[i].subjects];
+  }
+
+  for(var i=0;i<subjectsId.length;i++){
+    [err, subject] = await to(Subject.findById(subjectsId[i]));
+    subjects.push(subject)
+  }
+
+  return [err, subjects, subjectsId];
+}

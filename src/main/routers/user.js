@@ -28,7 +28,6 @@ class UserRouter extends Router {
 
     app.post('/user/update', async(req, res, next)=>{
       const data = req.body.data;
-      //console.log(data)
       let err, existedUser;
       [err, existedUser] = await to(User.findOne({id: data.id, pw: data.pw}));
       if(err){ console.log(err); return res.json({ result: 'failed'})}
@@ -40,12 +39,12 @@ class UserRouter extends Router {
         pw: data.pw,
         email: data.email
       }}, {new: true}, (err, updatedUser)=>{
-        //console.log(_updatedUser)
         return res.json({
           result: (err || !updatedUser)? 'failed':'success' ,
           updatedUser: updatedUser
         });
       });
+
     });
 
     app.get('/user/resetPassword/', async (req, res, next)=>{
@@ -68,84 +67,65 @@ class UserRouter extends Router {
       const id = req.headers.id;
       const pw = req.headers.pw;
 
-      let err, user, profile, othersProfile, course, subject, project, studentProject, school;
-      var profiles = [];
+      let profiles = [];
+      let schools = [];
+      let courses = [];
+      let subjects = [];
+      let projects = [];
+      let studentProhects = [];
 
-      [err, user] = await to(User.findOne({id, pw}));
-      if(err || !user){ console.log(err); console.log(user); return res.json({ result: "failed" });}
+      let err, data, user, profile;
+      [err, user, profile] = await User.getUserAndProfile(id, pw);
+      if(err){ return res.json({ result: "failed" }); }
 
-      [err, profile] = await to(Profile.findOne({belongTo: user._id}));
-      if(err || profile === null){ return res.json({ result: "failed" });}
-      profiles.push(profile);
+      profiles = [profile];
 
-      var courses = [];
-      var subjects = [];
+      let teacherProfiles;
+      [err, data, teacherProfiles] = await Course.getJoined(profile.joinedCourses);
+      if(err){ return res.json({ result: "failed" }); }
 
-      var joinedCourses = profile.joinedCourses;
-      var joinedSubjects = [];
+      courses = [...courses, ...data];
+      profiles = [...profiles, ...teacherProfiles];
 
-      const today = new Date();
+      let joinedSubjects;
+      [err, data, joinedSubjects] = await Subject.getByCourses(data);
+      if(err){ return res.json({ result: "failed" }); }
 
-      for(var i=0;i<joinedCourses.length;i++){
-        [err, course] = await to(Course.findById(joinedCourses[i]));
-        if(err || course === null){ return res.json({ result: "failed" });}
+      subjects = [...subjects, ...data];
 
-        courses.push(course);
+      let joinedProjects;
+      [err, data, joinedProjects] = await Project.getBySubjects(data);
+      if(err){ return res.json({ result: "failed" }); }
 
-        [err, othersProfile] = await to(Profile.findOne({belongTo: course.teacher}));
-        if(err || othersProfile === null){ return res.json({ result: "failed" });}
-        profiles.push(othersProfile);
-
-        const endDate = new Date(course.endDate);
-        if(endDate < today){ continue; }
-        joinedSubjects = [...joinedSubjects, ...course.subjects];
-      }
-
-      for(var i=0;i<joinedSubjects.length;i++){
-        [err, subject] = await to(Subject.findById(joinedSubjects[i]._id));
-        if(err || subject === null){ return res.json({ result: "failed" });}
-        subjects.push(subject)
-      }
+      projects = [...projects, ...data];
 
       var teachingCourses = [];
-      var teachingSubjects = [];
-
-      var teachingCoursesData = [];
-      [err, teachingCoursesData] = await to(Course.find({teacher: user._id}, null, {sort: {endDate: 'ascending'}}));
+      [err, data, teachingCourses] = await Course.getTeaching(user._id);
       if(err){ return res.json({ result: "failed" });}
-      courses = [...courses, ...teachingCoursesData];
 
-      for(var i=0;i<teachingCoursesData.length;i++){
-        teachingCourses.push(teachingCoursesData[i]._id);
-        const endDate = new Date(teachingCoursesData[i].endDate);
-        if(endDate < today){ continue; }
-        teachingSubjects = [...teachingSubjects, ...teachingCoursesData[i].subjects];
-      }
+      courses = [...courses, ...data];
 
-      for(var i=0;i<teachingSubjects.length;i++){
-        [err, subject] = await to(Subject.findById(teachingSubjects[i]._id));
-        if(err || subject === null){ return res.json({ result: "failed" });}
-        subjects.push(subject)
-      }
+      var teachingSubjects = [];
+      [err, data, teachingSubjects] = await Subject.getByCourses(data);
+      if(err){ return res.json({ result: "failed" });}
+
+      subjects = [...subjects, ...data];
+
+      let teachingProjects;
+      [err, data, teachingProjects] = await Project.getBySubjects(data);
+      if(err){ return res.json({ result: "failed" }); }
+
+      projects = [...projects, ...data];
 
       var studentProjects = [];
       [err, studentProjects] = await to(StudentProject.find({student: user._id}));
+      if(err){ return res.json({ result: "failed" });}
 
-      var schools = [];
       var supervisingSchools = [];
-      [err, schools] = await(to(School.find({admin: user._id})));
-      if(err || schools === null){ return res.json({ result: "failed" });}
-      schools.map(school=>{
-        supervisingSchools.push(school._id);
-        return null;
-      });
+      [err, data, supervisingSchools] = await School.getByUser(user._id, profile);
+      if(err){ return res.json({ result: "failed" });}
 
-      const joinedSchools = profile.joinedSchools;
-      for(var i=0;i<joinedSchools.length;i++){
-        [err, school] = await to(School.findById(joinedSchools[i]));
-        if(err || school === null){ return res.json({ result: "failed" });}
-        schools.push(school);
-      }
+      schools = [...schools, ...data];
 
       return res.json({
         result: "success",
@@ -156,14 +136,18 @@ class UserRouter extends Router {
         supervisingSchools: supervisingSchools,
 
         teachingCourses: teachingCourses,
-        joinedCourses: joinedCourses,
+        joinedCourses: profile.joinedCourses,
 
         teachingSubjects: teachingSubjects,
         joinedSubjects: joinedSubjects,
 
+        teachingProjects: teachingProjects,
+        joinedProjects: joinedProjects,
+
         schools: schools,
         courses: courses,
         subjects: subjects,
+        projects: projects,
         studentProjects: studentProjects
       })
     });

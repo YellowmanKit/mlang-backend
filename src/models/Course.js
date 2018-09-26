@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import randomString from'randomstring';
-import to from'../to';
+import Model from './Model';
+import to from '../to';
 
 import Profile from './Profile';
 
@@ -33,6 +34,38 @@ var courseSchema = mongoose.Schema({
 })
 
 var Course = module.exports = mongoose.model('course',courseSchema);
+
+module.exports.getTeaching = async (teacherId)=>{
+  let err, course;
+  let courses = [];
+  let teachingCourses = [];
+
+  [err, courses] = await to(Course.find({teacher: teacherId}, null, {sort: {endDate: 'ascending'}}));
+  for(var i=0;i<courses.length;i++){
+    teachingCourses.push(courses[i]._id);
+  }
+
+  return [err, courses, teachingCourses];
+}
+
+module.exports.getJoined = async (joinedCourses)=>{
+  let err, course, profile;
+  let courses = [];
+  let profiles = [];
+
+  for(var i=0;i<joinedCourses.length;i++){
+    [err, course] = await to(Course.findById(joinedCourses[i]));
+    if(err || course === null){ return ['error']; }
+
+    courses.push(course);
+
+    [err, profile] = await to(Profile.findOne({belongTo: course.teacher}));
+    if(err || profile === null){ return ['error']; }
+    profiles.push(profile);
+  }
+
+  return [err, courses, profiles];
+}
 
 module.exports.leaveCourse = async (data, cb)=>{
   let err, courseToLeave, updatedProfile;

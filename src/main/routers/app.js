@@ -40,26 +40,26 @@ class AppRouter extends Router{
 
       const type = req.headers.type;
       var append = this.getAppend(type);
-      var _filenames = [];
+      var filenames = [];
 
       for(var i=0;i<req.files.length;i++){
         var filename = req.files[i].filename;
-        const splted = filename.split('-')
+        const splted = filename.split('-');
 
-        _filenames.splice(0,0,filename);
+        filenames.splice(0,0,filename);
 
         if(type === 'card'){
-            append = splted[1] === 'cardIcon.png'? this.getAppend('cardIcon'):this.getAppend('langAudio');
+            append = splted[1] === 'cardIcon.png'? this.getAppend('cardIcon'): this.getAppend('langAudio');
         }
 
         fs.move(temp + filename, storage + append + filename, (err)=> {
-            if(err){console.log(err)}
+            if(err){ console.log(err); }
         });
       }
 
       return res.json({
         result: 'success',
-        filenames: _filenames
+        filenames: filenames
       })
     });
 

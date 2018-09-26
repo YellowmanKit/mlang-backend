@@ -29,6 +29,18 @@ var schema = mongoose.Schema({
 
 var User = module.exports = mongoose.model('user',schema);
 
+module.exports.getUserAndProfile = async (id, pw) =>{
+  let err, user, profile;
+
+  [err, user] = await to(User.findOne({id, pw}));
+  if(err || !user){ console.log(err); return ['error']; }
+
+  [err, profile] = await to(Profile.findOne({belongTo: user._id}));
+  if(err || !profile){ console.log(err); return ['error']; }
+
+  return [null , user, profile]
+}
+
 module.exports.resetPassword = async (_email, cb)=>{
   let err, user, info;
 
