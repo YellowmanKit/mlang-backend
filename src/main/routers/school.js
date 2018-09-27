@@ -19,6 +19,17 @@ class SchoolRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/school/getStatistics', async(req, res, next)=>{
+      const schoolId = req.body.data;
+      //console.log(schoolId)
+
+      let err, statistics;
+      [err, statistics] = await School.getStatistics(schoolId);
+      if(err){ return res.json({result: 'failed'})}
+      return res.json({result: 'success', statistics: statistics})
+
+    });
+
     app.post('/school/leave', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)

@@ -30,13 +30,13 @@ var subjectSchema = mongoose.Schema({
 
 var Subject = module.exports = mongoose.model('subject',subjectSchema);
 
-module.exports.getByCourses = async (courses) =>{
+module.exports.getByCourses = async (courses, all) =>{
   let err, subject;
   let subjectsId = [];
   let subjects = [];
 
   for(var i=0;i<courses.length;i++){
-    if(Model.outDated(courses[i].endDate)){ continue; }
+    if(!all && Model.outDated(courses[i].endDate)){ continue; }
     subjectsId = [...subjectsId, ...courses[i].subjects];
   }
 
