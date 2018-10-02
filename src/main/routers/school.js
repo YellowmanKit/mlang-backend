@@ -6,6 +6,8 @@ import to from '../../to';
 import User from '../../models/User.js';
 import School from '../../models/School.js';
 
+import Query from '../../models/Query.js';
+
 class SchoolRouter extends Router {
 
   constructor(app){
@@ -24,10 +26,26 @@ class SchoolRouter extends Router {
       //console.log(schoolId)
 
       let err, statistics;
-      [err, statistics] = await School.getStatistics(schoolId);
+      [err, statistics] = await Query.getStatistics(schoolId);
       if(err){ return res.json({result: 'failed'})}
       return res.json({result: 'success', statistics: statistics})
 
+    });
+
+    app.post('/school/getMultiple', async(req, res)=>{
+      const list = req.body.data;
+      //console.log(list);
+      let err, school;
+      var schools = [];
+      for(var i=0;i<list.length;i++){
+        [err, school] = await to(School.findById(list[i]));
+        if(err){ return res.json({ result: 'failed' })}
+        schools.splice(0,0,school);
+      }
+      return res.json({
+        result:'success',
+        schools: schools
+      })
     });
 
     app.post('/school/leave', async(req, res, next)=>{

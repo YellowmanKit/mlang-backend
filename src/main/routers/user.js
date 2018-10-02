@@ -127,12 +127,23 @@ class UserRouter extends Router {
 
       schools = [...schools, ...data];
 
+      var adminUsers = [];
+      [err, data, adminUsers] = await User.getByType('admin');
+
+      var admins = [];
+
+      [err, data, admins] = await User.getProfilesByUsers(data);
+      if(err){ return res.json({ result: "failed" });}
+
+      profiles = [...profiles, ...data];
+
       return res.json({
         result: "success",
         user: user,
         profile: profile,
         profiles: profiles,
 
+        admins: admins,
         supervisingSchools: supervisingSchools,
 
         teachingCourses: teachingCourses,

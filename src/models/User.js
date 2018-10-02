@@ -5,6 +5,7 @@ import to from'../to';
 import dotenv from'dotenv';
 dotenv.config();
 
+import School from './School';
 import Profile from './Profile';
 
 var schema = mongoose.Schema({
@@ -28,6 +29,39 @@ var schema = mongoose.Schema({
 })
 
 var User = module.exports = mongoose.model('user',schema);
+
+module.exports.getProfilesByUsers = async (users)=>{
+  let err,data;
+
+  let profile = [];
+  let profiles = [];
+  let profilesId = [];
+
+  for(var i=0;i<users.length;i++){
+    [err, profile] = await to(Profile.findOne({ belongTo: users[i]._id }) );
+
+    if(users[i].type === 'admin'){
+      let supervisingSchools = [];
+      [err, data, supervisingSchools] = await School.getByUser(users[i], profile);
+      profile = {...profile._doc, supervisingSchools: supervisingSchools};
+    }
+    profiles = [...profiles, profile];
+    profilesId = [...profilesId, profile._id];
+  }
+  return [err, profiles, profilesId];
+}
+
+module.exports.getByType = async (type)=>{
+  let err, users;
+  let usersId = [];
+
+  [err, users] = await to(User.find({type: type}));
+  if(err || !users){ console.log(err); return ['error']; }
+  for(var i=0;i<users.length;i++){
+    usersId = [...usersId, users[i]._id];
+  }
+  return [null , users, usersId]
+}
 
 module.exports.getUserAndProfile = async (id, pw) =>{
   let err, user, profile;
