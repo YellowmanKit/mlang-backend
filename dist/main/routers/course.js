@@ -79,7 +79,7 @@ var CourseRouter = function (_Router) {
                   courses = [];
                   teachingCourses = [];
                   _context.next = 6;
-                  return (0, _to2.default)(_Course2.default.find({ teacher: profile.belongTo }));
+                  return (0, _to2.default)(_Course2.default.find({ teacher: profile.belongTo }, null, { sort: { createdAt: 'descending' } }));
 
                 case 6:
                   _ref2 = _context.sent;
@@ -95,7 +95,7 @@ var CourseRouter = function (_Router) {
                   console.log('failed to getcourses');return _context.abrupt('return', res.json({ result: 'failed' }));
 
                 case 13:
-
+                  console.log(courses);
                   for (i = 0; i < courses.length; i++) {
                     teachingCourses.push(courses[i]._id);
                   }
@@ -107,7 +107,7 @@ var CourseRouter = function (_Router) {
                     profile: profile
                   }));
 
-                case 16:
+                case 17:
                 case 'end':
                   return _context.stop();
               }

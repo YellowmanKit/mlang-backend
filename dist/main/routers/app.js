@@ -80,13 +80,13 @@ var AppRouter = function (_Router) {
 
         var type = req.headers.type;
         var append = _this2.getAppend(type);
-        var _filenames = [];
+        var filenames = [];
 
         for (var i = 0; i < req.files.length; i++) {
           var filename = req.files[i].filename;
           var splted = filename.split('-');
 
-          _filenames.splice(0, 0, filename);
+          filenames.splice(0, 0, filename);
 
           if (type === 'card') {
             append = splted[1] === 'cardIcon.png' ? _this2.getAppend('cardIcon') : _this2.getAppend('langAudio');
@@ -101,7 +101,7 @@ var AppRouter = function (_Router) {
 
         return res.json({
           result: 'success',
-          filenames: _filenames
+          filenames: filenames
         });
       });
 

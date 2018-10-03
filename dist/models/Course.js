@@ -10,6 +10,10 @@ var _randomstring = require('randomstring');
 
 var _randomstring2 = _interopRequireDefault(_randomstring);
 
+var _Model = require('./Model');
+
+var _Model2 = _interopRequireDefault(_Model);
+
 var _to = require('../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -19,6 +23,8 @@ var _Profile = require('./Profile');
 var _Profile2 = _interopRequireDefault(_Profile);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
@@ -52,40 +58,211 @@ var courseSchema = _mongoose2.default.Schema({
 
 var Course = module.exports = _mongoose2.default.model('course', courseSchema);
 
-module.exports.leaveCourse = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(data, cb) {
-    var err, courseToLeave, updatedProfile, _ref2, _ref3, _ref4, _ref5;
+module.exports.getBySchool = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(school) {
+    var err, course, coursesId, courses, teachers, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            err = void 0, course = void 0;
+            coursesId = [];
+            courses = [];
+            teachers = school.joinedTeachers;
+            i = 0;
+
+          case 5:
+            if (!(i < teachers.length)) {
+              _context.next = 15;
+              break;
+            }
+
+            _context.next = 8;
+            return (0, _to2.default)(Course.find({ teacher: teachers[i] }));
+
+          case 8:
+            _ref2 = _context.sent;
+            _ref3 = _slicedToArray(_ref2, 2);
+            err = _ref3[0];
+            courses = _ref3[1];
+
+          case 12:
+            i++;
+            _context.next = 5;
+            break;
+
+          case 15:
+            for (i = 0; i < courses.length; i++) {
+              coursesId = [].concat(_toConsumableArray(coursesId), [courses[i]._id]);
+            }
+            return _context.abrupt('return', [err, courses, coursesId]);
+
+          case 17:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined);
+  }));
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getTeaching = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(teacherId) {
+    var err, course, courses, teachingCourses, _ref5, _ref6, i;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            err = void 0, course = void 0;
+            courses = [];
+            teachingCourses = [];
+            _context2.next = 5;
+            return (0, _to2.default)(Course.find({ teacher: teacherId }, null, { sort: { endDate: 'ascending' } }));
+
+          case 5:
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            courses = _ref6[1];
+
+            for (i = 0; i < courses.length; i++) {
+              teachingCourses.push(courses[i]._id);
+            }
+
+            return _context2.abrupt('return', [err, courses, teachingCourses]);
+
+          case 11:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, undefined);
+  }));
+
+  return function (_x2) {
+    return _ref4.apply(this, arguments);
+  };
+}();
+
+module.exports.getJoined = function () {
+  var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(joinedCourses) {
+    var err, course, profile, courses, profiles, i, _ref8, _ref9, _ref10, _ref11;
+
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            err = void 0, course = void 0, profile = void 0;
+            courses = [];
+            profiles = [];
+            i = 0;
+
+          case 4:
+            if (!(i < joinedCourses.length)) {
+              _context3.next = 26;
+              break;
+            }
+
+            _context3.next = 7;
+            return (0, _to2.default)(Course.findById(joinedCourses[i]));
+
+          case 7:
+            _ref8 = _context3.sent;
+            _ref9 = _slicedToArray(_ref8, 2);
+            err = _ref9[0];
+            course = _ref9[1];
+
+            if (!(err || course === null)) {
+              _context3.next = 13;
+              break;
+            }
+
+            return _context3.abrupt('return', ['error']);
+
+          case 13:
+
+            courses.push(course);
+
+            _context3.next = 16;
+            return (0, _to2.default)(_Profile2.default.findOne({ belongTo: course.teacher }));
+
+          case 16:
+            _ref10 = _context3.sent;
+            _ref11 = _slicedToArray(_ref10, 2);
+            err = _ref11[0];
+            profile = _ref11[1];
+
+            if (!(err || profile === null)) {
+              _context3.next = 22;
+              break;
+            }
+
+            return _context3.abrupt('return', ['error']);
+
+          case 22:
+            profiles.push(profile);
+
+          case 23:
+            i++;
+            _context3.next = 4;
+            break;
+
+          case 26:
+            return _context3.abrupt('return', [err, courses, profiles]);
+
+          case 27:
+          case 'end':
+            return _context3.stop();
+        }
+      }
+    }, _callee3, undefined);
+  }));
+
+  return function (_x3) {
+    return _ref7.apply(this, arguments);
+  };
+}();
+
+module.exports.leaveCourse = function () {
+  var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(data, cb) {
+    var err, courseToLeave, updatedProfile, _ref13, _ref14, _ref15, _ref16;
+
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
             err = void 0, courseToLeave = void 0, updatedProfile = void 0;
-            _context.next = 3;
+            _context4.next = 3;
             return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $pull: {
                 joinedStudents: data.userId
               } }, { new: true }));
 
           case 3:
-            _ref2 = _context.sent;
-            _ref3 = _slicedToArray(_ref2, 2);
-            err = _ref3[0];
-            courseToLeave = _ref3[1];
+            _ref13 = _context4.sent;
+            _ref14 = _slicedToArray(_ref13, 2);
+            err = _ref14[0];
+            courseToLeave = _ref14[1];
 
             if (err || courseToLeave === null) {
               cb('failed');
             };
 
-            _context.next = 11;
+            _context4.next = 11;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $pull: {
                 joinedCourses: courseToLeave._id
               } }, { new: true }));
 
           case 11:
-            _ref4 = _context.sent;
-            _ref5 = _slicedToArray(_ref4, 2);
-            err = _ref5[0];
-            updatedProfile = _ref5[1];
+            _ref15 = _context4.sent;
+            _ref16 = _slicedToArray(_ref15, 2);
+            err = _ref16[0];
+            updatedProfile = _ref16[1];
 
             if (err || updatedProfile === null) {
               cb('failed');
@@ -95,72 +272,72 @@ module.exports.leaveCourse = function () {
 
           case 18:
           case 'end':
-            return _context.stop();
+            return _context4.stop();
         }
       }
-    }, _callee, undefined);
+    }, _callee4, undefined);
   }));
 
-  return function (_x, _x2) {
-    return _ref.apply(this, arguments);
+  return function (_x4, _x5) {
+    return _ref12.apply(this, arguments);
   };
 }();
 
 module.exports.joinCourse = function () {
-  var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data, cb) {
-    var err, courseToJoin, updatedProfile, _ref7, _ref8, _ref9, _ref10, _ref11, _ref12;
+  var _ref17 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(data, cb) {
+    var err, courseToJoin, updatedProfile, _ref18, _ref19, _ref20, _ref21, _ref22, _ref23;
 
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
             err = void 0, courseToJoin = void 0, updatedProfile = void 0;
-            _context2.next = 3;
+            _context5.next = 3;
             return (0, _to2.default)(Course.findOne({ code: data.code }));
 
           case 3:
-            _ref7 = _context2.sent;
-            _ref8 = _slicedToArray(_ref7, 2);
-            err = _ref8[0];
-            courseToJoin = _ref8[1];
+            _ref18 = _context5.sent;
+            _ref19 = _slicedToArray(_ref18, 2);
+            err = _ref19[0];
+            courseToJoin = _ref19[1];
 
             if (err || courseToJoin === null) {
               cb('failed');
             };
 
             if (!(courseToJoin.joinedStudents.indexOf(data.userId) > -1)) {
-              _context2.next = 12;
+              _context5.next = 12;
               break;
             }
 
-            cb('failed - course already joined');return _context2.abrupt('return');
+            cb('failed - course already joined');return _context5.abrupt('return');
 
           case 12:
-            _context2.next = 14;
+            _context5.next = 14;
             return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $push: {
                 joinedStudents: data.userId
               } }, { new: true }));
 
           case 14:
-            _ref9 = _context2.sent;
-            _ref10 = _slicedToArray(_ref9, 2);
-            err = _ref10[0];
-            courseToJoin = _ref10[1];
+            _ref20 = _context5.sent;
+            _ref21 = _slicedToArray(_ref20, 2);
+            err = _ref21[0];
+            courseToJoin = _ref21[1];
 
             if (err || courseToJoin === null) {
               cb('failed');
             };
 
-            _context2.next = 22;
+            _context5.next = 22;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $push: {
                 joinedCourses: courseToJoin._id
               } }, { new: true }));
 
           case 22:
-            _ref11 = _context2.sent;
-            _ref12 = _slicedToArray(_ref11, 2);
-            err = _ref12[0];
-            updatedProfile = _ref12[1];
+            _ref22 = _context5.sent;
+            _ref23 = _slicedToArray(_ref22, 2);
+            err = _ref23[0];
+            updatedProfile = _ref23[1];
 
             if (err || updatedProfile === null) {
               cb('failed');
@@ -170,24 +347,24 @@ module.exports.joinCourse = function () {
 
           case 29:
           case 'end':
-            return _context2.stop();
+            return _context5.stop();
         }
       }
-    }, _callee2, undefined);
+    }, _callee5, undefined);
   }));
 
-  return function (_x3, _x4) {
-    return _ref6.apply(this, arguments);
+  return function (_x6, _x7) {
+    return _ref17.apply(this, arguments);
   };
 }();
 
 module.exports.addCourse = function () {
-  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(newCourse, cb) {
-    var err, course, newCode, i, _ref14, _ref15, _ref16, _ref17;
+  var _ref24 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(newCourse, cb) {
+    var err, course, newCode, i, _ref25, _ref26, _ref27, _ref28;
 
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context6.prev = _context6.next) {
           case 0:
             err = void 0, course = void 0;
             newCode = '';
@@ -195,7 +372,7 @@ module.exports.addCourse = function () {
 
           case 3:
             if (!(i < 99)) {
-              _context3.next = 17;
+              _context6.next = 17;
               break;
             }
 
@@ -204,49 +381,49 @@ module.exports.addCourse = function () {
               charset: 'ABCDEFGHJKMNOPQRSTUVWXYZ1234567890'
             });
 
-            _context3.next = 7;
+            _context6.next = 7;
             return (0, _to2.default)(Course.findOne({ code: newCode }));
 
           case 7:
-            _ref14 = _context3.sent;
-            _ref15 = _slicedToArray(_ref14, 2);
-            err = _ref15[0];
-            course = _ref15[1];
+            _ref25 = _context6.sent;
+            _ref26 = _slicedToArray(_ref25, 2);
+            err = _ref26[0];
+            course = _ref26[1];
 
             if (!(!err && course === null)) {
-              _context3.next = 13;
+              _context6.next = 13;
               break;
             }
 
-            return _context3.abrupt('break', 17);
+            return _context6.abrupt('break', 17);
 
           case 13:
             ;
 
           case 14:
             i++;
-            _context3.next = 3;
+            _context6.next = 3;
             break;
 
           case 17:
 
             newCourse['code'] = newCode;
 
-            _context3.next = 20;
+            _context6.next = 20;
             return (0, _to2.default)(Course.create(newCourse));
 
           case 20:
-            _ref16 = _context3.sent;
-            _ref17 = _slicedToArray(_ref16, 2);
-            err = _ref17[0];
-            course = _ref17[1];
+            _ref27 = _context6.sent;
+            _ref28 = _slicedToArray(_ref27, 2);
+            err = _ref28[0];
+            course = _ref28[1];
 
             if (!err) {
-              _context3.next = 28;
+              _context6.next = 28;
               break;
             }
 
-            cb('failed');console.log(err);return _context3.abrupt('return');
+            cb('failed');console.log(err);return _context6.abrupt('return');
 
           case 28:
 
@@ -255,14 +432,14 @@ module.exports.addCourse = function () {
 
           case 29:
           case 'end':
-            return _context3.stop();
+            return _context6.stop();
         }
       }
-    }, _callee3, undefined);
+    }, _callee6, undefined);
   }));
 
-  return function (_x5, _x6) {
-    return _ref13.apply(this, arguments);
+  return function (_x8, _x9) {
+    return _ref24.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Course.js.map

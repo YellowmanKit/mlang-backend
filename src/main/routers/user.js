@@ -26,6 +26,26 @@ class UserRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/user/addAdmin', async(req, res, next)=>{
+      const userId = req.body.data.userId;
+      console.log(userId);
+      let err, updatedUser;
+      [err, updatedUser] = await to(User.findOneAndUpdate({id: userId},{$set:{type:'admin'}},{new: true}))
+      if(err){ console.log(err); return res.json({ result: 'failed'})}
+
+      let profiles = [];
+      let admins = [];
+      [err, profiles, admins] = await User.getProfilesByUsers([updatedUser]);
+      if(err){ console.log(err); return res.json({ result: 'failed'})}
+
+      return res.json({
+        result: 'success',
+        updatedUser: updatedUser,
+        profiles: profiles,
+        admins: admins
+      });
+    });
+
     app.post('/user/update', async(req, res, next)=>{
       const data = req.body.data;
       let err, existedUser;

@@ -44,6 +44,10 @@ var _StudentProject = require('../../models/StudentProject.js');
 
 var _StudentProject2 = _interopRequireDefault(_StudentProject);
 
+var _Card = require('../../models/Card.js');
+
+var _Card2 = _interopRequireDefault(_Card);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -78,7 +82,7 @@ var SubjectRouter = function (_Router) {
 
       app.post('/subject/getAllOfUser', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var profile, err, studentProjects, project, subject, projects, subjects, _ref2, _ref3, studentProjectsList, subjectsList, i, _ref4, _ref5, _ref6, _ref7, updatedProfile;
+          var profile, err, studentProjects, project, subject, card, projects, subjects, _ref2, _ref3, studentProjectsList, subjectsList, i, cards, skip, j, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9, updatedProfile;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
@@ -87,7 +91,7 @@ var SubjectRouter = function (_Router) {
                   profile = req.body.data;
                   //console.log(profile);
 
-                  err = void 0, studentProjects = void 0, project = void 0, subject = void 0;
+                  err = void 0, studentProjects = void 0, project = void 0, subject = void 0, card = void 0;
                   projects = [];
                   subjects = [];
                   _context.next = 6;
@@ -114,60 +118,123 @@ var SubjectRouter = function (_Router) {
 
                 case 16:
                   if (!(i < studentProjects.length)) {
-                    _context.next = 42;
+                    _context.next = 64;
                     break;
                   }
 
-                  studentProjectsList.push(studentProjects[i]._id);
+                  cards = studentProjects[i].cards;
 
-                  _context.next = 20;
-                  return (0, _to2.default)(_Project2.default.findById(studentProjects[i].project));
+                  if (!(cards.length === 0)) {
+                    _context.next = 20;
+                    break;
+                  }
+
+                  return _context.abrupt('continue', 61);
 
                 case 20:
+                  skip = false;
+                  j = 0;
+
+                case 22:
+                  if (!(j < cards.length)) {
+                    _context.next = 37;
+                    break;
+                  }
+
+                  _context.next = 25;
+                  return (0, _to2.default)(_Card2.default.findById(cards[j]._id));
+
+                case 25:
                   _ref4 = _context.sent;
                   _ref5 = _slicedToArray(_ref4, 2);
                   err = _ref5[0];
-                  project = _ref5[1];
+                  card = _ref5[1];
+
+                  if (!(err || !card)) {
+                    _context.next = 31;
+                    break;
+                  }
+
+                  return _context.abrupt('continue', 34);
+
+                case 31:
+                  if (!(card.grade === 'featured')) {
+                    _context.next = 33;
+                    break;
+                  }
+
+                  return _context.abrupt('break', 37);
+
+                case 33:
+                  if (j === cards.length - 1) {
+                    skip = true;
+                  }
+
+                case 34:
+                  j++;
+                  _context.next = 22;
+                  break;
+
+                case 37:
+                  if (!skip) {
+                    _context.next = 39;
+                    break;
+                  }
+
+                  return _context.abrupt('continue', 61);
+
+                case 39:
+
+                  studentProjectsList.push(studentProjects[i]._id);
+
+                  _context.next = 42;
+                  return (0, _to2.default)(_Project2.default.findById(studentProjects[i].project));
+
+                case 42:
+                  _ref6 = _context.sent;
+                  _ref7 = _slicedToArray(_ref6, 2);
+                  err = _ref7[0];
+                  project = _ref7[1];
 
                   if (!(err || project === null)) {
-                    _context.next = 27;
+                    _context.next = 49;
                     break;
                   }
 
                   console.log('failed to get project');return _context.abrupt('return', res.json({ result: 'failed' }));
 
-                case 27:
+                case 49:
                   projects.push(project);
 
-                  _context.next = 30;
+                  _context.next = 52;
                   return (0, _to2.default)(_Subject2.default.findById(project.subject));
 
-                case 30:
-                  _ref6 = _context.sent;
-                  _ref7 = _slicedToArray(_ref6, 2);
-                  err = _ref7[0];
-                  subject = _ref7[1];
+                case 52:
+                  _ref8 = _context.sent;
+                  _ref9 = _slicedToArray(_ref8, 2);
+                  err = _ref9[0];
+                  subject = _ref9[1];
 
                   if (!(err || subject === null)) {
-                    _context.next = 37;
+                    _context.next = 59;
                     break;
                   }
 
                   console.log('failed to get subject');
-                  return _context.abrupt('continue', 39);
+                  return _context.abrupt('continue', 61);
 
-                case 37:
+                case 59:
                   subjects.push(subject);
                   if (!(subjectsList.indexOf('' + subject._id) > -1)) {
                     subjectsList.push('' + subject._id);
                   }
 
-                case 39:
+                case 61:
                   i++;
                   _context.next = 16;
                   break;
 
-                case 42:
+                case 64:
                   updatedProfile = profile;
 
                   updatedProfile.subjects = subjectsList;
@@ -181,7 +248,7 @@ var SubjectRouter = function (_Router) {
                     profile: updatedProfile
                   }));
 
-                case 46:
+                case 68:
                 case 'end':
                   return _context.stop();
               }
@@ -195,8 +262,8 @@ var SubjectRouter = function (_Router) {
       }());
 
       app.post('/subject/getMultiple', function () {
-        var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-          var list, err, subject, subjects, i, _ref9, _ref10;
+        var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, subject, subjects, i, _ref11, _ref12;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -219,10 +286,10 @@ var SubjectRouter = function (_Router) {
                   return (0, _to2.default)(_Subject2.default.findById(list[i]));
 
                 case 7:
-                  _ref9 = _context2.sent;
-                  _ref10 = _slicedToArray(_ref9, 2);
-                  err = _ref10[0];
-                  subject = _ref10[1];
+                  _ref11 = _context2.sent;
+                  _ref12 = _slicedToArray(_ref11, 2);
+                  err = _ref12[0];
+                  subject = _ref12[1];
 
                   if (!err) {
                     _context2.next = 13;
@@ -254,13 +321,13 @@ var SubjectRouter = function (_Router) {
         }));
 
         return function (_x3, _x4) {
-          return _ref8.apply(this, arguments);
+          return _ref10.apply(this, arguments);
         };
       }());
 
       app.post('/subject/edit', function () {
-        var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var subject, err, editedSubject, _ref12, _ref13;
+        var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var subject, err, editedSubject, _ref14, _ref15;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -274,10 +341,10 @@ var SubjectRouter = function (_Router) {
                   return (0, _to2.default)(_Subject2.default.findOneAndUpdate({ _id: subject._id }, { $set: subject }, { new: true }));
 
                 case 4:
-                  _ref12 = _context3.sent;
-                  _ref13 = _slicedToArray(_ref12, 2);
-                  err = _ref13[0];
-                  editedSubject = _ref13[1];
+                  _ref14 = _context3.sent;
+                  _ref15 = _slicedToArray(_ref14, 2);
+                  err = _ref15[0];
+                  editedSubject = _ref15[1];
                   return _context3.abrupt('return', res.json({
                     result: err ? 'failed' : 'success',
                     editedSubject: editedSubject
@@ -292,13 +359,13 @@ var SubjectRouter = function (_Router) {
         }));
 
         return function (_x5, _x6, _x7) {
-          return _ref11.apply(this, arguments);
+          return _ref13.apply(this, arguments);
         };
       }());
 
       app.post('/subject/add', function () {
-        var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
-          var subject, err, newSubject, updatedCourse, _ref15, _ref16, _ref17, _ref18;
+        var _ref16 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res) {
+          var subject, err, newSubject, updatedCourse, _ref17, _ref18, _ref19, _ref20;
 
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -312,10 +379,10 @@ var SubjectRouter = function (_Router) {
                   return (0, _to2.default)(_Subject2.default.create(subject));
 
                 case 5:
-                  _ref15 = _context4.sent;
-                  _ref16 = _slicedToArray(_ref15, 2);
-                  err = _ref16[0];
-                  newSubject = _ref16[1];
+                  _ref17 = _context4.sent;
+                  _ref18 = _slicedToArray(_ref17, 2);
+                  err = _ref18[0];
+                  newSubject = _ref18[1];
 
                   if (!err) {
                     _context4.next = 11;
@@ -331,10 +398,10 @@ var SubjectRouter = function (_Router) {
                     } }, { new: true }));
 
                 case 13:
-                  _ref17 = _context4.sent;
-                  _ref18 = _slicedToArray(_ref17, 2);
-                  err = _ref18[0];
-                  updatedCourse = _ref18[1];
+                  _ref19 = _context4.sent;
+                  _ref20 = _slicedToArray(_ref19, 2);
+                  err = _ref20[0];
+                  updatedCourse = _ref20[1];
 
                   if (err || updatedCourse === null) {
                     cb('failed');
@@ -355,7 +422,7 @@ var SubjectRouter = function (_Router) {
         }));
 
         return function (_x8, _x9) {
-          return _ref14.apply(this, arguments);
+          return _ref16.apply(this, arguments);
         };
       }());
     }
