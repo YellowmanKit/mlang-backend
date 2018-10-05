@@ -95,7 +95,7 @@ var CourseRouter = function (_Router) {
                   console.log('failed to getcourses');return _context.abrupt('return', res.json({ result: 'failed' }));
 
                 case 13:
-                  console.log(courses);
+                  //console.log(courses);
                   for (i = 0; i < courses.length; i++) {
                     teachingCourses.push(courses[i]._id);
                   }
@@ -107,7 +107,7 @@ var CourseRouter = function (_Router) {
                     profile: profile
                   }));
 
-                case 17:
+                case 16:
                 case 'end':
                   return _context.stop();
               }

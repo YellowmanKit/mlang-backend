@@ -29,7 +29,7 @@ class CourseRouter extends Router {
 
       [err, courses] = await to(Course.find({teacher: profile.belongTo}, null, {sort: {createdAt: 'descending'}}));
       if(err || courses === null){ console.log('failed to getcourses'); return res.json({ result: 'failed' })}
-      console.log(courses);
+      //console.log(courses);
       for(var i=0;i<courses.length;i++){
         teachingCourses.push(courses[i]._id);
       }
