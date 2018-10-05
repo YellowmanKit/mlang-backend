@@ -60,13 +60,13 @@ var Course = module.exports = _mongoose2.default.model('course', courseSchema);
 
 module.exports.getBySchool = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(school) {
-    var err, course, coursesId, courses, teachers, i, _ref2, _ref3;
+    var err, data, coursesId, courses, teachers, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            err = void 0, course = void 0;
+            err = void 0, data = void 0;
             coursesId = [];
             courses = [];
             teachers = school.joinedTeachers;
@@ -74,7 +74,7 @@ module.exports.getBySchool = function () {
 
           case 5:
             if (!(i < teachers.length)) {
-              _context.next = 15;
+              _context.next = 16;
               break;
             }
 
@@ -85,20 +85,22 @@ module.exports.getBySchool = function () {
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
-            courses = _ref3[1];
+            data = _ref3[1];
 
-          case 12:
+            courses = [].concat(_toConsumableArray(courses), _toConsumableArray(data));
+
+          case 13:
             i++;
             _context.next = 5;
             break;
 
-          case 15:
+          case 16:
             for (i = 0; i < courses.length; i++) {
               coursesId = [].concat(_toConsumableArray(coursesId), [courses[i]._id]);
             }
             return _context.abrupt('return', [err, courses, coursesId]);
 
-          case 17:
+          case 18:
           case 'end':
             return _context.stop();
         }
