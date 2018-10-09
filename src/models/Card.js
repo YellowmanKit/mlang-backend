@@ -30,10 +30,31 @@ var cardSchema = mongoose.Schema({
     type: Date,
     default: new Date()
   },
+  resubmitted: {
+    type: Boolean,
+    default: false
+  },
   langs: [ObjectId]
 })
 
 var Card = module.exports = mongoose.model('card',cardSchema);
+
+module.exports.getByStudentProjects = async (studentProjects)=>{
+  let err, card;
+  let cardsId = [];
+  let cards = [];
+
+  for(var i=0;i<studentProjects.length;i++){
+    cardsId = [...cardsId, ...studentProjects[i].cards];
+  }
+
+  for(var i=0;i<cardsId.length;i++){
+    [err, card] = await to(Card.findById(cardsId[i]));
+    cards.push(card)
+  }
+
+  return [err, cards, cardsId];
+}
 
 module.exports.getByProjects = async (projects)=>{
   let err, studentProject, card;

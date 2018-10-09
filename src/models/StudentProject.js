@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import to from '../to';
 
 var ObjectId = mongoose.Schema.Types.ObjectId;
 var studentProjectSchema = mongoose.Schema({
@@ -10,10 +11,6 @@ var studentProjectSchema = mongoose.Schema({
     type: ObjectId,
     required: true
   },
-  studentAlert: {
-    type: Boolean,
-    default: false
-  },
   createdAt: {
     type: Date,
     default: new Date()
@@ -22,3 +19,20 @@ var studentProjectSchema = mongoose.Schema({
 })
 
 var StudentProject = module.exports = mongoose.model('studentProject', studentProjectSchema);
+
+module.exports.getByProjects = async (projects) =>{
+  let err, studentProject;
+  let studentProjectsId = [];
+  let studentProjects = [];
+
+  for(var i=0;i<projects.length;i++){
+    studentProjectsId = [...studentProjectsId, ...projects[i].studentProjects];
+  }
+
+  for(var i=0;i<studentProjectsId.length;i++){
+    [err, studentProject] = await to(StudentProject.findById(studentProjectsId[i]));
+    studentProjects.push(studentProject)
+  }
+
+  return [err, studentProjects, studentProjectsId];
+}

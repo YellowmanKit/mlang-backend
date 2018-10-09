@@ -33,6 +33,25 @@ var profileSchema = mongoose.Schema({
 
 var Profile = module.exports = mongoose.model('profile',profileSchema);
 
+module.exports.getByStudentProjects = async (studentProjects) =>{
+  let err, profile;
+  let usersId = [];
+  let profilesId = [];
+  let profiles = [];
+
+  for(var i=0;i<studentProjects.length;i++){
+    usersId = [...usersId, studentProjects[i].student];
+  }
+
+  for(var i=0;i<usersId.length;i++){
+    [err, profile] = await to(Profile.findOne({belongTo: usersId[i]}));
+    profiles.push(profile);
+    profilesId.push(profile._id);
+  }
+
+  return [err, profiles, profilesId];
+}
+
 module.exports.getStudents = async (coursesId)=>{
   let err;
   let profiles = [];

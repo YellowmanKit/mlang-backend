@@ -38,21 +38,6 @@ class StudentProjectRouter extends Router {
       })
     });
 
-    app.post('/studentProject/clearAlert', async(req, res)=>{
-      const data = req.body.data;
-      //console.log(data);
-      let err, studentProject;
-      [err, studentProject] = await to(StudentProject.findOneAndUpdate({_id: data.studentProjectId}, {$set:{
-        studentAlert: false
-      }}, {new: true}));
-      if(err || studentProject === null){ return res.json({ result: 'failed' })}
-
-      return res.json({
-        result: 'success',
-        updatedStudentProject: studentProject
-      })
-    });
-
     app.post('/studentProject/getMultiple', async(req, res)=>{
       const list = req.body.data;
       //console.log(list);

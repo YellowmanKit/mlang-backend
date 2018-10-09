@@ -2,9 +2,9 @@ import Router from './Router';
 import path from 'path';
 import mongoose from 'mongoose';
 var ObjectId = require('mongoose').Types.ObjectId;
-
 import to from '../../to';
 
+import Query from '../../models/Query.js';
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
 import School from '../../models/School.js';
@@ -12,6 +12,8 @@ import Course from '../../models/Course.js';
 import Subject from '../../models/Subject.js';
 import Project from '../../models/Project.js';
 import StudentProject from '../../models/StudentProject.js';
+import Card from '../../models/Card.js';
+import Lang from '../../models/Lang.js';
 
 class UserRouter extends Router {
 
@@ -92,7 +94,9 @@ class UserRouter extends Router {
       let courses = [];
       let subjects = [];
       let projects = [];
-      let studentProhects = [];
+      let studentProjects = [];
+      let cards = [];
+      let langs = [];
 
       let err, data, user, profile;
       [err, user, profile] = await User.getUserAndProfile(id, pw);
@@ -107,47 +111,73 @@ class UserRouter extends Router {
       courses = [...courses, ...data];
       profiles = [...profiles, ...teacherProfiles];
 
-      let joinedSubjects;
+      var joinedSubjects;
       [err, data, joinedSubjects] = await Subject.getByCourses(data);
       if(err){ return res.json({ result: "failed" }); }
 
       subjects = [...subjects, ...data];
 
-      let joinedProjects;
+      var joinedProjects;
       [err, data, joinedProjects] = await Project.getBySubjects(data);
       if(err){ return res.json({ result: "failed" }); }
 
       projects = [...projects, ...data];
 
-      var teachingCourses = [];
+      var joinedStudentProjects;
+      [err, data, joinedStudentProjects] = await StudentProject.getByProjects(data);
+      if(err){ return res.json({ result: "failed" }); }
+
+      studentProjects = [...studentProjects, ...data];
+
+      var joinedCards;
+      [err, data, joinedCards] = await Card.getByStudentProjects(data);
+      if(err){ return res.json({ result: "failed" }); }
+
+      cards = [...cards, ...data];
+
+
+
+
+
+
+
+      var teachingCourses;
       [err, data, teachingCourses] = await Course.getTeaching(user._id);
       if(err){ return res.json({ result: "failed" });}
 
       courses = [...courses, ...data];
 
-      var teachingSubjects = [];
+      var teachingSubjects;
       [err, data, teachingSubjects] = await Subject.getByCourses(data);
       if(err){ return res.json({ result: "failed" });}
 
       subjects = [...subjects, ...data];
 
-      let teachingProjects;
+      var teachingProjects;
       [err, data, teachingProjects] = await Project.getBySubjects(data);
       if(err){ return res.json({ result: "failed" }); }
 
       projects = [...projects, ...data];
 
-      var studentProjects = [];
-      [err, studentProjects] = await to(StudentProject.find({student: user._id}));
-      if(err){ return res.json({ result: "failed" });}
+      var teachingStudentProjects;
+      [err, data, teachingStudentProjects] = await StudentProject.getByProjects(data);
+      if(err){ return res.json({ result: "failed" }); }
 
-      var supervisingSchools = [];
+      studentProjects = [...studentProjects, ...data];
+
+      var teachingCards;
+      [err, data, teachingCards] = await Card.getByStudentProjects(data);
+      if(err){ return res.json({ result: "failed" }); }
+
+      cards = [...cards, ...data];
+
+      var supervisingSchools;
       [err, data, supervisingSchools] = await School.getByUser(user._id, profile);
       if(err){ return res.json({ result: "failed" });}
 
       schools = [...schools, ...data];
 
-      var adminUsers = [];
+      var adminUsers;
       [err, data, adminUsers] = await User.getByType('admin');
 
       var admins = [];
@@ -156,6 +186,22 @@ class UserRouter extends Router {
       if(err){ return res.json({ result: "failed" });}
 
       profiles = [...profiles, ...data];
+
+
+
+
+
+      var profilesId;
+      [err, data, profilesId] = await Profile.getByStudentProjects(studentProjects);
+      if(err){ return res.json({ result: "failed" }); }
+
+      profiles = [...profiles, ...data];
+
+      var langsId;
+      [err, data, langsId] = await Lang.getByCards(cards);
+      if(err){ return res.json({ result: "failed" }); }
+
+      langs = [...langs, ...data];
 
       return res.json({
         result: "success",
@@ -175,11 +221,19 @@ class UserRouter extends Router {
         teachingProjects: teachingProjects,
         joinedProjects: joinedProjects,
 
+        teachingStudentProjects: teachingStudentProjects,
+        joinedStudentProjects: joinedStudentProjects,
+
+        teachingCards: teachingCards,
+        joinedCards: joinedCards,
+
         schools: schools,
         courses: courses,
         subjects: subjects,
         projects: projects,
-        studentProjects: studentProjects
+        studentProjects: studentProjects,
+        cards: cards,
+        langs: langs
       })
     });
 
