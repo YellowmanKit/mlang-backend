@@ -48,18 +48,79 @@ var cardSchema = _mongoose2.default.Schema({
     type: Date,
     default: new Date()
   },
+  resubmitted: {
+    type: Boolean,
+    default: false
+  },
   langs: [ObjectId]
 });
 
 var Card = module.exports = _mongoose2.default.model('card', cardSchema);
 
-module.exports.getByProjects = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(projects) {
-    var err, studentProject, card, studentProjectsId, cardsId, cards, featured, i, _ref2, _ref3, _ref4, _ref5;
+module.exports.getByStudentProjects = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(studentProjects) {
+    var err, card, cardsId, cards, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
+          case 0:
+            err = void 0, card = void 0;
+            cardsId = [];
+            cards = [];
+
+
+            for (i = 0; i < studentProjects.length; i++) {
+              cardsId = [].concat(_toConsumableArray(cardsId), _toConsumableArray(studentProjects[i].cards));
+            }
+
+            i = 0;
+
+          case 5:
+            if (!(i < cardsId.length)) {
+              _context.next = 16;
+              break;
+            }
+
+            _context.next = 8;
+            return (0, _to2.default)(Card.findById(cardsId[i]));
+
+          case 8:
+            _ref2 = _context.sent;
+            _ref3 = _slicedToArray(_ref2, 2);
+            err = _ref3[0];
+            card = _ref3[1];
+
+            cards.push(card);
+
+          case 13:
+            i++;
+            _context.next = 5;
+            break;
+
+          case 16:
+            return _context.abrupt('return', [err, cards, cardsId]);
+
+          case 17:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined);
+  }));
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getByProjects = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(projects) {
+    var err, studentProject, card, studentProjectsId, cardsId, cards, featured, i, _ref5, _ref6, _ref7, _ref8;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
           case 0:
             err = void 0, studentProject = void 0, card = void 0;
             studentProjectsId = [];
@@ -76,24 +137,24 @@ module.exports.getByProjects = function () {
 
           case 7:
             if (!(i < studentProjectsId.length)) {
-              _context.next = 18;
+              _context2.next = 18;
               break;
             }
 
-            _context.next = 10;
+            _context2.next = 10;
             return (0, _to2.default)(_StudentProject2.default.findById(studentProjectsId[i]));
 
           case 10:
-            _ref2 = _context.sent;
-            _ref3 = _slicedToArray(_ref2, 2);
-            err = _ref3[0];
-            studentProject = _ref3[1];
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            studentProject = _ref6[1];
 
             cardsId = [].concat(_toConsumableArray(cardsId), _toConsumableArray(studentProject.cards));
 
           case 15:
             i++;
-            _context.next = 7;
+            _context2.next = 7;
             break;
 
           case 18:
@@ -101,18 +162,18 @@ module.exports.getByProjects = function () {
 
           case 19:
             if (!(i < cardsId.length)) {
-              _context.next = 31;
+              _context2.next = 31;
               break;
             }
 
-            _context.next = 22;
+            _context2.next = 22;
             return (0, _to2.default)(Card.findById(cardsId[i]));
 
           case 22:
-            _ref4 = _context.sent;
-            _ref5 = _slicedToArray(_ref4, 2);
-            err = _ref5[0];
-            card = _ref5[1];
+            _ref7 = _context2.sent;
+            _ref8 = _slicedToArray(_ref7, 2);
+            err = _ref8[0];
+            card = _ref8[1];
 
             cards = [].concat(_toConsumableArray(cards), [card]);
             if (card.grade === 'featured') {
@@ -121,22 +182,22 @@ module.exports.getByProjects = function () {
 
           case 28:
             i++;
-            _context.next = 19;
+            _context2.next = 19;
             break;
 
           case 31:
-            return _context.abrupt('return', [err, cards, cardsId, featured]);
+            return _context2.abrupt('return', [err, cards, cardsId, featured]);
 
           case 32:
           case 'end':
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, undefined);
+    }, _callee2, undefined);
   }));
 
-  return function (_x) {
-    return _ref.apply(this, arguments);
+  return function (_x2) {
+    return _ref4.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Card.js.map

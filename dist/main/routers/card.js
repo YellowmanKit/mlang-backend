@@ -187,7 +187,7 @@ var CardRouter = function (_Router) {
 
       app.post('/card/grade', function () {
         var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-          var data, cards, err, card, featuredCount, profile, project, studentProject, _updatedCards, i, _ref7, _ref8, _ref9, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16;
+          var data, cards, err, card, featuredCount, profile, studentProject, updatedCards, i, _ref7, _ref8, _ref9, _ref10, _ref11, _ref12;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -197,8 +197,8 @@ var CardRouter = function (_Router) {
                   cards = data.cards;
                   //console.log(cards);
 
-                  err = void 0, card = void 0, featuredCount = void 0, profile = void 0, project = void 0, studentProject = void 0;
-                  _updatedCards = [];
+                  err = void 0, card = void 0, featuredCount = void 0, profile = void 0, studentProject = void 0;
+                  updatedCards = [];
                   i = 0;
 
                 case 5:
@@ -211,7 +211,8 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: cards[i] }, { $set: {
                       grade: cards[i].grade,
                       comment: cards[i].comment,
-                      audioComment: cards[i].audioComment
+                      audioComment: cards[i].audioComment,
+                      resubmitted: false
                     } }, { new: true }));
 
                 case 8:
@@ -228,7 +229,7 @@ var CardRouter = function (_Router) {
                   console.log('no such card!');return _context2.abrupt('return', res.json({ result: 'failed' }));
 
                 case 15:
-                  _updatedCards.splice(0, 0, card);
+                  updatedCards.splice(0, 0, card);
 
                 case 16:
                   i++;
@@ -270,44 +271,13 @@ var CardRouter = function (_Router) {
                   }
 
                 case 34:
-                  _context2.next = 36;
-                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: data.projectId }, { $set: {
-                      teacherAlert: false
-                    } }, { new: true }));
-
-                case 36:
-                  _ref13 = _context2.sent;
-                  _ref14 = _slicedToArray(_ref13, 2);
-                  err = _ref14[0];
-                  project = _ref14[1];
-
-                  if (err || project === null) {
-                    console.log('err on updating teacherAlert!');
-                  }
-
-                  _context2.next = 43;
-                  return (0, _to2.default)(_StudentProject2.default.findOneAndUpdate({ _id: data.studentProjectId }, { $set: {
-                      studentAlert: true
-                    } }, { new: true }));
-
-                case 43:
-                  _ref15 = _context2.sent;
-                  _ref16 = _slicedToArray(_ref15, 2);
-                  err = _ref16[0];
-                  studentProject = _ref16[1];
-
-                  if (err || studentProject === null) {
-                    console.log('err on updating teacherAlert!');
-                  }
-
                   return _context2.abrupt('return', res.json({
                     result: 'success',
-                    updatedCards: _updatedCards,
-                    updatedProfile: profile,
-                    updatedProject: project
+                    updatedCards: updatedCards,
+                    updatedProfile: profile
                   }));
 
-                case 49:
+                case 35:
                 case 'end':
                   return _context2.stop();
               }
@@ -321,8 +291,8 @@ var CardRouter = function (_Router) {
       }());
 
       app.post('/card/getMultiple', function () {
-        var _ref17 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
-          var cards, err, card, langs, profile, _cards, _profiles, i, _ref18, _ref19, _ref20, _ref21, _langs, j, _ref22, _ref23;
+        var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res) {
+          var cards, err, card, langs, profile, _cards, _profiles, i, _ref14, _ref15, _ref16, _ref17, _langs, j, _ref18, _ref19;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -346,10 +316,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Card2.default.findById(cards[i]));
 
                 case 8:
-                  _ref18 = _context3.sent;
-                  _ref19 = _slicedToArray(_ref18, 2);
-                  err = _ref19[0];
-                  card = _ref19[1];
+                  _ref14 = _context3.sent;
+                  _ref15 = _slicedToArray(_ref14, 2);
+                  err = _ref15[0];
+                  card = _ref15[1];
 
                   if (!(err || card === null)) {
                     _context3.next = 15;
@@ -365,10 +335,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Profile2.default.findOne({ belongTo: card.author }));
 
                 case 18:
-                  _ref20 = _context3.sent;
-                  _ref21 = _slicedToArray(_ref20, 2);
-                  err = _ref21[0];
-                  profile = _ref21[1];
+                  _ref16 = _context3.sent;
+                  _ref17 = _slicedToArray(_ref16, 2);
+                  err = _ref17[0];
+                  profile = _ref17[1];
 
                   if (!(err || profile === null)) {
                     _context3.next = 24;
@@ -399,10 +369,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Lang2.default.find({ card: cards[j] }));
 
                 case 33:
-                  _ref22 = _context3.sent;
-                  _ref23 = _slicedToArray(_ref22, 2);
-                  err = _ref23[0];
-                  langs = _ref23[1];
+                  _ref18 = _context3.sent;
+                  _ref19 = _slicedToArray(_ref18, 2);
+                  err = _ref19[0];
+                  langs = _ref19[1];
 
                   if (!(err || langs === null || langs.length === 0)) {
                     _context3.next = 40;
@@ -436,13 +406,13 @@ var CardRouter = function (_Router) {
         }));
 
         return function (_x5, _x6) {
-          return _ref17.apply(this, arguments);
+          return _ref13.apply(this, arguments);
         };
       }());
 
       app.post('/card/add', function () {
-        var _ref24 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
-          var data, card, langs, err, project, studentProject, createdCard, createdLang, cardCount, profile, _ref25, _ref26, createdLangs, createdLangsId, i, _ref27, _ref28, _ref29, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref38, _ref39, _ref40, _ref41, _ref42, _ref43, _ref44;
+        var _ref20 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+          var data, card, langs, err, project, studentProject, createdCard, createdLang, cardCount, profile, _ref21, _ref22, createdLangs, createdLangsId, i, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, _ref30, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref38, resubmitCard, _ref39, _ref40;
 
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -459,10 +429,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Card2.default.create(card));
 
                 case 6:
-                  _ref25 = _context4.sent;
-                  _ref26 = _slicedToArray(_ref25, 2);
-                  err = _ref26[0];
-                  createdCard = _ref26[1];
+                  _ref21 = _context4.sent;
+                  _ref22 = _slicedToArray(_ref21, 2);
+                  err = _ref22[0];
+                  createdCard = _ref22[1];
 
                   if (!(err || createdCard === null)) {
                     _context4.next = 13;
@@ -487,10 +457,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Lang2.default.create(langs[i]));
 
                 case 20:
-                  _ref27 = _context4.sent;
-                  _ref28 = _slicedToArray(_ref27, 2);
-                  err = _ref28[0];
-                  createdLang = _ref28[1];
+                  _ref23 = _context4.sent;
+                  _ref24 = _slicedToArray(_ref23, 2);
+                  err = _ref24[0];
+                  createdLang = _ref24[1];
 
                   if (!(err || createdLang === null)) {
                     _context4.next = 26;
@@ -515,10 +485,10 @@ var CardRouter = function (_Router) {
                     } }, { new: true }));
 
                 case 33:
-                  _ref29 = _context4.sent;
-                  _ref30 = _slicedToArray(_ref29, 2);
-                  err = _ref30[0];
-                  createdCard = _ref30[1];
+                  _ref25 = _context4.sent;
+                  _ref26 = _slicedToArray(_ref25, 2);
+                  err = _ref26[0];
+                  createdCard = _ref26[1];
 
                   if (!(err || createdCard === null)) {
                     _context4.next = 39;
@@ -539,10 +509,10 @@ var CardRouter = function (_Router) {
                     } }, { upsert: true, new: true }));
 
                 case 42:
-                  _ref31 = _context4.sent;
-                  _ref32 = _slicedToArray(_ref31, 2);
-                  err = _ref32[0];
-                  studentProject = _ref32[1];
+                  _ref27 = _context4.sent;
+                  _ref28 = _slicedToArray(_ref27, 2);
+                  err = _ref28[0];
+                  studentProject = _ref28[1];
 
                   if (!(err || studentProject === null)) {
                     _context4.next = 48;
@@ -556,10 +526,10 @@ var CardRouter = function (_Router) {
                   return (0, _to2.default)(_Project2.default.findById(studentProject.project));
 
                 case 50:
-                  _ref33 = _context4.sent;
-                  _ref34 = _slicedToArray(_ref33, 2);
-                  err = _ref34[0];
-                  project = _ref34[1];
+                  _ref29 = _context4.sent;
+                  _ref30 = _slicedToArray(_ref29, 2);
+                  err = _ref30[0];
+                  project = _ref30[1];
 
                   if (!(err || project === null)) {
                     _context4.next = 56;
@@ -582,10 +552,10 @@ var CardRouter = function (_Router) {
                     } }, { new: true }));
 
                 case 59:
-                  _ref35 = _context4.sent;
-                  _ref36 = _slicedToArray(_ref35, 2);
-                  err = _ref36[0];
-                  project = _ref36[1];
+                  _ref31 = _context4.sent;
+                  _ref32 = _slicedToArray(_ref31, 2);
+                  err = _ref32[0];
+                  project = _ref32[1];
 
                   if (!(err || project === null)) {
                     _context4.next = 65;
@@ -595,7 +565,7 @@ var CardRouter = function (_Router) {
                   return _context4.abrupt('return', res.json({ result: "failed to update project" }));
 
                 case 65:
-                  _context4.next = 82;
+                  _context4.next = 75;
                   break;
 
                 case 67:
@@ -605,10 +575,10 @@ var CardRouter = function (_Router) {
                     } }, { new: true }));
 
                 case 69:
-                  _ref37 = _context4.sent;
-                  _ref38 = _slicedToArray(_ref37, 2);
-                  err = _ref38[0];
-                  studentProject = _ref38[1];
+                  _ref33 = _context4.sent;
+                  _ref34 = _slicedToArray(_ref33, 2);
+                  err = _ref34[0];
+                  studentProject = _ref34[1];
 
                   if (!((err || createdCard === null) && !data.isTeacher)) {
                     _context4.next = 75;
@@ -619,57 +589,66 @@ var CardRouter = function (_Router) {
 
                 case 75:
                   _context4.next = 77;
-                  return (0, _to2.default)(_Project2.default.findOneAndUpdate({ _id: studentProject.project }, { $set: {
-                      teacherAlert: true
-                    } }));
-
-                case 77:
-                  _ref39 = _context4.sent;
-                  _ref40 = _slicedToArray(_ref39, 2);
-                  err = _ref40[0];
-                  project = _ref40[1];
-
-                  if (err || project === null) {
-                    console.log('Error when updating project alert!');
-                  }
-
-                case 82:
-                  _context4.next = 84;
                   return (0, _to2.default)(_Card2.default.count({ author: card.author }));
 
-                case 84:
-                  _ref41 = _context4.sent;
-                  _ref42 = _slicedToArray(_ref41, 2);
-                  err = _ref42[0];
-                  cardCount = _ref42[1];
+                case 77:
+                  _ref35 = _context4.sent;
+                  _ref36 = _slicedToArray(_ref35, 2);
+                  err = _ref36[0];
+                  cardCount = _ref36[1];
 
                   if (!(!err && cardCount)) {
-                    _context4.next = 95;
+                    _context4.next = 88;
                     break;
                   }
 
-                  _context4.next = 91;
+                  _context4.next = 84;
                   return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: card.author }, { $set: {
                       cardCount: cardCount
                     } }, { new: true }));
 
-                case 91:
-                  _ref43 = _context4.sent;
-                  _ref44 = _slicedToArray(_ref43, 2);
-                  err = _ref44[0];
-                  profile = _ref44[1];
+                case 84:
+                  _ref37 = _context4.sent;
+                  _ref38 = _slicedToArray(_ref37, 2);
+                  err = _ref38[0];
+                  profile = _ref38[1];
 
-                case 95:
+                case 88:
+                  resubmitCard = void 0;
+
+                  if (!data.resubmitCard) {
+                    _context4.next = 98;
+                    break;
+                  }
+
+                  _context4.next = 92;
+                  return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: data.resubmitCard }, { $set: { resubmitted: true } }));
+
+                case 92:
+                  _ref39 = _context4.sent;
+                  _ref40 = _slicedToArray(_ref39, 2);
+                  err = _ref40[0];
+                  resubmitCard = _ref40[1];
+
+                  if (!(err || !resubmitCard)) {
+                    _context4.next = 98;
+                    break;
+                  }
+
+                  return _context4.abrupt('return', res.json({ result: "failed to update resubmitCard!" }));
+
+                case 98:
                   return _context4.abrupt('return', res.json({
                     result: 'success',
                     card: createdCard,
                     langs: createdLangs,
                     updatedStudentProject: studentProject,
                     updatedProject: project,
-                    updatedProfile: profile
+                    updatedProfile: profile,
+                    updatedCard: resubmitCard
                   }));
 
-                case 96:
+                case 99:
                 case 'end':
                   return _context4.stop();
               }
@@ -678,7 +657,7 @@ var CardRouter = function (_Router) {
         }));
 
         return function (_x7, _x8, _x9) {
-          return _ref24.apply(this, arguments);
+          return _ref20.apply(this, arguments);
         };
       }());
     }

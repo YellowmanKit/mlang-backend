@@ -48,33 +48,53 @@ var profileSchema = _mongoose2.default.Schema({
 
 var Profile = module.exports = _mongoose2.default.model('profile', profileSchema);
 
-module.exports.getStudents = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(coursesId) {
-    var err, profiles, profilesId, _ref2, _ref3, i;
+module.exports.getByStudentProjects = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(studentProjects) {
+    var err, profile, usersId, profilesId, profiles, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            err = void 0;
-            profiles = [];
+            err = void 0, profile = void 0;
+            usersId = [];
             profilesId = [];
-            _context.next = 5;
-            return (0, _to2.default)(Profile.find({ joinedCourses: { $in: coursesId } }));
+            profiles = [];
 
-          case 5:
+
+            for (i = 0; i < studentProjects.length; i++) {
+              usersId = [].concat(_toConsumableArray(usersId), [studentProjects[i].student]);
+            }
+
+            i = 0;
+
+          case 6:
+            if (!(i < usersId.length)) {
+              _context.next = 18;
+              break;
+            }
+
+            _context.next = 9;
+            return (0, _to2.default)(Profile.findOne({ belongTo: usersId[i] }));
+
+          case 9:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
-            profiles = _ref3[1];
+            profile = _ref3[1];
 
-            for (i = 0; i < profiles.length; i++) {
-              profilesId = [].concat(_toConsumableArray(profilesId), [profiles[i]._id]);
-            }
+            profiles.push(profile);
+            profilesId.push(profile._id);
 
+          case 15:
+            i++;
+            _context.next = 6;
+            break;
+
+          case 18:
             return _context.abrupt('return', [err, profiles, profilesId]);
 
-          case 11:
+          case 19:
           case 'end':
             return _context.stop();
         }
@@ -87,8 +107,8 @@ module.exports.getStudents = function () {
   };
 }();
 
-module.exports.getTeachers = function () {
-  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(schoolId) {
+module.exports.getStudents = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(coursesId) {
     var err, profiles, profilesId, _ref5, _ref6, i;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -99,7 +119,7 @@ module.exports.getTeachers = function () {
             profiles = [];
             profilesId = [];
             _context2.next = 5;
-            return (0, _to2.default)(Profile.find({ joinedSchools: schoolId }));
+            return (0, _to2.default)(Profile.find({ joinedCourses: { $in: coursesId } }));
 
           case 5:
             _ref5 = _context2.sent;
@@ -123,6 +143,45 @@ module.exports.getTeachers = function () {
 
   return function (_x2) {
     return _ref4.apply(this, arguments);
+  };
+}();
+
+module.exports.getTeachers = function () {
+  var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(schoolId) {
+    var err, profiles, profilesId, _ref8, _ref9, i;
+
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            err = void 0;
+            profiles = [];
+            profilesId = [];
+            _context3.next = 5;
+            return (0, _to2.default)(Profile.find({ joinedSchools: schoolId }));
+
+          case 5:
+            _ref8 = _context3.sent;
+            _ref9 = _slicedToArray(_ref8, 2);
+            err = _ref9[0];
+            profiles = _ref9[1];
+
+            for (i = 0; i < profiles.length; i++) {
+              profilesId = [].concat(_toConsumableArray(profilesId), [profiles[i]._id]);
+            }
+
+            return _context3.abrupt('return', [err, profiles, profilesId]);
+
+          case 11:
+          case 'end':
+            return _context3.stop();
+        }
+      }
+    }, _callee3, undefined);
+  }));
+
+  return function (_x3) {
+    return _ref7.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Profile.js.map

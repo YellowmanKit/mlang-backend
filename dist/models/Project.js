@@ -45,10 +45,6 @@ var projectSchema = _mongoose2.default.Schema({
     type: Date,
     default: new Date()
   },
-  teacherAlert: {
-    type: Boolean,
-    default: false
-  },
   studentProjects: [ObjectId]
 });
 
