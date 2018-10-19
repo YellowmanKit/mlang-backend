@@ -77,6 +77,16 @@ class UserRouter extends Router {
       });
     });
 
+    app.get('/user/getNewAccountByCode/', (req, res, next)=>{
+      const code = req.headers.code;
+      const codeType = req.headers.type;
+
+      User.acquireNewAccountByCode(code, codeType, (result, user)=>{
+        console.log(result);
+        return res.json({ result: result, id: user.id, pw: user.pw });
+      });
+    });
+
     app.get('/user/getNewAccount/', (req, res, next)=>{
       const email = req.headers.email;
 
@@ -88,6 +98,8 @@ class UserRouter extends Router {
     app.get('/user/login/', async (req, res, next)=>{
       const id = req.headers.id;
       const pw = req.headers.pw;
+
+      console.log(id + ' ' + pw);
 
       let profiles = [];
       let schools = [];

@@ -6,6 +6,7 @@ import dotenv from'dotenv';
 dotenv.config();
 
 import School from './School';
+import Course from './Course';
 import Profile from './Profile';
 
 var schema = mongoose.Schema({
@@ -105,18 +106,54 @@ module.exports.resetPassword = async (_email, cb)=>{
   cb('success');
 }
 
+module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
+  let err, result, exist, user, profile;
+
+  if(codeType === 'course'){
+    [err, exist] = await to(Course.codeExist(code));
+  }else{
+    [err, exist] = await to(School.codeExist(code));
+  }
+
+  if(err || !exist){ cb('failed'); return; }
+
+
+  const newUser = {
+    id: 'DefaultId',
+    pw: randomPassword(),
+    email: '@',
+    type: codeType === 'course'? 'student': 'teacher'
+  };
+
+  [err, user] = await to(User.create(newUser));
+  if(err){ cb('failed'); console.log(err); return; }
+
+  var newProfile = {
+    belongTo: user._id
+  };
+
+  [err, profile] = await to(Profile.create(newProfile));
+  if(err){ cb('failed'); console.log(err); return; }
+
+  if(codeType === 'course'){
+    Course.joinCourse({ userId: user._id, code: code}, (result)=>{
+      cb(result, user);
+    });
+  }else if(codeType === 'school'){
+    School.joinSchool({ userId: user._id, code: code}, (result)=>{
+      cb(result, user);
+    });
+  }
+}
+
 module.exports.acquireNewAccount = async (_email, cb)=>{
   const existUser = await User.findOne({email: _email});
   if(existUser !== null){ cb('failed'); return; }
 
-  const randomPassword = randomString.generate({
-    length: 6,
-    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
-  });
   var defaultId = _email.substring(0, _email.lastIndexOf("@"));
   const newUser = {
     id: defaultId,
-    pw: randomPassword,
+    pw: randomPassword(),
     email: _email
   }
 
@@ -162,6 +199,13 @@ var transporter = nodemailer.createTransport({
      pass: process.env.GMAIL_PW
     }
 });
+
+function randomPassword(){
+  return randomString.generate({
+    length: 6,
+    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+  });
+}
 
 /*const transporter = nodemailer.createTransport({
     host: process.env.HOST,

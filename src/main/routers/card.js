@@ -32,6 +32,20 @@ class CardRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
+    app.post('/card/studentRead', async(req,res)=>{
+      const cardId = req.body.data.cardId;
+      let err, card;
+      [err, card] = await(to(Card.findOneAndUpdate({_id: cardId},{$set:{
+        studentRead: true
+      }}, {new: true})));
+      if(err || card === null){ console.log('failed to update card'); return res.json({ result: 'failed to update card'}) }
+
+      return res.json({
+        result: 'success',
+        updatedCard: card
+      })
+    })
+
     app.post('/card/edit', async(req, res)=>{
       const cardToUpdate = req.body.data.card;
       var langs = req.body.data.langs;
@@ -76,7 +90,8 @@ class CardRouter extends Router {
           grade: cards[i].grade,
           comment: cards[i].comment,
           audioComment: cards[i].audioComment,
-          resubmitted: false
+          resubmitted: false,
+          studentRead: false
         }}, {new: true}));
         if(err || card === null){ console.log('no such card!'); return res.json({ result: 'failed' })}
         updatedCards.splice(0,0,card);

@@ -142,3 +142,10 @@ module.exports.addCourse = async (newCourse, cb)=>{
   //console.log(course)
   cb('success', course)
 }
+
+module.exports.codeExist = async (code)=>{
+  let err, course;
+  [err, course] = await to(Course.findOne({code: code}));
+  if(err || !course){ return false; }
+  return true;
+}

@@ -115,3 +115,10 @@ module.exports.addSchool = async (newSchool, cb)=>{
   //console.log(School)
   cb('success', school)
 }
+
+module.exports.codeExist = async (code)=>{
+  let err, school;
+  [err, school] = await to(School.findOne({code: code}));
+  if(err || !school){ return false; }
+  return true;
+}

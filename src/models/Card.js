@@ -34,6 +34,10 @@ var cardSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
+  studentRead: {
+    type: Boolean,
+    default: false
+  },
   langs: [ObjectId]
 })
 
