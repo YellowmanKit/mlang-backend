@@ -444,4 +444,45 @@ module.exports.addCourse = function () {
     return _ref24.apply(this, arguments);
   };
 }();
+
+module.exports.codeExist = function () {
+  var _ref29 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(code) {
+    var err, course, _ref30, _ref31;
+
+    return regeneratorRuntime.wrap(function _callee7$(_context7) {
+      while (1) {
+        switch (_context7.prev = _context7.next) {
+          case 0:
+            err = void 0, course = void 0;
+            _context7.next = 3;
+            return (0, _to2.default)(Course.findOne({ code: code }));
+
+          case 3:
+            _ref30 = _context7.sent;
+            _ref31 = _slicedToArray(_ref30, 2);
+            err = _ref31[0];
+            course = _ref31[1];
+
+            if (!(err || !course)) {
+              _context7.next = 9;
+              break;
+            }
+
+            return _context7.abrupt('return', false);
+
+          case 9:
+            return _context7.abrupt('return', true);
+
+          case 10:
+          case 'end':
+            return _context7.stop();
+        }
+      }
+    }, _callee7, undefined);
+  }));
+
+  return function (_x10) {
+    return _ref29.apply(this, arguments);
+  };
+}();
 //# sourceMappingURL=Course.js.map

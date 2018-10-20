@@ -83,6 +83,7 @@ class UserRouter extends Router {
 
       User.acquireNewAccountByCode(code, codeType, (result, user)=>{
         console.log(result);
+        if(result === 'failed'){ return res.json({result: result})}
         return res.json({ result: result, id: user.id, pw: user.pw });
       });
     });

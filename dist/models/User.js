@@ -28,6 +28,10 @@ var _School = require('./School');
 
 var _School2 = _interopRequireDefault(_School);
 
+var _Course = require('./Course');
+
+var _Course2 = _interopRequireDefault(_Course);
+
 var _Profile = require('./Profile');
 
 var _Profile2 = _interopRequireDefault(_Profile);
@@ -307,77 +311,72 @@ module.exports.resetPassword = function () {
   };
 }();
 
-module.exports.acquireNewAccount = function () {
-  var _ref19 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(_email, cb) {
-    var existUser, randomPassword, defaultId, newUser, mailOptions, err, info, user, profile, _ref20, _ref21, _ref22, _ref23, newProfile, _ref24, _ref25;
+module.exports.acquireNewAccountByCode = function () {
+  var _ref19 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(code, codeType, cb) {
+    var err, result, exist, user, profile, _ref20, _ref21, _ref22, _ref23, newUser, _ref24, _ref25, newProfile, _ref26, _ref27;
 
     return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            _context5.next = 2;
-            return User.findOne({ email: _email });
+            err = void 0, result = void 0, exist = void 0, user = void 0, profile = void 0;
 
-          case 2:
-            existUser = _context5.sent;
-
-            if (!(existUser !== null)) {
-              _context5.next = 6;
+            if (!(codeType === 'course')) {
+              _context5.next = 10;
               break;
             }
 
-            cb('failed');return _context5.abrupt('return');
+            _context5.next = 4;
+            return (0, _to2.default)(_Course2.default.codeExist(code));
 
-          case 6:
-            randomPassword = _randomstring2.default.generate({
-              length: 6,
-              charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
-            });
-            defaultId = _email.substring(0, _email.lastIndexOf("@"));
-            newUser = {
-              id: defaultId,
-              pw: randomPassword,
-              email: _email
-            };
-            mailOptions = {
-              from: process.env.EMAIL_ID,
-              to: _email,
-              subject: 'Your mlang account is ready!',
-              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + newUser.id + '</p>' + '<p>and your password is <b>' + randomPassword + '</b></p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>' + '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
-            };
-            err = void 0, info = void 0, user = void 0, profile = void 0;
-            _context5.next = 13;
-            return (0, _to2.default)(transporter.sendMail(mailOptions));
-
-          case 13:
+          case 4:
             _ref20 = _context5.sent;
             _ref21 = _slicedToArray(_ref20, 2);
             err = _ref21[0];
-            info = _ref21[1];
+            exist = _ref21[1];
+            _context5.next = 16;
+            break;
 
-            if (!err) {
-              _context5.next = 22;
-              break;
-            }
+          case 10:
+            _context5.next = 12;
+            return (0, _to2.default)(_School2.default.codeExist(code));
 
-            cb('failed');console.log(err);console.log('err: mail cannot be sent');return _context5.abrupt('return');
-
-          case 22:
-            _context5.next = 24;
-            return (0, _to2.default)(User.create(newUser));
-
-          case 24:
+          case 12:
             _ref22 = _context5.sent;
             _ref23 = _slicedToArray(_ref22, 2);
             err = _ref23[0];
-            user = _ref23[1];
+            exist = _ref23[1];
+
+          case 16:
+            if (!(err || !exist)) {
+              _context5.next = 20;
+              break;
+            }
+
+            console.log('no such course');cb('failed');return _context5.abrupt('return');
+
+          case 20:
+            newUser = {
+              id: 'DefaultId',
+              pw: randomPassword(),
+              email: '@',
+              type: codeType === 'course' ? 'student' : 'teacher'
+            };
+            _context5.next = 23;
+            return (0, _to2.default)(User.create(newUser));
+
+          case 23:
+            _ref24 = _context5.sent;
+            _ref25 = _slicedToArray(_ref24, 2);
+            err = _ref25[0];
+            user = _ref25[1];
 
             if (!err) {
               _context5.next = 32;
               break;
             }
 
-            cb('failed');console.log(err);return _context5.abrupt('return');
+            console.log('cant create user');cb('failed');console.log(err);return _context5.abrupt('return');
 
           case 32:
             newProfile = {
@@ -387,22 +386,31 @@ module.exports.acquireNewAccount = function () {
             return (0, _to2.default)(_Profile2.default.create(newProfile));
 
           case 35:
-            _ref24 = _context5.sent;
-            _ref25 = _slicedToArray(_ref24, 2);
-            err = _ref25[0];
-            profile = _ref25[1];
+            _ref26 = _context5.sent;
+            _ref27 = _slicedToArray(_ref26, 2);
+            err = _ref27[0];
+            profile = _ref27[1];
 
             if (!err) {
-              _context5.next = 43;
+              _context5.next = 44;
               break;
             }
 
-            cb('failed');console.log(err);return _context5.abrupt('return');
-
-          case 43:
-            cb('success');
+            console.log('cant create profile');cb('failed');console.log(err);return _context5.abrupt('return');
 
           case 44:
+
+            if (codeType === 'course') {
+              _Course2.default.joinCourse({ userId: user._id, code: code }, function (result) {
+                cb(result, user);
+              });
+            } else if (codeType === 'school') {
+              _School2.default.joinSchool({ userId: user._id, code: code }, function (result) {
+                cb(result, user);
+              });
+            }
+
+          case 45:
           case 'end':
             return _context5.stop();
         }
@@ -410,8 +418,112 @@ module.exports.acquireNewAccount = function () {
     }, _callee5, undefined);
   }));
 
-  return function (_x7, _x8) {
+  return function (_x7, _x8, _x9) {
     return _ref19.apply(this, arguments);
+  };
+}();
+
+module.exports.acquireNewAccount = function () {
+  var _ref28 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(_email, cb) {
+    var existUser, defaultId, newUser, mailOptions, err, info, user, profile, _ref29, _ref30, _ref31, _ref32, newProfile, _ref33, _ref34;
+
+    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            _context6.next = 2;
+            return User.findOne({ email: _email });
+
+          case 2:
+            existUser = _context6.sent;
+
+            if (!(existUser !== null)) {
+              _context6.next = 6;
+              break;
+            }
+
+            cb('failed');return _context6.abrupt('return');
+
+          case 6:
+            defaultId = _email.substring(0, _email.lastIndexOf("@"));
+            newUser = {
+              id: defaultId,
+              pw: randomPassword(),
+              email: _email
+            };
+            mailOptions = {
+              from: process.env.EMAIL_ID,
+              to: _email,
+              subject: 'Your mlang account is ready!',
+              html: '<p>Dear user,</p>' + '<p>Thanks for using mlang!</p>' + '<p>Your account id is ' + newUser.id + '</p>' + '<p>and your password is <b>' + randomPassword + '</b></p>' + '<p>Have fun!</p>' + '<p>Regard,</p>' + '<p>mlang developer team</p>' + '<p>For any suggestions or bug report please send email to mlang.socail@gmail.com</p>'
+            };
+            err = void 0, info = void 0, user = void 0, profile = void 0;
+            _context6.next = 12;
+            return (0, _to2.default)(transporter.sendMail(mailOptions));
+
+          case 12:
+            _ref29 = _context6.sent;
+            _ref30 = _slicedToArray(_ref29, 2);
+            err = _ref30[0];
+            info = _ref30[1];
+
+            if (!err) {
+              _context6.next = 21;
+              break;
+            }
+
+            cb('failed');console.log(err);console.log('err: mail cannot be sent');return _context6.abrupt('return');
+
+          case 21:
+            _context6.next = 23;
+            return (0, _to2.default)(User.create(newUser));
+
+          case 23:
+            _ref31 = _context6.sent;
+            _ref32 = _slicedToArray(_ref31, 2);
+            err = _ref32[0];
+            user = _ref32[1];
+
+            if (!err) {
+              _context6.next = 31;
+              break;
+            }
+
+            cb('failed');console.log(err);return _context6.abrupt('return');
+
+          case 31:
+            newProfile = {
+              belongTo: user._id
+            };
+            _context6.next = 34;
+            return (0, _to2.default)(_Profile2.default.create(newProfile));
+
+          case 34:
+            _ref33 = _context6.sent;
+            _ref34 = _slicedToArray(_ref33, 2);
+            err = _ref34[0];
+            profile = _ref34[1];
+
+            if (!err) {
+              _context6.next = 42;
+              break;
+            }
+
+            cb('failed');console.log(err);return _context6.abrupt('return');
+
+          case 42:
+            cb('success');
+
+          case 43:
+          case 'end':
+            return _context6.stop();
+        }
+      }
+    }, _callee6, undefined);
+  }));
+
+  return function (_x10, _x11) {
+    return _ref28.apply(this, arguments);
   };
 }();
 
@@ -425,6 +537,13 @@ var transporter = _nodemailer2.default.createTransport({
     pass: process.env.GMAIL_PW
   }
 });
+
+function randomPassword() {
+  return _randomstring2.default.generate({
+    length: 6,
+    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+  });
+}
 
 /*const transporter = nodemailer.createTransport({
     host: process.env.HOST,

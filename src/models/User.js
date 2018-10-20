@@ -115,7 +115,7 @@ module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
     [err, exist] = await to(School.codeExist(code));
   }
 
-  if(err || !exist){ cb('failed'); return; }
+  if(err || !exist){ console.log('no such course'); cb('failed'); return; }
 
 
   const newUser = {
@@ -126,14 +126,14 @@ module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
   };
 
   [err, user] = await to(User.create(newUser));
-  if(err){ cb('failed'); console.log(err); return; }
+  if(err){ console.log('cant create user'); cb('failed'); console.log(err); return; }
 
   var newProfile = {
     belongTo: user._id
   };
 
   [err, profile] = await to(Profile.create(newProfile));
-  if(err){ cb('failed'); console.log(err); return; }
+  if(err){ console.log('cant create profile'); cb('failed'); console.log(err); return; }
 
   if(codeType === 'course'){
     Course.joinCourse({ userId: user._id, code: code}, (result)=>{

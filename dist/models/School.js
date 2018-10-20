@@ -341,4 +341,45 @@ module.exports.addSchool = function () {
     return _ref18.apply(this, arguments);
   };
 }();
+
+module.exports.codeExist = function () {
+  var _ref23 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(code) {
+    var err, school, _ref24, _ref25;
+
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            err = void 0, school = void 0;
+            _context5.next = 3;
+            return (0, _to2.default)(School.findOne({ code: code }));
+
+          case 3:
+            _ref24 = _context5.sent;
+            _ref25 = _slicedToArray(_ref24, 2);
+            err = _ref25[0];
+            school = _ref25[1];
+
+            if (!(err || !school)) {
+              _context5.next = 9;
+              break;
+            }
+
+            return _context5.abrupt('return', false);
+
+          case 9:
+            return _context5.abrupt('return', true);
+
+          case 10:
+          case 'end':
+            return _context5.stop();
+        }
+      }
+    }, _callee5, undefined);
+  }));
+
+  return function (_x9) {
+    return _ref23.apply(this, arguments);
+  };
+}();
 //# sourceMappingURL=School.js.map

@@ -52,6 +52,10 @@ var cardSchema = _mongoose2.default.Schema({
     type: Boolean,
     default: false
   },
+  studentRead: {
+    type: Boolean,
+    default: false
+  },
   langs: [ObjectId]
 });
 
