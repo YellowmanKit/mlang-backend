@@ -17,20 +17,22 @@ import Lang from '../../models/Lang.js';
 
 class UserRouter extends Router {
 
-  constructor(app){
+  constructor(app, mlanghku){
     super(app);
     this.app = app;
+    this.mlanghku = mlanghku;
     this.init();
   }
 
   init(){
     const app = this.app;
+    const mlanghku = this.mlanghku;
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
     app.post('/user/addAdmin', async(req, res, next)=>{
       const userId = req.body.data.userId;
-      console.log(userId);
+      //console.log(userId);
       let err, updatedUser;
       [err, updatedUser] = await to(User.findOneAndUpdate({id: userId},{$set:{type:'admin'}},{new: true}))
       if(err){ console.log(err); return res.json({ result: 'failed'})}
@@ -55,12 +57,7 @@ class UserRouter extends Router {
       if(err){ console.log(err); return res.json({ result: 'failed'})}
       if(existedUser && existedUser._id.toString() !== data._id){ console.log('user id/pw already used'); return res.json({ result: 'failed'}) }
 
-      User.findOneAndUpdate({_id: data._id}, { $set:{
-        type: data.type,
-        id: data.id,
-        pw: data.pw,
-        email: data.email
-      }}, {new: true}, (err, updatedUser)=>{
+      User.findOneAndUpdate({_id: data._id}, { $set: data }, {new: true}, (err, updatedUser)=>{
         return res.json({
           result: (err || !updatedUser)? 'failed':'success' ,
           updatedUser: updatedUser
@@ -100,7 +97,20 @@ class UserRouter extends Router {
       const id = req.headers.id;
       const pw = req.headers.pw;
 
-      console.log(id + ' ' + pw);
+      //console.log(id + ' ' + pw);
+
+      let err, data, user, profile, appUser;
+      [err, user, profile] = await User.getUserAndProfile(id, pw);
+      if(err){
+        [err, appUser] = await mlanghku.login(id, pw);
+        if(err){ console.log(err); return res.json({ result: "failed" }); }
+
+        [err, user, profile] = await User.aquireNewAccountByAppAccount(appUser.attributes, pw);
+      }
+      console.log(user);
+      console.log(profile);
+      
+      profiles = [profile];
 
       let profiles = [];
       let schools = [];
@@ -110,12 +120,6 @@ class UserRouter extends Router {
       let studentProjects = [];
       let cards = [];
       let langs = [];
-
-      let err, data, user, profile;
-      [err, user, profile] = await User.getUserAndProfile(id, pw);
-      if(err){ return res.json({ result: "failed" }); }
-
-      profiles = [profile];
 
       let teacherProfiles;
       [err, data, teacherProfiles] = await Course.getJoined(profile.joinedCourses);

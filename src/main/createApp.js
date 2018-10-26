@@ -20,6 +20,8 @@ import StudentProjectRouter from './routers/studentProject.js';
 import CardRouter from './routers/card.js';
 import LangRouter from './routers/lang.js';
 
+import mlanghkuRouter from './routers/mlanghku.js';
+
 //const temp = 'C:/data/temp/';
 //const storage = 'C:/data/storage/';
 
@@ -69,9 +71,11 @@ class CreateApp {
     app.set('temp',temp);
     app.set('storage',storage);
 
+    const mlanghku = new mlanghkuRouter(app);
+
     new AppRouter(app);
     new SchoolRouter(app);
-    new UserRouter(app);
+    new UserRouter(app, mlanghku);
     new ProfileRouter(app);
     new CourseRouter(app);
     new ProjectRouter(app);

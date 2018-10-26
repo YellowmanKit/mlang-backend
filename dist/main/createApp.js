@@ -82,6 +82,10 @@ var _lang = require('./routers/lang.js');
 
 var _lang2 = _interopRequireDefault(_lang);
 
+var _mlanghku = require('./routers/mlanghku.js');
+
+var _mlanghku2 = _interopRequireDefault(_mlanghku);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -138,9 +142,11 @@ var CreateApp = function () {
       app.set('temp', temp);
       app.set('storage', storage);
 
+      var mlanghku = new _mlanghku2.default(app);
+
       new _app2.default(app);
       new _school2.default(app);
-      new _user2.default(app);
+      new _user2.default(app, mlanghku);
       new _profile2.default(app);
       new _course2.default(app);
       new _project2.default(app);

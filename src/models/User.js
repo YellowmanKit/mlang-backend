@@ -16,6 +16,12 @@ var schema = mongoose.Schema({
   pw: {
     type: String
   },
+  mlanghkuId: {
+    type: String
+  },
+  mlanghkuPw: {
+    type: String
+  },
   email: {
     type: String
   },
@@ -68,24 +74,24 @@ module.exports.getUserAndProfile = async (id, pw) =>{
   let err, user, profile;
 
   [err, user] = await to(User.findOne({id, pw}));
-  if(err || !user){ console.log(err); return ['error']; }
+  if(err || !user){ return ['error']; }
 
   [err, profile] = await to(Profile.findOne({belongTo: user._id}));
-  if(err || !profile){ console.log(err); return ['error']; }
+  if(err || !profile){ return ['error']; }
 
   return [null , user, profile]
 }
 
-module.exports.resetPassword = async (_email, cb)=>{
+module.exports.resetPassword = async (email, cb)=>{
   let err, user, info;
 
-  [err,user] = await to(User.findOne({email: _email}));
+  [err,user] = await to(User.findOne({email: email}));
   if(err || user === null){ cb('failed'); return; };
 
   const randomPassword = randomString.generate(6);
   const mailOptions = {
       from: process.env.EMAIL_ID,
-      to: _email,
+      to: email,
       subject: 'Your mlang account password has been reset!',
       html:
       '<p>Dear user,</p>' +
@@ -104,6 +110,35 @@ module.exports.resetPassword = async (_email, cb)=>{
   user.set({ pw: randomPassword });
   user.save();
   cb('success');
+}
+
+module.exports.aquireNewAccountByAppAccount = async (appUser, appPw)=>{
+
+  const existUser = await User.findOne({id: appUser.username, pw: appPw});
+  if(existUser !== null){ return ['error'] }
+
+  let err, user, profile;
+
+  const newUser = {
+    id: appUser.username,
+    pw: appPw,
+    mlanghkuId: appUser.username,
+    mlanghkuPw: appPw,
+    email: appUser.email,
+    type: appUser.identity === 2? 'teacher': 'student'
+  };
+
+  [err, user] = await to(User.create(newUser));
+  if(err){ console.log('cant create user'); return ['error'] }
+
+  var newProfile = {
+    belongTo: user._id
+  };
+
+  [err, profile] = await to(Profile.create(newProfile));
+  if(err){ console.log('cant create profile'); return ['error'] }
+
+  return [null, user, profile];
 }
 
 module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
@@ -146,20 +181,20 @@ module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
   }
 }
 
-module.exports.acquireNewAccount = async (_email, cb)=>{
-  const existUser = await User.findOne({email: _email});
+module.exports.acquireNewAccount = async (email, cb)=>{
+  const existUser = await User.findOne({email: email});
   if(existUser !== null){ cb('failed'); return; }
 
-  var defaultId = _email.substring(0, _email.lastIndexOf("@"));
+  var defaultId = email.substring(0, email.lastIndexOf("@"));
   const newUser = {
     id: defaultId,
     pw: randomPassword(),
-    email: _email
+    email: email
   }
 
   const mailOptions = {
       from: process.env.EMAIL_ID,
-      to: _email,
+      to: email,
       subject: 'Your mlang account is ready!',
       html:
       '<p>Dear user,</p>' +

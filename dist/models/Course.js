@@ -125,7 +125,7 @@ module.exports.getTeaching = function () {
             courses = [];
             teachingCourses = [];
             _context2.next = 5;
-            return (0, _to2.default)(Course.find({ teacher: teacherId }, null, { sort: { endDate: 'ascending' } }));
+            return (0, _to2.default)(Course.find({ teacher: teacherId }, null, { sort: { endDate: 'descending' } }));
 
           case 5:
             _ref5 = _context2.sent;

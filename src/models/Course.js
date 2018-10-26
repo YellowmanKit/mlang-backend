@@ -56,7 +56,7 @@ module.exports.getTeaching = async (teacherId)=>{
   let courses = [];
   let teachingCourses = [];
 
-  [err, courses] = await to(Course.find({teacher: teacherId}, null, {sort: {endDate: 'ascending'}}));
+  [err, courses] = await to(Course.find({teacher: teacherId}, null, {sort: {endDate: 'descending'}}));
   for(var i=0;i<courses.length;i++){
     teachingCourses.push(courses[i]._id);
   }

@@ -1,8 +1,8 @@
 {
   "main.css": "static/css/main.e943e914.css",
   "main.css.map": "static/css/main.e943e914.css.map",
-  "main.js": "static/js/main.b706cd08.js",
-  "main.js.map": "static/js/main.b706cd08.js.map",
+  "main.js": "static/js/main.c4a2aa9f.js",
+  "main.js.map": "static/js/main.c4a2aa9f.js.map",
   "static\\media\\A.png": "static/media/A.a1c8df69.png",
   "static\\media\\B.png": "static/media/B.35addca5.png",
   "static\\media\\C.png": "static/media/C.cbea7505.png",
@@ -30,6 +30,7 @@
   "static\\media\\hongkong.png": "static/media/hongkong.23b72487.png",
   "static\\media\\menu_bg.png": "static/media/menu_bg.5281c8aa.png",
   "static\\media\\mlang_green.png": "static/media/mlang_green.7b6388fe.png",
+  "static\\media\\mlanghku.png": "static/media/mlanghku.8204b9ee.png",
   "static\\media\\no_image.png": "static/media/no_image.57f701ae.png",
   "static\\media\\nsm.jpg": "static/media/nsm.28035f03.jpg",
   "static\\media\\paperBox.png": "static/media/paperBox.e0e17bf9.png",
