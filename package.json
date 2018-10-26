@@ -44,7 +44,8 @@
     "multer-s3": "^2.7.0",
     "nodemailer": "^4.6.7",
     "parse": "^2.1.0",
-    "randomstring": "^1.1.5"
+    "randomstring": "^1.1.5",
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

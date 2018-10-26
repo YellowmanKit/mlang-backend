@@ -3,8 +3,7 @@ import path from 'path';
 import mongoose from 'mongoose';
 import to from '../../to';
 import Parse from 'parse/node';
-Parse.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
-Parse.serverURL = process.env.PARSE_SERVER;
+import request from 'request';
 
 class mlanghkuRouter extends Router {
 
@@ -19,16 +18,53 @@ class mlanghkuRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    Parse.initialize(process.env.PARSE_APP_ID);
+    Parse.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
     Parse.serverURL = process.env.PARSE_SERVER;
 
-    /*app.post('/mlanghku/fetchUser', async(req, res, next)=>{
+    app.post('/mlanghku/fetch', async(req, res, next)=>{
       const data = req.body.data;
-      console.log(data);
+
+      let err, dataRes;
+      const query = new Parse.Query(data.className);
+      //query.equalTo('project', { __type: 'Pointer', className: 'Project', objectId: req.body.data.projectId });
+      query.equalTo(data.field, data.value);
+      [err, dataRes] = await to(query.find());
+      if(err){ res.json({ result: 'failed' }) }
+
       res.json({
-        result: 'success'
+        result: 'success',
+        data: dataRes
       })
-    });*/
+    })
+
+    app.post('/mlanghku/login', async(req, res, next)=>{
+
+      const data = req.body.data;
+      //console.log(data);
+      let err, dataRes, user;
+      [err, user] = await to(Parse.User.logIn(data.id, data.pw));
+      if(err){ console.log(err); res.json({ result: 'failed to login'}); return; }
+      //console.log(user);
+
+      const timestamp =  this.timestamp();
+      //[err, dataRes] = await to(Parse.Cloud.run('RenewUser', { timestamp: timestamp }));
+      this.runParseCloudFunction("RenewUser", user.attributes.sessionToken, { timestamp: timestamp },
+      (err, dataRes, body)=>{
+
+        if(err){ console.log(err); res.json({ result: 'failed to RenewUser'}); return;}
+
+        //console.log(body);
+        const jsonBody = JSON.parse(body);
+        //console.log(jsonBody);
+
+        res.json({
+          result: 'success',
+          user: user,
+          body: jsonBody.result
+        })
+      });
+
+    });
 
   }
 
@@ -39,6 +75,45 @@ class mlanghkuRouter extends Router {
     //console.log(user.attributes);
     return [null, user];
   }
+
+  timestamp(){
+    //return '000000000';
+    return Math.floor(new Date().getTime() / 1000);
+  }
+
+  async runParseCloudFunction(urlPath, token, params, cb) {
+    if (!params) {
+        params = {};
+    }
+
+    //var buildVariables = config.buildVariables(buildEnvironment);
+    //var publicServerURL = buildVariables.publicServerURL;
+
+    urlPath = urlPath.indexOf('/') == 0 ? urlPath.substring(1) : urlPath;
+    var url = process.env.PARSE_SERVER + "/functions/" + urlPath;
+
+    var headers = {
+        'X-Parse-Application-Id': process.env.PARSE_APP_ID,
+        'X-Parse-REST-API-Key': process.env.DOTNET_KEY,
+        'X-Parse-Client-Key': process.env.DOTNET_KEY,
+        'X-Parse-Javascript-Key': process.env.DOTNET_KEY,
+        'Content-Type': 'application/json;charset=utf-8'
+    };
+
+    if (token) {
+        headers['X-Parse-Session-Token'] = token;
+    }
+
+    //let err, res;
+    request({
+        url: url,
+        method: "POST",
+        headers: headers,
+        qs: params
+    }, (err, res, body)=>{
+      cb(err, res, body);
+    });
+  };
 
 }
 

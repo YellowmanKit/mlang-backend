@@ -107,9 +107,9 @@ class UserRouter extends Router {
 
         [err, user, profile] = await User.aquireNewAccountByAppAccount(appUser.attributes, pw);
       }
-      console.log(user);
-      console.log(profile);
-      
+      //console.log(user);
+      //console.log(profile);
+
       profiles = [profile];
 
       let profiles = [];
