@@ -21,6 +21,12 @@ class mlanghkuRouter extends Router {
     Parse.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
     Parse.serverURL = process.env.PARSE_SERVER;
 
+    app.get('/mlanghku/download/:filenameUpper/:filenameLower', async(req, res, next)=>{
+      const url = 'http://147.8.219.237:1337/parse/files/' + req.params.filenameUpper + '/' + req.params.filenameLower;
+      //console.log(url);
+      request(url).pipe(res);
+    })
+
     app.post('/mlanghku/fetch', async(req, res, next)=>{
       const data = req.body.data;
 

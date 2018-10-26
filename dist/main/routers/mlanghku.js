@@ -67,39 +67,19 @@ var mlanghkuRouter = function (_Router) {
       _node2.default.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
       _node2.default.serverURL = process.env.PARSE_SERVER;
 
-      app.post('/mlanghku/fetch', function () {
+      app.get('/mlanghku/download/:filenameUpper/:filenameLower', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
-          var data, err, dataRes, query, _ref2, _ref3;
-
+          var url;
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  data = req.body.data;
-                  err = void 0, dataRes = void 0;
-                  query = new _node2.default.Query(data.className);
-                  //query.equalTo('project', { __type: 'Pointer', className: 'Project', objectId: req.body.data.projectId });
+                  url = 'http://147.8.219.237:1337/parse/files/' + req.params.filenameUpper + '/' + req.params.filenameLower;
+                  //console.log(url);
 
-                  query.equalTo(data.field, data.value);
-                  _context.next = 6;
-                  return (0, _to2.default)(query.find());
+                  (0, _request2.default)(url).pipe(res);
 
-                case 6:
-                  _ref2 = _context.sent;
-                  _ref3 = _slicedToArray(_ref2, 2);
-                  err = _ref3[0];
-                  dataRes = _ref3[1];
-
-                  if (err) {
-                    res.json({ result: 'failed' });
-                  }
-
-                  res.json({
-                    result: 'success',
-                    data: dataRes
-                  });
-
-                case 12:
+                case 2:
                 case 'end':
                   return _context.stop();
               }
@@ -112,33 +92,78 @@ var mlanghkuRouter = function (_Router) {
         };
       }());
 
-      app.post('/mlanghku/login', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var data, err, dataRes, user, _ref5, _ref6, timestamp;
+      app.post('/mlanghku/fetch', function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
+          var data, err, dataRes, query, _ref3, _ref4;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
                   data = req.body.data;
+                  err = void 0, dataRes = void 0;
+                  query = new _node2.default.Query(data.className);
+                  //query.equalTo('project', { __type: 'Pointer', className: 'Project', objectId: req.body.data.projectId });
+
+                  query.equalTo(data.field, data.value);
+                  _context2.next = 6;
+                  return (0, _to2.default)(query.find());
+
+                case 6:
+                  _ref3 = _context2.sent;
+                  _ref4 = _slicedToArray(_ref3, 2);
+                  err = _ref4[0];
+                  dataRes = _ref4[1];
+
+                  if (err) {
+                    res.json({ result: 'failed' });
+                  }
+
+                  res.json({
+                    result: 'success',
+                    data: dataRes
+                  });
+
+                case 12:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, _this2);
+        }));
+
+        return function (_x4, _x5, _x6) {
+          return _ref2.apply(this, arguments);
+        };
+      }());
+
+      app.post('/mlanghku/login', function () {
+        var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var data, err, dataRes, user, _ref6, _ref7, timestamp;
+
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
+                  data = req.body.data;
                   //console.log(data);
 
                   err = void 0, dataRes = void 0, user = void 0;
-                  _context2.next = 4;
+                  _context3.next = 4;
                   return (0, _to2.default)(_node2.default.User.logIn(data.id, data.pw));
 
                 case 4:
-                  _ref5 = _context2.sent;
-                  _ref6 = _slicedToArray(_ref5, 2);
-                  err = _ref6[0];
-                  user = _ref6[1];
+                  _ref6 = _context3.sent;
+                  _ref7 = _slicedToArray(_ref6, 2);
+                  err = _ref7[0];
+                  user = _ref7[1];
 
                   if (!err) {
-                    _context2.next = 12;
+                    _context3.next = 12;
                     break;
                   }
 
-                  console.log(err);res.json({ result: 'failed to login' });return _context2.abrupt('return');
+                  console.log(err);res.json({ result: 'failed to login' });return _context3.abrupt('return');
 
                 case 12:
                   //console.log(user);
@@ -165,57 +190,57 @@ var mlanghkuRouter = function (_Router) {
 
                 case 14:
                 case 'end':
-                  return _context2.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee2, _this2);
+          }, _callee3, _this2);
         }));
 
-        return function (_x4, _x5, _x6) {
-          return _ref4.apply(this, arguments);
+        return function (_x7, _x8, _x9) {
+          return _ref5.apply(this, arguments);
         };
       }());
     }
   }, {
     key: 'login',
     value: function () {
-      var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(id, pw) {
-        var err, user, _ref8, _ref9;
+      var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, pw) {
+        var err, user, _ref9, _ref10;
 
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 err = void 0, user = void 0;
-                _context3.next = 3;
+                _context4.next = 3;
                 return (0, _to2.default)(_node2.default.User.logIn(id, pw));
 
               case 3:
-                _ref8 = _context3.sent;
-                _ref9 = _slicedToArray(_ref8, 2);
-                err = _ref9[0];
-                user = _ref9[1];
+                _ref9 = _context4.sent;
+                _ref10 = _slicedToArray(_ref9, 2);
+                err = _ref10[0];
+                user = _ref10[1];
 
                 if (!err) {
-                  _context3.next = 10;
+                  _context4.next = 10;
                   break;
                 }
 
-                console.log(err.message);return _context3.abrupt('return', ['error']);
+                console.log(err.message);return _context4.abrupt('return', ['error']);
 
               case 10:
-                return _context3.abrupt('return', [null, user]);
+                return _context4.abrupt('return', [null, user]);
 
               case 11:
               case 'end':
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
-      function login(_x7, _x8) {
-        return _ref7.apply(this, arguments);
+      function login(_x10, _x11) {
+        return _ref8.apply(this, arguments);
       }
 
       return login;
@@ -229,11 +254,11 @@ var mlanghkuRouter = function (_Router) {
   }, {
     key: 'runParseCloudFunction',
     value: function () {
-      var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(urlPath, token, params, cb) {
+      var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(urlPath, token, params, cb) {
         var url, headers;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 if (!params) {
                   params = {};
@@ -269,14 +294,14 @@ var mlanghkuRouter = function (_Router) {
 
               case 6:
               case 'end':
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
-      function runParseCloudFunction(_x9, _x10, _x11, _x12) {
-        return _ref10.apply(this, arguments);
+      function runParseCloudFunction(_x12, _x13, _x14, _x15) {
+        return _ref11.apply(this, arguments);
       }
 
       return runParseCloudFunction;
