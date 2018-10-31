@@ -140,7 +140,7 @@ var ProfileRouter = function (_Router) {
 
                   _Profile2.default.findOneAndUpdate({ _id: data.profile._id }, { $set: {
                       name: data.newName ? data.newName : data.profile.name,
-                      description: data.newDesc ? data.newDesc : data.profile.description,
+                      description: data.newDesc,
                       icon: data.newIcon ? data.newIcon : data.profile.icon
                     } }, { new: true }, function (err, _updatedProfile) {
                     //console.log(_updatedUser)
