@@ -12,6 +12,8 @@ import Course from '../../models/Course.js';
 import Subject from '../../models/Subject.js';
 import Project from '../../models/Project.js';
 import StudentProject from '../../models/StudentProject.js';
+import Group from '../../models/Group.js';
+
 import Card from '../../models/Card.js';
 import Lang from '../../models/Lang.js';
 
@@ -118,6 +120,7 @@ class UserRouter extends Router {
       let subjects = [];
       let projects = [];
       let studentProjects = [];
+      let groups = [];
       let cards = [];
       let langs = [];
 
@@ -152,7 +155,11 @@ class UserRouter extends Router {
 
       cards = [...cards, ...data];
 
+      var joinedGroups;
+      [err, data, joinedGroups] = await Group.getByUserAndProjects(user._id, joinedProjects);
+      if(err){ return res.json({ result: "failed" }); }
 
+      groups = [...groups, ...data];
 
 
 
@@ -165,7 +172,7 @@ class UserRouter extends Router {
       courses = [...courses, ...data];
 
       var teachingSubjects;
-      [err, data, teachingSubjects] = await Subject.getByCourses(data);
+      [err, data, teachingSubjects] = await Subject.getByCourses(data.slice(0).reverse());
       if(err){ return res.json({ result: "failed" });}
 
       subjects = [...subjects, ...data];
@@ -187,6 +194,14 @@ class UserRouter extends Router {
       if(err){ return res.json({ result: "failed" }); }
 
       cards = [...cards, ...data];
+
+      var teachingGroups;
+      [err, data, teachingGroups] = await Group.getByProjects(teachingProjects);
+      if(err){ return res.json({ result: "failed" }); }
+
+      groups = [...groups, ...data];
+
+
 
       var supervisingSchools;
       [err, data, supervisingSchools] = await School.getByUser(user._id, profile);
@@ -249,6 +264,7 @@ class UserRouter extends Router {
         subjects: subjects,
         projects: projects,
         studentProjects: studentProjects,
+        groups: groups,
         cards: cards,
         langs: langs
       })

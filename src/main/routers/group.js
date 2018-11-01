@@ -18,20 +18,57 @@ class GroupRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    app.post('/group/add', async(req, res, next)=>{
+    app.post('/group/fetchData', async(req, res, next)=>{
       const data = req.body.data;
-      console.log(data)
+      //console.log(data)
 
-      let err, group;
-      [err, group] = await to(Group.create({ name: data.groupName, project: data.projectId, students: [data.userId], leader: data.userId }));
-      if(err){ console.log(err); res.json({ result: 'failed'}); return; }
-
-      res.json({
-        result: 'success',
-        group: group
+      Group.fetchData(data.group, (result, groupData, profiles, studentProjects, cards, langs)=>{
+        return res.json({
+          result: result,
+          groupData: groupData,
+          profiles: profiles,
+          studentProjects: studentProjects,
+          cards: cards,
+          langs: langs
+        })
       })
     });
 
+    app.post('/group/join', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+
+      Group.joinGroup(data, (result, newGroup)=>{
+        return res.json({
+          result: result,
+          group: newGroup
+        })
+      })
+    });
+
+    app.post('/group/leave', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+
+      Group.leaveGroup(data, (result, newGroup)=>{
+        return res.json({
+          result: result,
+          group: newGroup
+        })
+      })
+    });
+
+    app.post('/group/add', async(req, res, next)=>{
+      const data = req.body.data;
+      //console.log(data)
+
+      Group.addGroup(data, (result, newGroup)=>{
+        return res.json({
+          result: result,
+          group: newGroup
+        })
+      })
+    });
   }
 
 }
