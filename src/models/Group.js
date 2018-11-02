@@ -101,8 +101,11 @@ module.exports.addGroup = async (data, cb)=>{
     });
 
     [err, group] = await to(Group.findOne({code: newCode}));
-    if(!err && group === null){ cb('failed'); return; };
+    if(!err && group === null){ break; };
   }
+
+  [err, group] = await to(Group.findOne({project: data.projectId, leader: data.userId}));
+  if(group !== null){ cb('failed', null, group); console.log('group existed'); return; };
 
   [err, group] = await to(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode }));
   if(err){ cb('failed'); console.log(err); return; }

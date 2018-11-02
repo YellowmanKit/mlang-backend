@@ -62,10 +62,11 @@ class GroupRouter extends Router {
       const data = req.body.data;
       //console.log(data)
 
-      Group.addGroup(data, (result, newGroup)=>{
+      Group.addGroup(data, (result, newGroup, existedGroup)=>{
         return res.json({
           result: result,
-          group: newGroup
+          group: newGroup,
+          existedGroup: existedGroup
         })
       })
     });
