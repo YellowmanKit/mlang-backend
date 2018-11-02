@@ -115,16 +115,18 @@ module.exports.addGroup = async (data, cb)=>{
 }
 
 module.exports.getByProjects = async (projectsId)=>{
-  let err, group;
+  let err, data;
   let groupsId = [];
   let groups = [];
 
   for(var i=0;i<projectsId.length;i++){
-    [err, group] = await to(Group.findOne({ project: projectsId[i]}));
+    [err, data] = await to(Group.find({ project: projectsId[i]}));
     if(err){ return [err]; }
-    if(group){
-      groupsId = [...groupsId, group._id];
-      groups = [...groups, group];
+    if(data){
+      for(var j=0;j<data.length;j++){
+        groupsId = [...groupsId, data[j]._id];
+      }
+      groups = [...groups, ...data];
     }
   }
 

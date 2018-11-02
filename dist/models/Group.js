@@ -386,13 +386,13 @@ module.exports.addGroup = function () {
 
 module.exports.getByProjects = function () {
   var _ref23 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(projectsId) {
-    var err, group, groupsId, groups, i, _ref24, _ref25;
+    var err, data, groupsId, groups, i, _ref24, _ref25, j;
 
     return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
-            err = void 0, group = void 0;
+            err = void 0, data = void 0;
             groupsId = [];
             groups = [];
             i = 0;
@@ -404,13 +404,13 @@ module.exports.getByProjects = function () {
             }
 
             _context5.next = 7;
-            return (0, _to2.default)(Group.findOne({ project: projectsId[i] }));
+            return (0, _to2.default)(Group.find({ project: projectsId[i] }));
 
           case 7:
             _ref24 = _context5.sent;
             _ref25 = _slicedToArray(_ref24, 2);
             err = _ref25[0];
-            group = _ref25[1];
+            data = _ref25[1];
 
             if (!err) {
               _context5.next = 13;
@@ -420,9 +420,11 @@ module.exports.getByProjects = function () {
             return _context5.abrupt('return', [err]);
 
           case 13:
-            if (group) {
-              groupsId = [].concat(_toConsumableArray(groupsId), [group._id]);
-              groups = [].concat(_toConsumableArray(groups), [group]);
+            if (data) {
+              for (j = 0; j < data.length; j++) {
+                groupsId = [].concat(_toConsumableArray(groupsId), [data[j]._id]);
+              }
+              groups = [].concat(_toConsumableArray(groups), _toConsumableArray(data));
             }
 
           case 14:
