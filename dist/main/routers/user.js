@@ -68,6 +68,10 @@ var _Lang = require('../../models/Lang.js');
 
 var _Lang2 = _interopRequireDefault(_Lang);
 
+var _Log = require('../../models/Log.js');
+
+var _Log2 = _interopRequireDefault(_Log);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -339,6 +343,8 @@ var UserRouter = function (_Router) {
                                                       //console.log(user);
                                                       //console.log(profile);
 
+                                                      _Log2.default.createLoginLog(user._id);
+
                                                       profiles = [profile];
 
                                                       profiles = [];
@@ -351,10 +357,10 @@ var UserRouter = function (_Router) {
                                                       cards = [];
                                                       langs = [];
                                                       teacherProfiles = void 0;
-                                                      _context4.next = 40;
+                                                      _context4.next = 41;
                                                       return _Course2.default.getJoined(profile.joinedCourses);
 
-                                                case 40:
+                                                case 41:
                                                       _ref17 = _context4.sent;
                                                       _ref18 = _slicedToArray(_ref17, 3);
                                                       err = _ref18[0];
@@ -362,21 +368,21 @@ var UserRouter = function (_Router) {
                                                       teacherProfiles = _ref18[2];
 
                                                       if (!err) {
-                                                            _context4.next = 47;
+                                                            _context4.next = 48;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 47:
+                                                case 48:
 
                                                       courses = [].concat(_toConsumableArray(courses), _toConsumableArray(data));
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(teacherProfiles));
 
-                                                      _context4.next = 51;
+                                                      _context4.next = 52;
                                                       return _Subject2.default.getByCourses(data);
 
-                                                case 51:
+                                                case 52:
                                                       _ref19 = _context4.sent;
                                                       _ref20 = _slicedToArray(_ref19, 3);
                                                       err = _ref20[0];
@@ -384,20 +390,20 @@ var UserRouter = function (_Router) {
                                                       joinedSubjects = _ref20[2];
 
                                                       if (!err) {
-                                                            _context4.next = 58;
+                                                            _context4.next = 59;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 58:
+                                                case 59:
 
                                                       subjects = [].concat(_toConsumableArray(subjects), _toConsumableArray(data));
 
-                                                      _context4.next = 61;
+                                                      _context4.next = 62;
                                                       return _Project2.default.getBySubjects(data);
 
-                                                case 61:
+                                                case 62:
                                                       _ref21 = _context4.sent;
                                                       _ref22 = _slicedToArray(_ref21, 3);
                                                       err = _ref22[0];
@@ -405,20 +411,20 @@ var UserRouter = function (_Router) {
                                                       joinedProjects = _ref22[2];
 
                                                       if (!err) {
-                                                            _context4.next = 68;
+                                                            _context4.next = 69;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 68:
+                                                case 69:
 
                                                       projects = [].concat(_toConsumableArray(projects), _toConsumableArray(data));
 
-                                                      _context4.next = 71;
+                                                      _context4.next = 72;
                                                       return _StudentProject2.default.getByProjects(data);
 
-                                                case 71:
+                                                case 72:
                                                       _ref23 = _context4.sent;
                                                       _ref24 = _slicedToArray(_ref23, 3);
                                                       err = _ref24[0];
@@ -426,20 +432,20 @@ var UserRouter = function (_Router) {
                                                       joinedStudentProjects = _ref24[2];
 
                                                       if (!err) {
-                                                            _context4.next = 78;
+                                                            _context4.next = 79;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 78:
+                                                case 79:
 
                                                       studentProjects = [].concat(_toConsumableArray(studentProjects), _toConsumableArray(data));
 
-                                                      _context4.next = 81;
+                                                      _context4.next = 82;
                                                       return _Card2.default.getByStudentProjects(data);
 
-                                                case 81:
+                                                case 82:
                                                       _ref25 = _context4.sent;
                                                       _ref26 = _slicedToArray(_ref25, 3);
                                                       err = _ref26[0];
@@ -447,20 +453,20 @@ var UserRouter = function (_Router) {
                                                       joinedCards = _ref26[2];
 
                                                       if (!err) {
-                                                            _context4.next = 88;
+                                                            _context4.next = 89;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 88:
+                                                case 89:
 
                                                       cards = [].concat(_toConsumableArray(cards), _toConsumableArray(data));
 
-                                                      _context4.next = 91;
+                                                      _context4.next = 92;
                                                       return _Group2.default.getByUserAndProjects(user._id, joinedProjects);
 
-                                                case 91:
+                                                case 92:
                                                       _ref27 = _context4.sent;
                                                       _ref28 = _slicedToArray(_ref27, 3);
                                                       err = _ref28[0];
@@ -468,20 +474,20 @@ var UserRouter = function (_Router) {
                                                       joinedGroups = _ref28[2];
 
                                                       if (!err) {
-                                                            _context4.next = 98;
+                                                            _context4.next = 99;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 98:
+                                                case 99:
 
                                                       groups = [].concat(_toConsumableArray(groups), _toConsumableArray(data));
 
-                                                      _context4.next = 101;
+                                                      _context4.next = 102;
                                                       return _Course2.default.getTeaching(user._id);
 
-                                                case 101:
+                                                case 102:
                                                       _ref29 = _context4.sent;
                                                       _ref30 = _slicedToArray(_ref29, 3);
                                                       err = _ref30[0];
@@ -489,20 +495,20 @@ var UserRouter = function (_Router) {
                                                       teachingCourses = _ref30[2];
 
                                                       if (!err) {
-                                                            _context4.next = 108;
+                                                            _context4.next = 109;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 108:
+                                                case 109:
 
                                                       courses = [].concat(_toConsumableArray(courses), _toConsumableArray(data));
 
-                                                      _context4.next = 111;
+                                                      _context4.next = 112;
                                                       return _Subject2.default.getByCourses(data.slice(0).reverse());
 
-                                                case 111:
+                                                case 112:
                                                       _ref31 = _context4.sent;
                                                       _ref32 = _slicedToArray(_ref31, 3);
                                                       err = _ref32[0];
@@ -510,20 +516,20 @@ var UserRouter = function (_Router) {
                                                       teachingSubjects = _ref32[2];
 
                                                       if (!err) {
-                                                            _context4.next = 118;
+                                                            _context4.next = 119;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 118:
+                                                case 119:
 
                                                       subjects = [].concat(_toConsumableArray(subjects), _toConsumableArray(data));
 
-                                                      _context4.next = 121;
+                                                      _context4.next = 122;
                                                       return _Project2.default.getBySubjects(data);
 
-                                                case 121:
+                                                case 122:
                                                       _ref33 = _context4.sent;
                                                       _ref34 = _slicedToArray(_ref33, 3);
                                                       err = _ref34[0];
@@ -531,20 +537,20 @@ var UserRouter = function (_Router) {
                                                       teachingProjects = _ref34[2];
 
                                                       if (!err) {
-                                                            _context4.next = 128;
+                                                            _context4.next = 129;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 128:
+                                                case 129:
 
                                                       projects = [].concat(_toConsumableArray(projects), _toConsumableArray(data));
 
-                                                      _context4.next = 131;
+                                                      _context4.next = 132;
                                                       return _StudentProject2.default.getByProjects(data);
 
-                                                case 131:
+                                                case 132:
                                                       _ref35 = _context4.sent;
                                                       _ref36 = _slicedToArray(_ref35, 3);
                                                       err = _ref36[0];
@@ -552,20 +558,20 @@ var UserRouter = function (_Router) {
                                                       teachingStudentProjects = _ref36[2];
 
                                                       if (!err) {
-                                                            _context4.next = 138;
+                                                            _context4.next = 139;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 138:
+                                                case 139:
 
                                                       studentProjects = [].concat(_toConsumableArray(studentProjects), _toConsumableArray(data));
 
-                                                      _context4.next = 141;
+                                                      _context4.next = 142;
                                                       return _Card2.default.getByStudentProjects(data);
 
-                                                case 141:
+                                                case 142:
                                                       _ref37 = _context4.sent;
                                                       _ref38 = _slicedToArray(_ref37, 3);
                                                       err = _ref38[0];
@@ -573,20 +579,20 @@ var UserRouter = function (_Router) {
                                                       teachingCards = _ref38[2];
 
                                                       if (!err) {
-                                                            _context4.next = 148;
+                                                            _context4.next = 149;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 148:
+                                                case 149:
 
                                                       cards = [].concat(_toConsumableArray(cards), _toConsumableArray(data));
 
-                                                      _context4.next = 151;
+                                                      _context4.next = 152;
                                                       return _Group2.default.getByProjects(teachingProjects);
 
-                                                case 151:
+                                                case 152:
                                                       _ref39 = _context4.sent;
                                                       _ref40 = _slicedToArray(_ref39, 3);
                                                       err = _ref40[0];
@@ -594,20 +600,20 @@ var UserRouter = function (_Router) {
                                                       teachingGroups = _ref40[2];
 
                                                       if (!err) {
-                                                            _context4.next = 158;
+                                                            _context4.next = 159;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 158:
+                                                case 159:
 
                                                       groups = [].concat(_toConsumableArray(groups), _toConsumableArray(data));
 
-                                                      _context4.next = 161;
+                                                      _context4.next = 162;
                                                       return _School2.default.getByUser(user._id, profile);
 
-                                                case 161:
+                                                case 162:
                                                       _ref41 = _context4.sent;
                                                       _ref42 = _slicedToArray(_ref41, 3);
                                                       err = _ref42[0];
@@ -615,30 +621,30 @@ var UserRouter = function (_Router) {
                                                       supervisingSchools = _ref42[2];
 
                                                       if (!err) {
-                                                            _context4.next = 168;
+                                                            _context4.next = 169;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 168:
+                                                case 169:
 
                                                       schools = [].concat(_toConsumableArray(schools), _toConsumableArray(data));
 
-                                                      _context4.next = 171;
+                                                      _context4.next = 172;
                                                       return _User2.default.getByType('admin');
 
-                                                case 171:
+                                                case 172:
                                                       _ref43 = _context4.sent;
                                                       _ref44 = _slicedToArray(_ref43, 3);
                                                       err = _ref44[0];
                                                       data = _ref44[1];
                                                       adminUsers = _ref44[2];
                                                       admins = [];
-                                                      _context4.next = 179;
+                                                      _context4.next = 180;
                                                       return _User2.default.getProfilesByUsers(data);
 
-                                                case 179:
+                                                case 180:
                                                       _ref45 = _context4.sent;
                                                       _ref46 = _slicedToArray(_ref45, 3);
                                                       err = _ref46[0];
@@ -646,20 +652,20 @@ var UserRouter = function (_Router) {
                                                       admins = _ref46[2];
 
                                                       if (!err) {
-                                                            _context4.next = 186;
+                                                            _context4.next = 187;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 186:
+                                                case 187:
 
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(data));
 
-                                                      _context4.next = 189;
+                                                      _context4.next = 190;
                                                       return _Profile2.default.getByStudentProjects(studentProjects);
 
-                                                case 189:
+                                                case 190:
                                                       _ref47 = _context4.sent;
                                                       _ref48 = _slicedToArray(_ref47, 3);
                                                       err = _ref48[0];
@@ -667,20 +673,20 @@ var UserRouter = function (_Router) {
                                                       profilesId = _ref48[2];
 
                                                       if (!err) {
-                                                            _context4.next = 196;
+                                                            _context4.next = 197;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 196:
+                                                case 197:
 
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(data));
 
-                                                      _context4.next = 199;
+                                                      _context4.next = 200;
                                                       return _Lang2.default.getByCards(cards);
 
-                                                case 199:
+                                                case 200:
                                                       _ref49 = _context4.sent;
                                                       _ref50 = _slicedToArray(_ref49, 3);
                                                       err = _ref50[0];
@@ -688,13 +694,13 @@ var UserRouter = function (_Router) {
                                                       langsId = _ref50[2];
 
                                                       if (!err) {
-                                                            _context4.next = 206;
+                                                            _context4.next = 207;
                                                             break;
                                                       }
 
                                                       return _context4.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 206:
+                                                case 207:
 
                                                       langs = [].concat(_toConsumableArray(langs), _toConsumableArray(data));
 
@@ -732,7 +738,7 @@ var UserRouter = function (_Router) {
                                                             langs: langs
                                                       }));
 
-                                                case 208:
+                                                case 209:
                                                 case 'end':
                                                       return _context4.stop();
                                           }

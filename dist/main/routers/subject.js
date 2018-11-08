@@ -48,6 +48,10 @@ var _Card = require('../../models/Card.js');
 
 var _Card2 = _interopRequireDefault(_Card);
 
+var _Log = require('../../models/Log.js');
+
+var _Log2 = _interopRequireDefault(_Log);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -371,33 +375,33 @@ var SubjectRouter = function (_Router) {
             while (1) {
               switch (_context4.prev = _context4.next) {
                 case 0:
-                  subject = req.body.data;
+                  subject = req.body.data.subject;
+                  //console.log(subject);
 
-                  console.log(subject);
                   err = void 0, newSubject = void 0, updatedCourse = void 0;
-                  _context4.next = 5;
+                  _context4.next = 4;
                   return (0, _to2.default)(_Subject2.default.create(subject));
 
-                case 5:
+                case 4:
                   _ref17 = _context4.sent;
                   _ref18 = _slicedToArray(_ref17, 2);
                   err = _ref18[0];
                   newSubject = _ref18[1];
 
                   if (!err) {
-                    _context4.next = 11;
+                    _context4.next = 10;
                     break;
                   }
 
                   return _context4.abrupt('return', res.json({ result: 'failed' }));
 
-                case 11:
-                  _context4.next = 13;
+                case 10:
+                  _context4.next = 12;
                   return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: subject.course }, { $push: {
                       subjects: newSubject._id
                     } }, { new: true }));
 
-                case 13:
+                case 12:
                   _ref19 = _context4.sent;
                   _ref20 = _slicedToArray(_ref19, 2);
                   err = _ref20[0];
@@ -407,13 +411,15 @@ var SubjectRouter = function (_Router) {
                     cb('failed');
                   };
 
+                  //Log.create({ user: data.userId, type: 'addSubject' });
+
                   return _context4.abrupt('return', res.json({
                     result: 'success',
                     newSubject: newSubject,
                     updatedCourse: updatedCourse
                   }));
 
-                case 20:
+                case 19:
                 case 'end':
                   return _context4.stop();
               }

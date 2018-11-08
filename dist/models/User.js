@@ -630,7 +630,7 @@ var transporter = _nodemailer2.default.createTransport({
 function randomPassword() {
   return _randomstring2.default.generate({
     length: 6,
-    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+    charset: 'abcdefghjkmnopqrstuvwxyz234567890'
   });
 }
 

@@ -367,6 +367,8 @@ var ProjectRouter = function (_Router) {
                     cb('failed');
                   };
 
+                  //Log.create({ user: data.userId, type: 'addProject' });
+
                   return _context4.abrupt('return', res.json({
                     result: 'success',
                     newProject: newProject,

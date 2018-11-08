@@ -234,10 +234,10 @@ var CourseRouter = function (_Router) {
                   data = req.body.data;
                   //console.log(data)
 
-                  _Course2.default.addCourse(data, function (_result, _newCourse) {
+                  _Course2.default.addCourse(data, function (result, newCourse) {
                     return res.json({
-                      result: _result,
-                      newCourse: _newCourse
+                      result: result,
+                      newCourse: newCourse
                     });
                   });
 

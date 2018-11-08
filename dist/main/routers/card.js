@@ -162,7 +162,7 @@ var CardRouter = function (_Router) {
                   }
 
                   _context2.next = 8;
-                  return (0, _to2.default)(_Lang2.default.findOneAndUpdate({ _id: new ObjectId(langs[i]._id) }, { $set: {
+                  return (0, _to2.default)(_Lang2.default.findOneAndUpdate({ _id: langs[i]._id }, { $set: {
                       key: langs[i].key,
                       text: langs[i].text,
                       audio: langs[i].audio,
