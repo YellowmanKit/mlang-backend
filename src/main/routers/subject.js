@@ -10,6 +10,8 @@ import Subject from '../../models/Subject.js';
 import StudentProject from '../../models/StudentProject.js';
 import Card from '../../models/Card.js';
 
+import Log from '../../models/Log.js';
+
 class SubjectRouter extends Router {
 
   constructor(app){
@@ -107,8 +109,8 @@ class SubjectRouter extends Router {
     });
 
     app.post('/subject/add', async(req, res)=>{
-      const subject = req.body.data;
-      console.log(subject);
+      const subject = req.body.data.subject;
+      //console.log(subject);
       let err, newSubject, updatedCourse;
       [err, newSubject] = await to(Subject.create(subject))
       if(err){ return res.json({ result: 'failed' })}
@@ -117,6 +119,8 @@ class SubjectRouter extends Router {
         subjects: newSubject._id
       }}, {new: true}))
       if(err || updatedCourse === null){ cb('failed'); };
+
+      //Log.create({ user: data.userId, type: 'addSubject' });
 
       return res.json({
         result:'success',

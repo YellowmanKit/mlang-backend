@@ -20,10 +20,10 @@ class LangRouter extends Router {
     mongoose.connect('mongodb://localhost/mlang');
     var db = mongoose.connection;
 
-    app.post('/lang/add', async(req, res, next)=>{
+    /*app.post('/lang/add', async(req, res, next)=>{
       const data = req.body.data;
 
-    })
+    })*/
 
   }
 

@@ -17,6 +17,8 @@ import Group from '../../models/Group.js';
 import Card from '../../models/Card.js';
 import Lang from '../../models/Lang.js';
 
+import Log from '../../models/Log.js';
+
 class UserRouter extends Router {
 
   constructor(app, mlanghku){
@@ -106,11 +108,12 @@ class UserRouter extends Router {
       if(err){
         [err, appUser] = await mlanghku.login(id, pw);
         if(err){ console.log(err); return res.json({ result: "failed" }); }
-
         [err, user, profile] = await User.aquireNewAccountByAppAccount(appUser.attributes, pw);
       }
       //console.log(user);
       //console.log(profile);
+
+      Log.createLoginLog(user._id);
 
       profiles = [profile];
 

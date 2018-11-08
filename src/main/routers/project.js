@@ -113,6 +113,8 @@ class ProjectRouter extends Router {
       }}, {new: true}))
       if(err || updatedSubject === null){ cb('failed'); };
 
+      //Log.create({ user: data.userId, type: 'addProject' });
+
       return res.json({
         result:'success',
         newProject: newProject,

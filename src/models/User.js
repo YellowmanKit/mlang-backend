@@ -238,7 +238,7 @@ var transporter = nodemailer.createTransport({
 function randomPassword(){
   return randomString.generate({
     length: 6,
-    charset: 'abcdefghjkmnopqrstuvwxyz1234567890'
+    charset: 'abcdefghjkmnopqrstuvwxyz234567890'
   });
 }
 

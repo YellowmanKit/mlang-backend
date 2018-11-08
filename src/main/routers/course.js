@@ -89,10 +89,10 @@ class CourseRouter extends Router {
       const data = req.body.data;
       //console.log(data)
 
-      Course.addCourse(data, (_result, _newCourse)=>{
+      Course.addCourse(data, (result, newCourse)=>{
         return res.json({
-          result: _result,
-          newCourse: _newCourse
+          result: result,
+          newCourse: newCourse
         })
       })
     });

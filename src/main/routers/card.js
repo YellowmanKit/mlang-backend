@@ -54,7 +54,7 @@ class CardRouter extends Router {
       let err, lang, card;
       var langsId = [];
       for(var i=0;i<langs.length;i++){
-        [err, lang] = await(to(Lang.findOneAndUpdate({_id: new ObjectId(langs[i]._id)},{$set:{
+        [err, lang] = await(to(Lang.findOneAndUpdate({_id: langs[i]._id},{$set:{
           key: langs[i].key,
           text: langs[i].text,
           audio: langs[i].audio,
