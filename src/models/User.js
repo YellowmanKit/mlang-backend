@@ -45,7 +45,7 @@ module.exports.getProfilesByUsers = async (users)=>{
   let profilesId = [];
 
   for(var i=0;i<users.length;i++){
-    [err, profile] = await to(Profile.findOne({ belongTo: users[i]._id }) );
+    [err, profile] = await to(Profile.findOne({ belongTo: users[i]._id }));
 
     if(users[i].type === 'admin'){
       let supervisingSchools = [];
