@@ -50,13 +50,73 @@ var projectSchema = _mongoose2.default.Schema({
 
 var Project = module.exports = _mongoose2.default.model('project', projectSchema);
 
-module.exports.getBySubjects = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(subjects) {
+module.exports.getByStudentProjects = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(studentProjects) {
     var err, project, projectsId, projects, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
+          case 0:
+            err = void 0, project = void 0;
+            projectsId = [];
+            projects = [];
+            i = 0;
+
+          case 4:
+            if (!(i < studentProjects.length)) {
+              _context.next = 18;
+              break;
+            }
+
+            _context.next = 7;
+            return (0, _to2.default)(Project.findById(studentProjects[i].project));
+
+          case 7:
+            _ref2 = _context.sent;
+            _ref3 = _slicedToArray(_ref2, 2);
+            err = _ref3[0];
+            project = _ref3[1];
+
+            if (!err) {
+              _context.next = 13;
+              break;
+            }
+
+            return _context.abrupt('continue', 15);
+
+          case 13:
+            projects.push(project);
+            projectsId.push(project._id);
+
+          case 15:
+            i++;
+            _context.next = 4;
+            break;
+
+          case 18:
+            return _context.abrupt('return', [err, projects, projectsId]);
+
+          case 19:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined);
+  }));
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getBySubjects = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(subjects) {
+    var err, project, projectsId, projects, i, _ref5, _ref6;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
           case 0:
             err = void 0, project = void 0;
             projectsId = [];
@@ -71,39 +131,39 @@ module.exports.getBySubjects = function () {
 
           case 5:
             if (!(i < projectsId.length)) {
-              _context.next = 16;
+              _context2.next = 16;
               break;
             }
 
-            _context.next = 8;
+            _context2.next = 8;
             return (0, _to2.default)(Project.findById(projectsId[i]));
 
           case 8:
-            _ref2 = _context.sent;
-            _ref3 = _slicedToArray(_ref2, 2);
-            err = _ref3[0];
-            project = _ref3[1];
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            project = _ref6[1];
 
             projects.push(project);
 
           case 13:
             i++;
-            _context.next = 5;
+            _context2.next = 5;
             break;
 
           case 16:
-            return _context.abrupt('return', [err, projects, projectsId]);
+            return _context2.abrupt('return', [err, projects, projectsId]);
 
           case 17:
           case 'end':
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, undefined);
+    }, _callee2, undefined);
   }));
 
-  return function (_x) {
-    return _ref.apply(this, arguments);
+  return function (_x2) {
+    return _ref4.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Project.js.map

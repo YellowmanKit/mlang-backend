@@ -35,13 +35,52 @@ var studentProjectSchema = _mongoose2.default.Schema({
 
 var StudentProject = module.exports = _mongoose2.default.model('studentProject', studentProjectSchema);
 
-module.exports.getByProjects = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(projects) {
-    var err, studentProject, studentProjectsId, studentProjects, i, _ref2, _ref3;
+module.exports.getByUser = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(userId) {
+    var err, studentProject, studentProjectsId, studentProjects, _ref2, _ref3, i;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
+          case 0:
+            err = void 0, studentProject = void 0;
+            studentProjectsId = [];
+            studentProjects = [];
+            _context.next = 5;
+            return (0, _to2.default)(StudentProject.find({ student: userId }));
+
+          case 5:
+            _ref2 = _context.sent;
+            _ref3 = _slicedToArray(_ref2, 2);
+            err = _ref3[0];
+            studentProjects = _ref3[1];
+
+            for (i = 0; i < studentProjects.length; i++) {
+              studentProjectsId.push(studentProjects[i]._id);
+            }
+
+            return _context.abrupt('return', [err, studentProjects, studentProjectsId]);
+
+          case 11:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined);
+  }));
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getByProjects = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(projects) {
+    var err, studentProject, studentProjectsId, studentProjects, i, _ref5, _ref6;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
           case 0:
             err = void 0, studentProject = void 0;
             studentProjectsId = [];
@@ -56,39 +95,39 @@ module.exports.getByProjects = function () {
 
           case 5:
             if (!(i < studentProjectsId.length)) {
-              _context.next = 16;
+              _context2.next = 16;
               break;
             }
 
-            _context.next = 8;
+            _context2.next = 8;
             return (0, _to2.default)(StudentProject.findById(studentProjectsId[i]));
 
           case 8:
-            _ref2 = _context.sent;
-            _ref3 = _slicedToArray(_ref2, 2);
-            err = _ref3[0];
-            studentProject = _ref3[1];
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            studentProject = _ref6[1];
 
             studentProjects.push(studentProject);
 
           case 13:
             i++;
-            _context.next = 5;
+            _context2.next = 5;
             break;
 
           case 16:
-            return _context.abrupt('return', [err, studentProjects, studentProjectsId]);
+            return _context2.abrupt('return', [err, studentProjects, studentProjectsId]);
 
           case 17:
           case 'end':
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, undefined);
+    }, _callee2, undefined);
   }));
 
-  return function (_x) {
-    return _ref.apply(this, arguments);
+  return function (_x2) {
+    return _ref4.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=StudentProject.js.map

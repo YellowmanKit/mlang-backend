@@ -20,6 +20,17 @@ var studentProjectSchema = mongoose.Schema({
 
 var StudentProject = module.exports = mongoose.model('studentProject', studentProjectSchema);
 
+module.exports.getByUser = async (userId) =>{
+  let err, studentProject;
+  let studentProjectsId = [];
+  let studentProjects = [];
+
+  [err, studentProjects] = await to(StudentProject.find({ student: userId }));
+  for(var i=0;i < studentProjects.length;i++){ studentProjectsId.push(studentProjects[i]._id); }
+
+  return [err, studentProjects, studentProjectsId];
+}
+
 module.exports.getByProjects = async (projects) =>{
   let err, studentProject;
   let studentProjectsId = [];

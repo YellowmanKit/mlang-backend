@@ -32,6 +32,10 @@ var _Profile = require('../../models/Profile.js');
 
 var _Profile2 = _interopRequireDefault(_Profile);
 
+var _Query = require('../../models/Query.js');
+
+var _Query2 = _interopRequireDefault(_Query);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -64,58 +68,36 @@ var ProfileRouter = function (_Router) {
       _mongoose2.default.connect('mongodb://localhost/mlang');
       var db = _mongoose2.default.connection;
 
-      app.post('/profile/getMultiple', function () {
-        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
-          var list, err, profile, _profiles, i, _ref2, _ref3;
+      app.post('/profile/getStatistics', function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
+          var userId, err, statistics, _ref2, _ref3;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  list = req.body.data;
-                  //console.log(list);
-
-                  err = void 0, profile = void 0;
-                  _profiles = [];
-                  i = 0;
+                  userId = req.body.data;
+                  err = void 0, statistics = void 0;
+                  _context.next = 4;
+                  return _Query2.default.getStatisticsByUser(userId);
 
                 case 4:
-                  if (!(i < list.length)) {
-                    _context.next = 17;
-                    break;
-                  }
-
-                  _context.next = 7;
-                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: list[i] }));
-
-                case 7:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  profile = _ref3[1];
+                  statistics = _ref3[1];
 
                   if (!err) {
-                    _context.next = 13;
+                    _context.next = 10;
                     break;
                   }
 
                   return _context.abrupt('return', res.json({ result: 'failed' }));
 
-                case 13:
-                  _profiles.splice(0, 0, profile);
+                case 10:
+                  return _context.abrupt('return', res.json({ result: 'success', statistics: statistics }));
 
-                case 14:
-                  i++;
-                  _context.next = 4;
-                  break;
-
-                case 17:
-                  return _context.abrupt('return', res.json({
-                    result: 'success',
-                    profiles: _profiles
-                  }));
-
-                case 18:
+                case 11:
                 case 'end':
                   return _context.stop();
               }
@@ -123,27 +105,87 @@ var ProfileRouter = function (_Router) {
           }, _callee, _this2);
         }));
 
-        return function (_x, _x2) {
+        return function (_x, _x2, _x3) {
           return _ref.apply(this, arguments);
         };
       }());
 
-      app.post('/profile/update', function () {
-        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var data;
+      app.post('/profile/getMultiple', function () {
+        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, profile, _profiles, i, _ref5, _ref6;
+
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
                 case 0:
+                  list = req.body.data;
+                  err = void 0, profile = void 0;
+                  _profiles = [];
+                  i = 0;
+
+                case 4:
+                  if (!(i < list.length)) {
+                    _context2.next = 17;
+                    break;
+                  }
+
+                  _context2.next = 7;
+                  return (0, _to2.default)(_Profile2.default.findOne({ belongTo: list[i] }));
+
+                case 7:
+                  _ref5 = _context2.sent;
+                  _ref6 = _slicedToArray(_ref5, 2);
+                  err = _ref6[0];
+                  profile = _ref6[1];
+
+                  if (!err) {
+                    _context2.next = 13;
+                    break;
+                  }
+
+                  return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 13:
+                  _profiles.splice(0, 0, profile);
+
+                case 14:
+                  i++;
+                  _context2.next = 4;
+                  break;
+
+                case 17:
+                  return _context2.abrupt('return', res.json({
+                    result: 'success',
+                    profiles: _profiles
+                  }));
+
+                case 18:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, _this2);
+        }));
+
+        return function (_x4, _x5) {
+          return _ref4.apply(this, arguments);
+        };
+      }());
+
+      app.post('/profile/update', function () {
+        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var data;
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
+                case 0:
                   data = req.body.data;
-                  //console.log(data)
 
                   _Profile2.default.findOneAndUpdate({ _id: data.profile._id }, { $set: {
                       name: data.newName ? data.newName : data.profile.name,
                       description: data.newDesc,
                       icon: data.newIcon ? data.newIcon : data.profile.icon
                     } }, { new: true }, function (err, _updatedProfile) {
-                    //console.log(_updatedUser)
                     return res.json({
                       result: err || !_updatedProfile ? 'failed' : 'success',
                       updatedProfile: _updatedProfile
@@ -152,14 +194,14 @@ var ProfileRouter = function (_Router) {
 
                 case 2:
                 case 'end':
-                  return _context2.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee2, _this2);
+          }, _callee3, _this2);
         }));
 
-        return function (_x3, _x4, _x5) {
-          return _ref4.apply(this, arguments);
+        return function (_x6, _x7, _x8) {
+          return _ref7.apply(this, arguments);
         };
       }());
     }

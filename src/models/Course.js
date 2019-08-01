@@ -35,6 +35,27 @@ var courseSchema = mongoose.Schema({
 
 var Course = module.exports = mongoose.model('course',courseSchema);
 
+module.exports.getBySubjects = async (subjects)=>{
+  let err, course;
+  let coursesId = [];
+  let courses = [];
+
+  for(var i=0;i<subjects.length;i++){
+    if(coursesId.length === 0){ coursesId.push(subjects[i].course) }
+    for(var j=0;j<coursesId.length;j++){
+      if(coursesId[j] === subjects[i].course){ break; }
+      if(j === coursesId.length){ coursesId.push(subjects[i].course) }
+    }
+  }
+
+  for(var i=0;i<coursesId.length;i++){
+    [err, course] = await to(Course.findById(coursesId[i]));
+    courses.push(course)
+  }
+
+  return [err, courses, coursesId];
+}
+
 module.exports.getBySchool = async (school)=>{
   let err, data;
   let coursesId = [];

@@ -5,12 +5,94 @@ import School from './School';
 import Course from './Course';
 import Subject from './Subject';
 import Project from './Project';
+import StudentProject from './StudentProject';
 import Card from './Card';
 import Lang from './Lang';
 
+module.exports.getStatisticsByUser = async (userId)=>{
+  let err, data;
+  var stat= {
+    value: 'ok',
+    userStudentProjects: [],
+    userCards: [],
+    userLangs: [],
+    userProjects: [],
+    userSubjects: [],
+    userCourses: [],
+
+    studentProjects: [],
+    cards: [],
+    langs: [],
+    projects: [],
+    subjects: [],
+    courses: [],
+
+    featuredCount: 0,
+    langCharCount: 0,
+    langCharFreq: {}
+  };
+
+  let studentProjectsId = [];
+  [err, data, studentProjectsId] = await StudentProject.getByUser(userId);
+
+  stat['userStudentProjects'] = studentProjectsId;
+  stat['studentProjects'] = data;
+
+  let cardsId = [];
+  [err, data, cardsId] = await Card.getByStudentProjects(stat['studentProjects']);
+
+  stat['userCards'] = cardsId;
+  stat['cards'] = data;
+
+  let langsId = [];
+  [err, data, langsId] = await Lang.getByCards(stat['cards']);
+
+  stat['userLangs'] = langsId;
+  stat['langs'] = data;
+
+  let projectsId = [];
+  [err, data, projectsId] = await Project.getByStudentProjects(stat['studentProjects']);
+
+  stat['userProjects'] = projectsId;
+  stat['projects'] = data;
+
+  let subjectsId = [];
+  [err, data, subjectsId] = await Subject.getByProjects(stat['projects']);
+
+  stat['userSubjects'] = subjectsId;
+  stat['subjects'] = data;
+
+  let coursesId = [];
+  [err, data, coursesId] = await Course.getBySubjects(stat['subjects']);
+
+  stat['userCourses'] = coursesId;
+  stat['courses'] = data;
+
+  for(var i=0;i<stat.cards.length;i++){
+    if(stat.cards[i].grade === 'featured'){ stat.featuredCount++; }
+  }
+
+  for(var i=0;i<stat.langs.length;i++){
+    const txt = stat.langs[i].text;
+    const key = stat.langs[i].key;
+    stat.langCharCount += txt.length;
+    for(var j=0;j<txt.length;j++){
+      if(!stat.langCharFreq[key]){ stat.langCharFreq[key] = {}; }
+      if(!stat.langCharFreq[key][txt[j]]){ stat.langCharFreq[key][txt[j]] = 0; }
+      stat.langCharFreq[key][txt[j]]++;
+    }
+    stat.langCharFreq[key] = sortNumuriObject(stat.langCharFreq[key]);
+  }
+
+
+
+  console.log(stat);
+  return [err, stat];
+}
+
 module.exports.getStatistics = async (schoolId)=>{
   let err, data, school;
-  var statistics= {
+  var stat= {
     schoolTeachers: [],
     schoolStudents: [],
     schoolCourses: [],
@@ -31,45 +113,56 @@ module.exports.getStatistics = async (schoolId)=>{
   let coursesId = [];
   [err, data, coursesId] = await Course.getBySchool(school);
 
-  statistics['schoolCourses'] = coursesId;
-  statistics['courses'] = data;
+  stat['schoolCourses'] = coursesId;
+  stat['courses'] = data;
 
   let subjectsId = [];
   [err, data, subjectsId] = await Subject.getByCourses(data, true);
 
-  statistics['schoolSubjects'] = subjectsId;
-  statistics['subjects'] = data;
+  stat['schoolSubjects'] = subjectsId;
+  stat['subjects'] = data;
 
   let projectsId = [];
   [err, data, projectsId] = await Project.getBySubjects(data);
 
-  statistics['schoolProjects'] = projectsId;
-  statistics['projects'] = data;
+  stat['schoolProjects'] = projectsId;
+  stat['projects'] = data;
 
   let cardsId = [];
   let featured = 0;
   [err, data, cardsId, featured] = await Card.getByProjects(data);
 
-  statistics['schoolCards'] = cardsId;
-  statistics['cards'] = data;
-  statistics['featured'] = featured;
+  stat['schoolCards'] = cardsId;
+  stat['cards'] = data;
+  stat['featured'] = featured;
 
   let langsId = [];
   [err, data, langsId] = await Lang.getByCards(data);
 
-  statistics['schoolLangs'] = langsId;
-  statistics['langs'] = data;
+  stat['schoolLangs'] = langsId;
+  stat['langs'] = data;
 
   let profilesId = [];
   [err, data, profilesId] = await Profile.getTeachers(schoolId);
 
-  statistics['schoolTeachers'] = profilesId;
-  statistics['profiles'] = data;
+  stat['schoolTeachers'] = profilesId;
+  stat['profiles'] = data;
 
-  [err, data, profilesId] = await Profile.getStudents(statistics.schoolCourses);
+  [err, data, profilesId] = await Profile.getStudents(stat.schoolCourses);
 
-  statistics['schoolStudents'] = profilesId;
-  statistics['profiles'] = [...statistics['profiles'], ...data];
+  stat['schoolStudents'] = profilesId;
+  stat['profiles'] = [...stat['profiles'], ...data];
 
-  return [err, statistics];
+  return [err, stat];
+}
+
+var sortNumuriObject = (objectToSort) =>{
+  var sortable = [];
+  for (var item in objectToSort){ sortable.push([item, objectToSort[item]]); }
+  sortable.sort((a, b)=> { return b[1] - a[1]; });
+
+  var objectToReturn = {};
+  for (var i = 0;i<sortable.length;i++){  objectToReturn[sortable[i][0]] = sortable[i][1] }
+
+  return objectToReturn;
 }

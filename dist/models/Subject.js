@@ -48,9 +48,9 @@ var subjectSchema = _mongoose2.default.Schema({
 
 var Subject = module.exports = _mongoose2.default.model('subject', subjectSchema);
 
-module.exports.getByCourses = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(courses, all) {
-    var err, subject, subjectsId, subjects, i, _ref2, _ref3;
+module.exports.getByProjects = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(projects, all) {
+    var err, subject, subjectsId, subjects, i, j, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -62,39 +62,57 @@ module.exports.getByCourses = function () {
             i = 0;
 
           case 4:
-            if (!(i < courses.length)) {
-              _context.next = 11;
+            if (!(i < projects.length)) {
+              _context.next = 17;
               break;
             }
 
-            if (!(!all && _Model2.default.outDated(courses[i].endDate))) {
-              _context.next = 7;
-              break;
+            if (subjectsId.length === 0) {
+              subjectsId.push(projects[i].subject);
             }
-
-            return _context.abrupt('continue', 8);
+            j = 0;
 
           case 7:
-            subjectsId = [].concat(_toConsumableArray(subjectsId), _toConsumableArray(courses[i].subjects));
+            if (!(j < subjectsId.length)) {
+              _context.next = 14;
+              break;
+            }
 
-          case 8:
+            if (!(subjectsId[j] === projects[i].subject)) {
+              _context.next = 10;
+              break;
+            }
+
+            return _context.abrupt('break', 14);
+
+          case 10:
+            if (j === subjectsId.length) {
+              subjectsId.push(projects[i].subject);
+            }
+
+          case 11:
+            j++;
+            _context.next = 7;
+            break;
+
+          case 14:
             i++;
             _context.next = 4;
             break;
 
-          case 11:
+          case 17:
             i = 0;
 
-          case 12:
+          case 18:
             if (!(i < subjectsId.length)) {
-              _context.next = 23;
+              _context.next = 29;
               break;
             }
 
-            _context.next = 15;
+            _context.next = 21;
             return (0, _to2.default)(Subject.findById(subjectsId[i]));
 
-          case 15:
+          case 21:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
@@ -102,15 +120,15 @@ module.exports.getByCourses = function () {
 
             subjects.push(subject);
 
-          case 20:
+          case 26:
             i++;
-            _context.next = 12;
+            _context.next = 18;
             break;
 
-          case 23:
+          case 29:
             return _context.abrupt('return', [err, subjects, subjectsId]);
 
-          case 24:
+          case 30:
           case 'end':
             return _context.stop();
         }
@@ -120,6 +138,81 @@ module.exports.getByCourses = function () {
 
   return function (_x, _x2) {
     return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getByCourses = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(courses, all) {
+    var err, subject, subjectsId, subjects, i, _ref5, _ref6;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            err = void 0, subject = void 0;
+            subjectsId = [];
+            subjects = [];
+            i = 0;
+
+          case 4:
+            if (!(i < courses.length)) {
+              _context2.next = 11;
+              break;
+            }
+
+            if (!(!all && _Model2.default.outDated(courses[i].endDate))) {
+              _context2.next = 7;
+              break;
+            }
+
+            return _context2.abrupt('continue', 8);
+
+          case 7:
+            subjectsId = [].concat(_toConsumableArray(subjectsId), _toConsumableArray(courses[i].subjects));
+
+          case 8:
+            i++;
+            _context2.next = 4;
+            break;
+
+          case 11:
+            i = 0;
+
+          case 12:
+            if (!(i < subjectsId.length)) {
+              _context2.next = 23;
+              break;
+            }
+
+            _context2.next = 15;
+            return (0, _to2.default)(Subject.findById(subjectsId[i]));
+
+          case 15:
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            subject = _ref6[1];
+
+            subjects.push(subject);
+
+          case 20:
+            i++;
+            _context2.next = 12;
+            break;
+
+          case 23:
+            return _context2.abrupt('return', [err, subjects, subjectsId]);
+
+          case 24:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, undefined);
+  }));
+
+  return function (_x3, _x4) {
+    return _ref4.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=Subject.js.map

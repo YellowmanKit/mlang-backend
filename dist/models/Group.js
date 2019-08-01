@@ -223,7 +223,6 @@ module.exports.leaveGroup = function () {
           case 10:
             ;
 
-            //console.log(group)
             cb('success', group);
 
           case 12:
@@ -267,7 +266,6 @@ module.exports.joinGroup = function () {
           case 10:
             ;
 
-            //console.log(group)
             cb('success', group);
 
           case 12:
@@ -368,7 +366,6 @@ module.exports.addGroup = function () {
 
           case 38:
 
-            //console.log(group)
             cb('success', group);
 
           case 39:

@@ -326,7 +326,6 @@ module.exports.addSchool = function () {
 
           case 28:
 
-            //console.log(School)
             cb('success', school);
 
           case 29:

@@ -75,7 +75,6 @@ module.exports.leaveGroup = async (data, cb)=>{
     {$pull:{ members: data.userId }}, { new: true }));
   if(!err && group === null){ cb('failed'); return; };
 
-  //console.log(group)
   cb('success', group)
 }
 
@@ -86,7 +85,6 @@ module.exports.joinGroup = async (data, cb)=>{
     {$addToSet:{ members: data.userId }}, { new: true }));
   if(!err && group === null){ cb('failed'); return; };
 
-  //console.log(group)
   cb('success', group)
 }
 
@@ -110,7 +108,6 @@ module.exports.addGroup = async (data, cb)=>{
   [err, group] = await to(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode }));
   if(err){ cb('failed'); console.log(err); return; }
 
-  //console.log(group)
   cb('success', group)
 }
 

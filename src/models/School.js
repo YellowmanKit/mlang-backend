@@ -112,7 +112,6 @@ module.exports.addSchool = async (newSchool, cb)=>{
   [err, school] = await to(School.create(newSchool));
   if(err){ cb('failed'); console.log(err); return; }
 
-  //console.log(School)
   cb('success', school)
 }
 
