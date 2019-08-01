@@ -38,7 +38,7 @@ var langSchema = _mongoose2.default.Schema({
 var Lang = module.exports = _mongoose2.default.model('lang', langSchema);
 
 module.exports.getByCards = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(cards) {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(cards, featuredOnly) {
     var err, lang, langsId, langs, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -48,24 +48,42 @@ module.exports.getByCards = function () {
             err = void 0, lang = void 0;
             langsId = [];
             langs = [];
-
-
-            for (i = 0; i < cards.length; i++) {
-              langsId = [].concat(_toConsumableArray(langsId), _toConsumableArray(cards[i].langs));
-            }
-
             i = 0;
 
-          case 5:
-            if (!(i < langsId.length)) {
-              _context.next = 16;
+          case 4:
+            if (!(i < cards.length)) {
+              _context.next = 11;
               break;
             }
 
-            _context.next = 8;
-            return (0, _to2.default)(Lang.findById(langsId[i]));
+            if (!(featuredOnly && cards[i].grade !== 'featured')) {
+              _context.next = 7;
+              break;
+            }
+
+            return _context.abrupt('continue', 8);
+
+          case 7:
+            langsId = [].concat(_toConsumableArray(langsId), _toConsumableArray(cards[i].langs));
 
           case 8:
+            i++;
+            _context.next = 4;
+            break;
+
+          case 11:
+            i = 0;
+
+          case 12:
+            if (!(i < langsId.length)) {
+              _context.next = 23;
+              break;
+            }
+
+            _context.next = 15;
+            return (0, _to2.default)(Lang.findById(langsId[i]));
+
+          case 15:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
@@ -73,15 +91,15 @@ module.exports.getByCards = function () {
 
             langs = [].concat(_toConsumableArray(langs), [lang]);
 
-          case 13:
+          case 20:
             i++;
-            _context.next = 5;
+            _context.next = 12;
             break;
 
-          case 16:
+          case 23:
             return _context.abrupt('return', [err, langs, langsId]);
 
-          case 17:
+          case 24:
           case 'end':
             return _context.stop();
         }
@@ -89,7 +107,7 @@ module.exports.getByCards = function () {
     }, _callee, undefined);
   }));
 
-  return function (_x) {
+  return function (_x, _x2) {
     return _ref.apply(this, arguments);
   };
 }();

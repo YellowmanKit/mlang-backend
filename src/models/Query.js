@@ -16,6 +16,7 @@ module.exports.getStatisticsByUser = async (userId)=>{
     userStudentProjects: [],
     userCards: [],
     userLangs: [],
+    userFeaturedLangs: [],
     userProjects: [],
     userSubjects: [],
     userCourses: [],
@@ -23,6 +24,7 @@ module.exports.getStatisticsByUser = async (userId)=>{
     studentProjects: [],
     cards: [],
     langs: [],
+    featuredLangs: [],
     projects: [],
     subjects: [],
     courses: [],
@@ -50,6 +52,12 @@ module.exports.getStatisticsByUser = async (userId)=>{
   stat['userLangs'] = langsId;
   stat['langs'] = data;
 
+  let featuredLangsId = [];
+  [err, data, langsId] = await Lang.getByCards(stat['cards'], true);
+
+  stat['userFeaturedLangs'] = featuredLangsId;
+  stat['featuredLangs'] = data;
+
   let projectsId = [];
   [err, data, projectsId] = await Project.getByStudentProjects(stat['studentProjects']);
 
@@ -72,9 +80,9 @@ module.exports.getStatisticsByUser = async (userId)=>{
     if(stat.cards[i].grade === 'featured'){ stat.featuredCount++; }
   }
 
-  for(var i=0;i<stat.langs.length;i++){
-    const txt = stat.langs[i].text;
-    const key = stat.langs[i].key;
+  for(var i=0;i<stat.featuredLangs.length;i++){
+    const txt = stat.featuredLangs[i].text;
+    const key = stat.featuredLangs[i].key;
     stat.langCharCount += txt.length;
     for(var j=0;j<txt.length;j++){
       if(!stat.langCharFreq[key]){ stat.langCharFreq[key] = {}; }
@@ -84,9 +92,7 @@ module.exports.getStatisticsByUser = async (userId)=>{
     stat.langCharFreq[key] = sortNumuriObject(stat.langCharFreq[key]);
   }
 
-
-
-  console.log(stat);
+  //console.log(stat);
   return [err, stat];
 }
 

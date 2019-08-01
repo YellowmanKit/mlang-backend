@@ -22,12 +22,13 @@ var langSchema = mongoose.Schema({
 
 var Lang = module.exports = mongoose.model('lang', langSchema);
 
-module.exports.getByCards = async (cards)=>{
+module.exports.getByCards = async (cards, featuredOnly)=>{
   let err, lang;
   let langsId = [];
   let langs = [];
 
   for(var i=0;i<cards.length;i++){
+    if(featuredOnly && cards[i].grade !== 'featured'){ continue; }
     langsId = [...langsId, ...cards[i].langs];
   }
 
