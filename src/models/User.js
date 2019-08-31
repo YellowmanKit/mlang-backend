@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import randomString from'randomstring';
 import nodemailer from 'nodemailer';
 import to from'../to';
-import dotenv from'dotenv';
+import dotenv from 'dotenv';
 dotenv.config();
 
 import School from './School';
@@ -30,8 +30,7 @@ var schema = mongoose.Schema({
     default: 'student'
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 })
 
@@ -76,7 +75,7 @@ module.exports.getUserAndProfile = async (id, pw) =>{
   [err, user] = await to(User.findOne({id, pw}));
   if(err || !user){ return ['error']; }
 
-  [err, profile] = await to(Profile.findOne({belongTo: user._id}));
+  [err, profile] = await to(Profile.findOneAndUpdate({belongTo: user._id},{ $set:{ lastLogin: new Date() }}));
   if(err || !profile){ return ['error']; }
 
   return [null , user, profile]
@@ -125,7 +124,8 @@ module.exports.aquireNewAccountByAppAccount = async (appUser, appPw)=>{
     mlanghkuId: appUser.username,
     mlanghkuPw: appPw,
     email: appUser.email,
-    type: appUser.identity === 2? 'teacher': 'student'
+    type: appUser.identity === 2? 'teacher': 'student',
+    createdAt: new Date()
   };
 
   [err, user] = await to(User.create(newUser));
@@ -141,8 +141,8 @@ module.exports.aquireNewAccountByAppAccount = async (appUser, appPw)=>{
   return [null, user, profile];
 }
 
-module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
-  let err, result, exist, user, profile;
+module.exports.acquireNewAccountByCode = async (code, codeType)=>{
+  let err, exist, user, profile, course, teacher, school;
 
   if(codeType === 'course'){
     [err, exist] = await to(Course.codeExist(code));
@@ -150,34 +150,30 @@ module.exports.acquireNewAccountByCode = async (code, codeType, cb)=>{
     [err, exist] = await to(School.codeExist(code));
   }
 
-  if(err || !exist){ console.log('no such course'); cb('failed'); return; }
-
+  if(err || !exist){ return ['failed - invalid code'] }
 
   const newUser = {
     id: 'DefaultId',
     pw: randomPassword(),
     email: '@',
-    type: codeType === 'course'? 'student': 'teacher'
+    type: codeType === 'course'? 'student': 'teacher',
+    createdAt: new Date()
   };
-
   [err, user] = await to(User.create(newUser));
-  if(err){ console.log('cant create user'); cb('failed'); console.log(err); return; }
 
-  var newProfile = {
-    belongTo: user._id
-  };
-
+  var newProfile = { belongTo: user._id };
   [err, profile] = await to(Profile.create(newProfile));
-  if(err){ console.log('cant create profile'); cb('failed'); console.log(err); return; }
 
   if(codeType === 'course'){
-    Course.joinCourse({ userId: user._id, code: code}, (result)=>{
-      cb(result, user);
-    });
+    [err, course] = await Course.joinCourse({ userId: user._id, code: code});
+    [err, teacher] = await to(User.findOne({ _id: course.teacher }));
+    [err, profile] = await to(Profile.findOne({ belongTo: teacher._id }));
+    [err, school] = await to(School.findOne({ _id: profile.joinedSchools[0] }));
+    [err] = await School.joinSchool({ user: user, code: school.code});
+    return [err, user];
   }else if(codeType === 'school'){
-    School.joinSchool({ userId: user._id, code: code}, (result)=>{
-      cb(result, user);
-    });
+    [err] = await School.joinSchool({ user: user, code: code});
+    return [err, user];
   }
 }
 

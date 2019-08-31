@@ -27,8 +27,7 @@ var cardSchema = mongoose.Schema({
     required: true
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   resubmitted: {
     type: Boolean,
@@ -38,7 +37,12 @@ var cardSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
-  langs: [ObjectId]
+  langs: [ObjectId],
+
+  likeCount: {
+    type: Number,
+    default: 0
+  }
 })
 
 var Card = module.exports = mongoose.model('card',cardSchema);
@@ -47,6 +51,7 @@ module.exports.getByStudentProjects = async (studentProjects)=>{
   let err, card;
   let cardsId = [];
   let cards = [];
+  let featured = 0;
 
   for(var i=0;i<studentProjects.length;i++){
     cardsId = [...cardsId, ...studentProjects[i].cards];
@@ -54,10 +59,11 @@ module.exports.getByStudentProjects = async (studentProjects)=>{
 
   for(var i=0;i<cardsId.length;i++){
     [err, card] = await to(Card.findById(cardsId[i]));
-    cards.push(card)
+    cards.push(card);
+    if(card.grade === 'featured'){ featured++; }
   }
 
-  return [err, cards, cardsId];
+  return [err, cards, cardsId, featured];
 }
 
 module.exports.getByProjects = async (projects)=>{

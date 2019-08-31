@@ -1,6 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import Group from '../../models/Group.js';
@@ -15,8 +14,6 @@ class GroupRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/group/fetchData', async(req, res, next)=>{
       const data = req.body.data;

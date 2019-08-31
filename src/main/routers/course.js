@@ -1,10 +1,10 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
 import Course from '../../models/Course.js';
+import Query from '../../functions/Query.js';
 
 class CourseRouter extends Router {
 
@@ -16,8 +16,17 @@ class CourseRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
+
+    app.post('/course/getStatistics', async(req, res, next)=>{
+      const courseId = req.body.data;
+      //console.log(schoolId)
+
+      let err, statistics;
+      [err, statistics] = await Query.getStatisticsByCourse(courseId);
+      if(err){ return res.json({result: 'failed'})}
+      return res.json({result: 'success', statistics: statistics})
+
+    });
 
     app.post('/course/getAllOfTeacher', async(req, res, next)=>{
       const profile = req.body.data;
@@ -59,14 +68,17 @@ class CourseRouter extends Router {
     app.post('/course/join', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
+      var err, joinedCourse, updatedProfile;
 
-      Course.joinCourse(data, (result, joinedCourse, updatedProfile)=>{
-        return res.json({
-          result: result,
-          joinedCourse: joinedCourse,
-          updatedProfile: updatedProfile
-        })
+      [err, joinedCourse, updatedProfile] = await Course.joinCourse(data);
+      if(err){ res.json({ result: 'failed' })}
+
+      return res.json({
+        result: 'success',
+        joinedCourse: joinedCourse,
+        updatedProfile: updatedProfile
       })
+
     });
 
     app.post('/course/edit', async(req, res, next)=>{

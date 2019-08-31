@@ -11,10 +11,6 @@ var studentProjectSchema = mongoose.Schema({
     type: ObjectId,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: new Date()
-  },
   cards: [ObjectId]
 })
 

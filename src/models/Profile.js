@@ -28,6 +28,9 @@ var profileSchema = mongoose.Schema({
   featuredCount: {
     type: Number,
     default: 0
+  },
+  lastLogin: {
+    type: Date
   }
 })
 
@@ -52,7 +55,7 @@ module.exports.getByStudentProjects = async (studentProjects) =>{
   return [err, profiles, profilesId];
 }
 
-module.exports.getStudents = async (coursesId)=>{
+module.exports.getStudentsByCoursesId = async (coursesId)=>{
   let err;
   let profiles = [];
   let profilesId = [];
@@ -65,7 +68,7 @@ module.exports.getStudents = async (coursesId)=>{
   return [err, profiles, profilesId];
 }
 
-module.exports.getTeachers = async (schoolId)=>{
+module.exports.getTeachersBySchool = async (schoolId)=>{
   let err;
   let profiles = [];
   let profilesId = [];

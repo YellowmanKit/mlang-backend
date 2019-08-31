@@ -23,8 +23,7 @@ var subjectSchema = mongoose.Schema({
     default: ''
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 })
 

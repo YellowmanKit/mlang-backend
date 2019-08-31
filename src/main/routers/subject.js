@@ -1,6 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
@@ -22,8 +21,6 @@ class SubjectRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/subject/getAllOfUser', async(req, res)=>{
       const profile = req.body.data;
@@ -109,9 +106,11 @@ class SubjectRouter extends Router {
     });
 
     app.post('/subject/add', async(req, res)=>{
-      const subject = req.body.data.subject;
+      var subject = req.body.data.subject;
       //console.log(subject);
       let err, newSubject, updatedCourse;
+      
+      subject['createdAt'] = new Date();
       [err, newSubject] = await to(Subject.create(subject))
       if(err){ return res.json({ result: 'failed' })}
 

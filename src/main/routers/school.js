@@ -1,12 +1,12 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
-import School from '../../models/School.js';
+import Card from '../../models/Card.js';
 
-import Query from '../../models/Query.js';
+import School from '../../models/School.js';
+import Query from '../../functions/Query.js';
 
 class SchoolRouter extends Router {
 
@@ -18,18 +18,23 @@ class SchoolRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/school/getStatistics', async(req, res, next)=>{
       const schoolId = req.body.data;
       //console.log(schoolId)
 
-      let err, statistics;
-      [err, statistics] = await Query.getStatistics(schoolId);
+      let err, statistics, card;
+      [err, statistics] = await Query.getStatisticsBySchool(schoolId);
       if(err){ return res.json({result: 'failed'})}
-      return res.json({result: 'success', statistics: statistics})
 
+      var cards = statistics.cards;
+      for(var i=0;i<cards.length;i++){
+        const timestamp = cards[i]._id.getTimestamp();
+        [err, card] = await to(Card.findOneAndUpdate({ _id:cards[i]._id }, {$set:{ createdAt: new Date(timestamp) } },{ new: true }));
+      }
+      if(err){ return res.json({result: 'failed'}) }
+
+      return res.json({result: 'success', statistics: statistics})
     });
 
     app.post('/school/getMultiple', async(req, res)=>{
@@ -48,7 +53,7 @@ class SchoolRouter extends Router {
       })
     });
 
-    app.post('/school/leave', async(req, res, next)=>{
+    /*app.post('/school/leave', async(req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
 
@@ -60,19 +65,21 @@ class SchoolRouter extends Router {
           updatedUser: updatedUser
         })
       })
-    });
+    });*/
 
-    app.post('/school/join', async(req, res, next)=>{
+    app.post('/school/join', async (req, res, next)=>{
       const data = req.body.data;
       //console.log(data)
+      let err, joinedSchool, updatedProfile;
 
-      School.joinSchool(data, (result, joinedSchool, updatedProfile)=>{
-        return res.json({
-          result: result,
-          joinedSchool: joinedSchool,
-          updatedProfile: updatedProfile
-        })
-      })
+      [err, joinedSchool, updatedProfile] = await School.joinSchool(data);
+
+      return res.json({
+        result: err? 'failed': 'success',
+        joinedSchool: joinedSchool,
+        updatedProfile: updatedProfile
+      });
+
     });
 
     app.post('/school/edit', async(req, res, next)=>{

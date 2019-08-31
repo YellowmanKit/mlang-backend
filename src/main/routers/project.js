@@ -1,6 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
@@ -21,8 +20,6 @@ class ProjectRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/project/getRanking', async(req, res)=>{
       const projectId = req.body.data;
@@ -102,8 +99,9 @@ class ProjectRouter extends Router {
     });
 
     app.post('/project/add', async(req, res)=>{
-      const project = req.body.data;
-      console.log(project);
+      var project = req.body.data;
+      project['createdAt'] = new Date();
+      //console.log(project);
       let err, newProject, updatedSubject;
       [err, newProject] = await to(Project.create(project))
       if(err){ return res.json({ result: 'failed' })}

@@ -18,8 +18,7 @@ var courseSchema = mongoose.Schema({
     type: String
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   endDate: {
     type: Date,
@@ -120,25 +119,21 @@ module.exports.leaveCourse = async (data, cb)=>{
   cb('success', courseToLeave, updatedProfile)
 }
 
-module.exports.joinCourse = async (data, cb)=>{
+module.exports.joinCourse = async (data)=>{
   let err, courseToJoin, updatedProfile;
 
   [err, courseToJoin] = await to(Course.findOne({code: data.code}));
-  if(err || courseToJoin === null){ cb('failed'); };
-
-  if(courseToJoin.joinedStudents.indexOf(data.userId) > -1){ cb('failed - course already joined'); return; }
+  if(courseToJoin.joinedStudents.indexOf(data.userId) > -1){ return ['failed - course already joined', null, null]; }
 
   [err, courseToJoin] = await to(Course.findOneAndUpdate({code: data.code}, { $push: {
     joinedStudents: data.userId
-  }}, {new: true}))
-  if(err || courseToJoin === null){ cb('failed'); };
+  }}, {new: true}));
 
   [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.userId}, { $push: {
     joinedCourses: courseToJoin._id
-  }}, {new: true}))
-  if(err || updatedProfile === null){ cb('failed'); };
+  }}, {new: true}));
 
-  cb('success', courseToJoin, updatedProfile);
+  return [err, courseToJoin, updatedProfile];
 }
 
 module.exports.addCourse = async (newCourse, cb)=>{
@@ -156,6 +151,7 @@ module.exports.addCourse = async (newCourse, cb)=>{
   }
 
   newCourse['code'] = newCode;
+  newCourse['createdAt'] = new Date();
 
   [err, course] = await to(Course.create(newCourse));
   if(err){ cb('failed'); console.log(err); return; }

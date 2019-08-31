@@ -1,8 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
-var ObjectId = require('mongoose').Types.ObjectId;
-
 import to from '../../to';
 
 import StudentProject from '../../models/StudentProject.js';
@@ -21,8 +18,6 @@ class StudentProjectRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/studentProject/update', async(req, res)=>{
       const data = req.body.data;

@@ -1,7 +1,6 @@
 import Router from './Router';
 import {version} from '../../../package.json';
 import path from 'path';
-import mongoose from 'mongoose';
 
 import fs from 'fs-extra';
 
@@ -19,16 +18,13 @@ class AppRouter extends Router{
     const temp = app.get('temp');
     const storage = app.get('storage');
 
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
-
     app.get('/download/:type/:name', (req,res,next)=>{
       const type = req.params.type;
       const append = this.getAppend(type);
       const fileName = req.params.name;
       const filePath = path.join(storage,append,fileName);
 
-      console.log('Donwloading ' + filePath)
+      //console.log('Donwloading ' + filePath)
 
       return res.download(filePath,fileName,(err)=>{
         if(err){ console.log('File download error'); }

@@ -1,10 +1,8 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
-var ObjectId = require('mongoose').Types.ObjectId;
 import to from '../../to';
 
-import Query from '../../models/Query.js';
+import Query from '../../functions/Query.js';
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
 import School from '../../models/School.js';
@@ -16,6 +14,10 @@ import Group from '../../models/Group.js';
 
 import Card from '../../models/Card.js';
 import Lang from '../../models/Lang.js';
+
+import Questionnaire from '../../models/survey/Questionnaire.js';
+import Question from '../../models/survey/Question.js';
+import Publish from '../../models/survey/Publish.js';
 
 import Log from '../../models/Log.js';
 
@@ -31,18 +33,16 @@ class UserRouter extends Router {
   init(){
     const app = this.app;
     const mlanghku = this.mlanghku;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/user/addAdmin', async(req, res, next)=>{
       const userId = req.body.data.userId;
       //console.log(userId);
-      let err, updatedUser;
+      var err, updatedUser;
       [err, updatedUser] = await to(User.findOneAndUpdate({id: userId},{$set:{type:'admin'}},{new: true}))
       if(err){ console.log(err); return res.json({ result: 'failed'})}
 
-      let profiles = [];
-      let admins = [];
+      var profiles = [];
+      var admins = [];
       [err, profiles, admins] = await User.getProfilesByUsers([updatedUser]);
       if(err){ console.log(err); return res.json({ result: 'failed'})}
 
@@ -56,7 +56,7 @@ class UserRouter extends Router {
 
     app.post('/user/update', async(req, res, next)=>{
       const data = req.body.data;
-      let err, existedUser;
+      var err, existedUser;
       [err, existedUser] = await to(User.findOne({id: data.id, pw: data.pw}));
       if(err){ console.log(err); return res.json({ result: 'failed'})}
       if(existedUser && existedUser._id.toString() !== data._id){ console.log('user id/pw already used'); return res.json({ result: 'failed'}) }
@@ -78,15 +78,16 @@ class UserRouter extends Router {
       });
     });
 
-    app.get('/user/getNewAccountByCode/', (req, res, next)=>{
+    app.get('/user/getNewAccountByCode/', async (req, res, next)=>{
       const code = req.headers.code;
       const codeType = req.headers.type;
 
-      User.acquireNewAccountByCode(code, codeType, (result, user)=>{
-        console.log(result);
-        if(result === 'failed'){ return res.json({result: result})}
-        return res.json({ result: result, id: user.id, pw: user.pw });
-      });
+      var err, user;
+
+      [err, user] = await User.acquireNewAccountByCode(code, codeType);
+      if(err){ return res.json({ result: 'failed'})}
+
+      return res.json({ result: 'success', id: user.id, pw: user.pw });
     });
 
     app.get('/user/getNewAccount/', (req, res, next)=>{
@@ -103,7 +104,7 @@ class UserRouter extends Router {
 
       //console.log(id + ' ' + pw);
 
-      let err, data, user, profile, appUser;
+      var err, data, user, profile, appUser;
       [err, user, profile] = await User.getUserAndProfile(id, pw);
       if(err){
         [err, appUser] = await mlanghku.login(id, pw);
@@ -115,19 +116,32 @@ class UserRouter extends Router {
 
       Log.createLoginLog(user._id);
 
+      var profiles = [];
+      var schools = [];
+      var courses = [];
+      var subjects = [];
+      var projects = [];
+      var studentProjects = [];
+      var groups = [];
+      var cards = [];
+      var langs = [];
+
+      var questionnaires = [];
+      var questions = [];
+      var publishes = [];
+
+      if(profile.joinedSchools.length === 0 && profile.joinedCourses.length > 0){
+        [err, data] = await to(Course.findOne({ _id: profile.joinedCourses[0] }));
+        [err, data] = await to(User.findOne({ _id: data.teacher }));
+        [err, data] = await to(Profile.findOne({ belongTo: data._id }));
+        [err, data] = await to(School.findOne({ _id: data.joinedSchools[0] }));
+        schools = [...schools, data];
+        [err, data, profile] = await School.joinSchool({ user: user, code: data.code});
+      }
+
       profiles = [profile];
 
-      let profiles = [];
-      let schools = [];
-      let courses = [];
-      let subjects = [];
-      let projects = [];
-      let studentProjects = [];
-      let groups = [];
-      let cards = [];
-      let langs = [];
-
-      let teacherProfiles;
+      var teacherProfiles;
       [err, data, teacherProfiles] = await Course.getJoined(profile.joinedCourses);
       if(err){ return res.json({ result: "failed" }); }
 
@@ -225,7 +239,6 @@ class UserRouter extends Router {
 
 
 
-
       var profilesId;
       [err, data, profilesId] = await Profile.getByStudentProjects(studentProjects);
       if(err){ return res.json({ result: "failed" }); }
@@ -237,6 +250,32 @@ class UserRouter extends Router {
       if(err){ return res.json({ result: "failed" }); }
 
       langs = [...langs, ...data];
+
+
+
+
+
+      var createdQuestionnaires = [];
+      [err, data, createdQuestionnaires] = await Questionnaire.getByAuthor(user._id);
+      questionnaires = [...questionnaires, ...data];
+
+      var assignedQuestionnaires = [];
+      [err, data, assignedQuestionnaires] = await Questionnaire.getAssigned(profile);
+      questionnaires = [...questionnaires, ...data];
+
+      [err, data] = await Question.getByQuestionnaires(questionnaires);
+      questions = [...questions, ...data];
+
+
+
+      var createdPublishes = [];
+      [err, data, createdPublishes] = await Publish.getByAuthor(user._id);
+      publishes = [...publishes, ...data];
+
+      [err, data] = await School.getByPublishes(publishes);
+      schools = [...schools, ...data];
+
+
 
       return res.json({
         result: "success",
@@ -262,6 +301,10 @@ class UserRouter extends Router {
         teachingCards: teachingCards,
         joinedCards: joinedCards,
 
+        assignedQuestionnaires: assignedQuestionnaires,
+        createdQuestionnaires: createdQuestionnaires,
+        createdPublishes: createdPublishes,
+
         schools: schools,
         courses: courses,
         subjects: subjects,
@@ -269,7 +312,11 @@ class UserRouter extends Router {
         studentProjects: studentProjects,
         groups: groups,
         cards: cards,
-        langs: langs
+        langs: langs,
+
+        questionnaires: questionnaires,
+        questions: questions,
+        publishes: publishes
       })
     });
 

@@ -22,17 +22,28 @@ var schoolSchema = mongoose.Schema({
     default: ''
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   code: {
     type: String,
     required: true
   },
-  joinedTeachers: [ObjectId]
+  joinedTeachers: [ObjectId],
+  joinedStudents: [ObjectId]
 })
 
 var School = module.exports = mongoose.model('school',schoolSchema);
+
+module.exports.getByPublishes = async (publishes) =>{
+  let err, school;
+  let schools = [];
+
+  for(var i=0;i<publishes.length;i++){
+    [err, school] = await to(School.findOne({ _id: publishes[i].school }));
+    schools = [...schools, school];
+  }
+  return [err, schools];
+}
 
 module.exports.getByUser = async (userId, profile) =>{
   let err, school;
@@ -54,7 +65,7 @@ module.exports.getByUser = async (userId, profile) =>{
   return [err, schools, supervisingSchools];
 }
 
-module.exports.leaveSchool = async (data, cb)=>{
+/*module.exports.leaveSchool = async (data, cb)=>{
   let err, schoolToLeave, updatedProfile, updatedUser;
 
   [err, schoolToLeave] = await to(School.findOneAndUpdate({code: data.code}, { $pull: {
@@ -75,22 +86,23 @@ module.exports.leaveSchool = async (data, cb)=>{
   }
 
   cb('success', schoolToLeave, updatedProfile, updatedUser)
-}
+}*/
 
-module.exports.joinSchool = async (data, cb)=>{
+module.exports.joinSchool = async (data)=>{
   let err, schoolToJoin, updatedProfile;
 
-  [err, schoolToJoin] = await to(School.findOneAndUpdate({code: data.code}, { $push: {
-    joinedTeachers: data.userId
-  }}, {new: true}))
-  if(err || schoolToJoin === null){ cb('failed'); };
+  const toPush =
+  data.user.type === 'teacher'? { joinedTeachers: data.user._id }:
+  data.user.type === 'student'? { joinedStudents: data.user._id }:
+  {};
 
-  [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.userId}, { $push: {
+  [err, schoolToJoin] = await to(School.findOneAndUpdate({code: data.code}, { $push: toPush }, {new: true}));
+
+  [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.user._id}, { $push: {
     joinedSchools: schoolToJoin._id
-  }}, {new: true}))
-  if(err || updatedProfile === null){ cb('failed'); };
+  }}, {new: true}));
 
-  cb('success', schoolToJoin, updatedProfile)
+  return [err, schoolToJoin, updatedProfile]
 }
 
 module.exports.addSchool = async (newSchool, cb)=>{
@@ -108,6 +120,7 @@ module.exports.addSchool = async (newSchool, cb)=>{
   }
 
   newSchool['code'] = newCode;
+  newSchool['createdAt'] = new Date();
 
   [err, school] = await to(School.create(newSchool));
   if(err){ cb('failed'); console.log(err); return; }

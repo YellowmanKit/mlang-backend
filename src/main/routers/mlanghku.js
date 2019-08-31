@@ -1,6 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 import Parse from 'parse/node';
 import request from 'request';
@@ -15,8 +14,6 @@ class mlanghkuRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     Parse.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
     Parse.serverURL = process.env.PARSE_SERVER;

@@ -25,8 +25,7 @@ var groupSchema = mongoose.Schema({
     required: true
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 })
 
@@ -105,7 +104,7 @@ module.exports.addGroup = async (data, cb)=>{
   [err, group] = await to(Group.findOne({project: data.projectId, leader: data.userId}));
   if(group !== null){ cb('failed', null, group); console.log('group existed'); return; };
 
-  [err, group] = await to(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode }));
+  [err, group] = await to(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode, createdAt: new Date() }));
   if(err){ cb('failed'); console.log(err); return; }
 
   cb('success', group)

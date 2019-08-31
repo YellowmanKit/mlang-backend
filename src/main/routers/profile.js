@@ -1,11 +1,10 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 import to from '../../to';
 
 import User from '../../models/User.js';
 import Profile from '../../models/Profile.js';
-import Query from '../../models/Query.js';
+import Query from '../../functions/Query.js';
 
 class ProfileRouter extends Router {
 
@@ -17,8 +16,6 @@ class ProfileRouter extends Router {
 
   init(){
     const app = this.app;
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
 
     app.post('/profile/getStatistics', async(req, res, next)=>{
       const userId = req.body.data;

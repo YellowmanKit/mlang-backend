@@ -7,6 +7,7 @@ import bodyParser from 'body-parser';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import mongoose from 'mongoose';
 
 import AppRouter from './routers/app.js';
 import SchoolRouter from './routers/school.js';
@@ -20,6 +21,8 @@ import GroupRouter from './routers/group.js';
 
 import CardRouter from './routers/card.js';
 import LangRouter from './routers/lang.js';
+
+import SurveyRouter from './routers/survey.js';
 
 import mlanghkuRouter from './routers/mlanghku.js';
 
@@ -53,7 +56,8 @@ class CreateApp {
       const httpsOptions = {
         cert: fs.readFileSync(path.join(__dirname, '../ssl', devMode? 'dev-server.crt':'server.crt' )),
         key: fs.readFileSync(path.join(__dirname, '../ssl',  devMode? 'dev-server.key':'server.key' )),
-        ca: fs.readFileSync(path.join(__dirname, '../ssl', devMode? 'dev-server-ca.crt':'server-ca.crt' ))
+        ca: fs.readFileSync(path.join(__dirname, '../ssl', devMode? 'dev-server-ca.crt':'server-ca.crt' )),
+        passphrase: 'P@ssw0rd'
       }
       app.server = https.createServer(httpsOptions, app);
     }else{
@@ -85,8 +89,16 @@ class CreateApp {
     new LangRouter(app);
     new SubjectRouter(app);
     new GroupRouter(app);
-
+    new SurveyRouter(app);
+    
+    this.connectDb();
     app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
+  }
+
+  connectDb(){
+    const uri = 'mongodb://localhost/mlang';
+    mongoose.set('useFindAndModify', false);
+    mongoose.connect(uri, { useNewUrlParser: true });
   }
 
 

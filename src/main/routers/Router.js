@@ -1,3 +1,4 @@
+
 class Router {
 
   getAppend(type){
@@ -18,7 +19,7 @@ class Router {
     const endDate = new Date(date);
     return date < today;
   }
-  
+
 }
 
 export default Router;

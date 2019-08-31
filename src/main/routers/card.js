@@ -1,6 +1,5 @@
 import Router from './Router';
 import path from 'path';
-import mongoose from 'mongoose';
 var ObjectId = require('mongoose').Types.ObjectId;
 //import multer from 'multer';
 
@@ -13,6 +12,8 @@ import Project from '../../models/Project.js';
 import StudentProject from '../../models/StudentProject.js';
 import Profile from '../../models/Profile.js';
 
+import Like from '../../models/Like.js';
+
 class CardRouter extends Router {
 
   constructor(app){
@@ -23,14 +24,20 @@ class CardRouter extends Router {
 
   init(){
     const app = this.app;
-    const upload = app.get('upload');
-    //const config = app.get('config');
-    //var upload = multer({ storage: config }).single('avatar')
 
-    const temp = app.get('temp');
-    const storage = app.get('storage');
-    mongoose.connect('mongodb://localhost/mlang');
-    var db = mongoose.connection;
+    app.post('/card/like', async(req,res)=>{
+      const cardId = req.body.data.cardId;
+      const userId = req.body.data.userId;
+      let err, card, like;
+      [err, card, like] = await Like.card(cardId, userId);
+
+      if(err){ console.log('failed to like card'); return res.json({ result: 'failed to like card'}) }
+
+      return res.json({
+        result: 'success',
+        updatedCard: card
+      })
+    })
 
     app.post('/card/studentRead', async(req,res)=>{
       const cardId = req.body.data.cardId;
