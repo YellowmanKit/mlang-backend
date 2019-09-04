@@ -14,10 +14,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -55,8 +51,6 @@ var GroupRouter = function (_Router) {
       var _this2 = this;
 
       var app = this.app;
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
 
       app.post('/group/fetchData', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {

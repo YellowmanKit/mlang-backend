@@ -54,8 +54,7 @@ var groupSchema = _mongoose2.default.Schema({
     required: true
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 });
 
@@ -349,7 +348,7 @@ module.exports.addGroup = function () {
             ;
 
             _context4.next = 30;
-            return (0, _to2.default)(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode }));
+            return (0, _to2.default)(Group.create({ name: data.groupName, project: data.projectId, members: [data.userId], leader: data.userId, code: newCode, createdAt: new Date() }));
 
           case 30:
             _ref21 = _context4.sent;

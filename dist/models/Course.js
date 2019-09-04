@@ -41,8 +41,7 @@ var courseSchema = _mongoose2.default.Schema({
     type: String
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   endDate: {
     type: Date,
@@ -379,7 +378,7 @@ module.exports.leaveCourse = function () {
 }();
 
 module.exports.joinCourse = function () {
-  var _ref20 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(data, cb) {
+  var _ref20 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(data) {
     var err, courseToJoin, updatedProfile, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26;
 
     return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -396,51 +395,37 @@ module.exports.joinCourse = function () {
             err = _ref22[0];
             courseToJoin = _ref22[1];
 
-            if (err || courseToJoin === null) {
-              cb('failed');
-            };
-
             if (!(courseToJoin.joinedStudents.indexOf(data.userId) > -1)) {
-              _context6.next = 12;
+              _context6.next = 9;
               break;
             }
 
-            cb('failed - course already joined');return _context6.abrupt('return');
+            return _context6.abrupt('return', ['failed - course already joined', null, null]);
 
-          case 12:
-            _context6.next = 14;
+          case 9:
+            _context6.next = 11;
             return (0, _to2.default)(Course.findOneAndUpdate({ code: data.code }, { $push: {
                 joinedStudents: data.userId
               } }, { new: true }));
 
-          case 14:
+          case 11:
             _ref23 = _context6.sent;
             _ref24 = _slicedToArray(_ref23, 2);
             err = _ref24[0];
             courseToJoin = _ref24[1];
-
-            if (err || courseToJoin === null) {
-              cb('failed');
-            };
-
-            _context6.next = 22;
+            _context6.next = 17;
             return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $push: {
                 joinedCourses: courseToJoin._id
               } }, { new: true }));
 
-          case 22:
+          case 17:
             _ref25 = _context6.sent;
             _ref26 = _slicedToArray(_ref25, 2);
             err = _ref26[0];
             updatedProfile = _ref26[1];
+            return _context6.abrupt('return', [err, courseToJoin, updatedProfile]);
 
-            if (err || updatedProfile === null) {
-              cb('failed');
-            };
-
-            cb('success', courseToJoin, updatedProfile);
-
-          case 29:
+          case 22:
           case 'end':
             return _context6.stop();
         }
@@ -448,7 +433,7 @@ module.exports.joinCourse = function () {
     }, _callee6, undefined);
   }));
 
-  return function (_x7, _x8) {
+  return function (_x7) {
     return _ref20.apply(this, arguments);
   };
 }();
@@ -503,29 +488,30 @@ module.exports.addCourse = function () {
           case 17:
 
             newCourse['code'] = newCode;
+            newCourse['createdAt'] = new Date();
 
-            _context7.next = 20;
+            _context7.next = 21;
             return (0, _to2.default)(Course.create(newCourse));
 
-          case 20:
+          case 21:
             _ref30 = _context7.sent;
             _ref31 = _slicedToArray(_ref30, 2);
             err = _ref31[0];
             course = _ref31[1];
 
             if (!err) {
-              _context7.next = 28;
+              _context7.next = 29;
               break;
             }
 
             cb('failed');console.log(err);return _context7.abrupt('return');
 
-          case 28:
+          case 29:
 
             //console.log(course)
             cb('success', course);
 
-          case 29:
+          case 30:
           case 'end':
             return _context7.stop();
         }
@@ -533,7 +519,7 @@ module.exports.addCourse = function () {
     }, _callee7, undefined);
   }));
 
-  return function (_x9, _x10) {
+  return function (_x8, _x9) {
     return _ref27.apply(this, arguments);
   };
 }();
@@ -574,7 +560,7 @@ module.exports.codeExist = function () {
     }, _callee8, undefined);
   }));
 
-  return function (_x11) {
+  return function (_x10) {
     return _ref32.apply(this, arguments);
   };
 }();

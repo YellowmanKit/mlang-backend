@@ -16,10 +16,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -31,6 +27,10 @@ var _User2 = _interopRequireDefault(_User);
 var _Course = require('../../models/Course.js');
 
 var _Course2 = _interopRequireDefault(_Course);
+
+var _Query = require('../../functions/Query.js');
+
+var _Query2 = _interopRequireDefault(_Query);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -61,53 +61,39 @@ var CourseRouter = function (_Router) {
       var _this2 = this;
 
       var app = this.app;
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
 
-      app.post('/course/getAllOfTeacher', function () {
+      app.post('/course/getStatistics', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
-          var profile, err, course, subject, project, studentProject, courses, teachingCourses, _ref2, _ref3, i;
+          var courseId, err, statistics, _ref2, _ref3;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  profile = req.body.data;
-                  //console.log(data)
+                  courseId = req.body.data;
+                  //console.log(schoolId)
 
-                  err = void 0, course = void 0, subject = void 0, project = void 0, studentProject = void 0;
-                  courses = [];
-                  teachingCourses = [];
-                  _context.next = 6;
-                  return (0, _to2.default)(_Course2.default.find({ teacher: profile.belongTo }, null, { sort: { createdAt: 'descending' } }));
+                  err = void 0, statistics = void 0;
+                  _context.next = 4;
+                  return _Query2.default.getStatisticsByCourse(courseId);
 
-                case 6:
+                case 4:
                   _ref2 = _context.sent;
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
-                  courses = _ref3[1];
+                  statistics = _ref3[1];
 
-                  if (!(err || courses === null)) {
-                    _context.next = 13;
+                  if (!err) {
+                    _context.next = 10;
                     break;
                   }
 
-                  console.log('failed to getcourses');return _context.abrupt('return', res.json({ result: 'failed' }));
+                  return _context.abrupt('return', res.json({ result: 'failed' }));
 
-                case 13:
-                  //console.log(courses);
-                  for (i = 0; i < courses.length; i++) {
-                    teachingCourses.push(courses[i]._id);
-                  }
-                  profile['teachingCourses'] = teachingCourses;
+                case 10:
+                  return _context.abrupt('return', res.json({ result: 'success', statistics: statistics }));
 
-                  return _context.abrupt('return', res.json({
-                    result: 'success',
-                    courses: courses,
-                    profile: profile
-                  }));
-
-                case 16:
+                case 11:
                 case 'end':
                   return _context.stop();
               }
@@ -120,12 +106,68 @@ var CourseRouter = function (_Router) {
         };
       }());
 
-      app.post('/course/leave', function () {
+      app.post('/course/getAllOfTeacher', function () {
         var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res, next) {
-          var data;
+          var profile, err, course, subject, project, studentProject, courses, teachingCourses, _ref5, _ref6, i;
+
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
               switch (_context2.prev = _context2.next) {
+                case 0:
+                  profile = req.body.data;
+                  //console.log(data)
+
+                  err = void 0, course = void 0, subject = void 0, project = void 0, studentProject = void 0;
+                  courses = [];
+                  teachingCourses = [];
+                  _context2.next = 6;
+                  return (0, _to2.default)(_Course2.default.find({ teacher: profile.belongTo }, null, { sort: { createdAt: 'descending' } }));
+
+                case 6:
+                  _ref5 = _context2.sent;
+                  _ref6 = _slicedToArray(_ref5, 2);
+                  err = _ref6[0];
+                  courses = _ref6[1];
+
+                  if (!(err || courses === null)) {
+                    _context2.next = 13;
+                    break;
+                  }
+
+                  console.log('failed to getcourses');return _context2.abrupt('return', res.json({ result: 'failed' }));
+
+                case 13:
+                  //console.log(courses);
+                  for (i = 0; i < courses.length; i++) {
+                    teachingCourses.push(courses[i]._id);
+                  }
+                  profile['teachingCourses'] = teachingCourses;
+
+                  return _context2.abrupt('return', res.json({
+                    result: 'success',
+                    courses: courses,
+                    profile: profile
+                  }));
+
+                case 16:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, _this2);
+        }));
+
+        return function (_x4, _x5, _x6) {
+          return _ref4.apply(this, arguments);
+        };
+      }());
+
+      app.post('/course/leave', function () {
+        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var data;
+          return regeneratorRuntime.wrap(function _callee3$(_context3) {
+            while (1) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
                   data = req.body.data;
                   //console.log(data)
@@ -140,37 +182,6 @@ var CourseRouter = function (_Router) {
 
                 case 2:
                 case 'end':
-                  return _context2.stop();
-              }
-            }
-          }, _callee2, _this2);
-        }));
-
-        return function (_x4, _x5, _x6) {
-          return _ref4.apply(this, arguments);
-        };
-      }());
-
-      app.post('/course/join', function () {
-        var _ref5 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var data;
-          return regeneratorRuntime.wrap(function _callee3$(_context3) {
-            while (1) {
-              switch (_context3.prev = _context3.next) {
-                case 0:
-                  data = req.body.data;
-                  //console.log(data)
-
-                  _Course2.default.joinCourse(data, function (result, joinedCourse, updatedProfile) {
-                    return res.json({
-                      result: result,
-                      joinedCourse: joinedCourse,
-                      updatedProfile: updatedProfile
-                    });
-                  });
-
-                case 2:
-                case 'end':
                   return _context3.stop();
               }
             }
@@ -178,40 +189,42 @@ var CourseRouter = function (_Router) {
         }));
 
         return function (_x7, _x8, _x9) {
-          return _ref5.apply(this, arguments);
+          return _ref7.apply(this, arguments);
         };
       }());
 
-      app.post('/course/edit', function () {
-        var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
-          var course, err, editedCourse, _ref7, _ref8;
+      app.post('/course/join', function () {
+        var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+          var data, err, joinedCourse, updatedProfile, _ref9, _ref10;
 
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
               switch (_context4.prev = _context4.next) {
                 case 0:
-                  course = req.body.data;
+                  data = req.body.data;
                   //console.log(data)
 
-                  err = void 0, editedCourse = void 0;
-                  _context4.next = 4;
-                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: course._id }, { $set: {
-                      icon: course.icon,
-                      title: course.title,
-                      endDate: course.endDate
-                    } }, { new: true }));
+                  _context4.next = 3;
+                  return _Course2.default.joinCourse(data);
 
-                case 4:
-                  _ref7 = _context4.sent;
-                  _ref8 = _slicedToArray(_ref7, 2);
-                  err = _ref8[0];
-                  editedCourse = _ref8[1];
+                case 3:
+                  _ref9 = _context4.sent;
+                  _ref10 = _slicedToArray(_ref9, 3);
+                  err = _ref10[0];
+                  joinedCourse = _ref10[1];
+                  updatedProfile = _ref10[2];
+
+                  if (err) {
+                    res.json({ result: 'failed' });
+                  }
+
                   return _context4.abrupt('return', res.json({
-                    result: err ? 'failed' : 'success',
-                    editedCourse: editedCourse
+                    result: 'success',
+                    joinedCourse: joinedCourse,
+                    updatedProfile: updatedProfile
                   }));
 
-                case 9:
+                case 10:
                 case 'end':
                   return _context4.stop();
               }
@@ -220,16 +233,58 @@ var CourseRouter = function (_Router) {
         }));
 
         return function (_x10, _x11, _x12) {
-          return _ref6.apply(this, arguments);
+          return _ref8.apply(this, arguments);
+        };
+      }());
+
+      app.post('/course/edit', function () {
+        var _ref11 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
+          var course, err, editedCourse, _ref12, _ref13;
+
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  course = req.body.data;
+                  //console.log(data)
+
+                  err = void 0, editedCourse = void 0;
+                  _context5.next = 4;
+                  return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: course._id }, { $set: {
+                      icon: course.icon,
+                      title: course.title,
+                      endDate: course.endDate
+                    } }, { new: true }));
+
+                case 4:
+                  _ref12 = _context5.sent;
+                  _ref13 = _slicedToArray(_ref12, 2);
+                  err = _ref13[0];
+                  editedCourse = _ref13[1];
+                  return _context5.abrupt('return', res.json({
+                    result: err ? 'failed' : 'success',
+                    editedCourse: editedCourse
+                  }));
+
+                case 9:
+                case 'end':
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, _this2);
+        }));
+
+        return function (_x13, _x14, _x15) {
+          return _ref11.apply(this, arguments);
         };
       }());
 
       app.post('/course/add', function () {
-        var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
+        var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(req, res, next) {
           var data;
-          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          return regeneratorRuntime.wrap(function _callee6$(_context6) {
             while (1) {
-              switch (_context5.prev = _context5.next) {
+              switch (_context6.prev = _context6.next) {
                 case 0:
                   data = req.body.data;
                   //console.log(data)
@@ -243,14 +298,14 @@ var CourseRouter = function (_Router) {
 
                 case 2:
                 case 'end':
-                  return _context5.stop();
+                  return _context6.stop();
               }
             }
-          }, _callee5, _this2);
+          }, _callee6, _this2);
         }));
 
-        return function (_x13, _x14, _x15) {
-          return _ref9.apply(this, arguments);
+        return function (_x16, _x17, _x18) {
+          return _ref14.apply(this, arguments);
         };
       }());
     }

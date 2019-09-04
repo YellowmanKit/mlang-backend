@@ -42,21 +42,21 @@ var schoolSchema = _mongoose2.default.Schema({
     default: ''
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   code: {
     type: String,
     required: true
   },
-  joinedTeachers: [ObjectId]
+  joinedTeachers: [ObjectId],
+  joinedStudents: [ObjectId]
 });
 
 var School = module.exports = _mongoose2.default.model('school', schoolSchema);
 
-module.exports.getByUser = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(userId, profile) {
-    var err, school, schools, supervisingSchools, joinedSchools, _ref2, _ref3, i, _ref4, _ref5;
+module.exports.getByPublishes = function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(publishes) {
+    var err, school, schools, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -64,23 +64,73 @@ module.exports.getByUser = function () {
           case 0:
             err = void 0, school = void 0;
             schools = [];
-            supervisingSchools = [];
-            joinedSchools = profile.joinedSchools;
+            i = 0;
+
+          case 3:
+            if (!(i < publishes.length)) {
+              _context.next = 14;
+              break;
+            }
+
             _context.next = 6;
-            return (0, _to2.default)(School.find({ admin: userId }));
+            return (0, _to2.default)(School.findOne({ _id: publishes[i].school }));
 
           case 6:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
-            schools = _ref3[1];
+            school = _ref3[1];
+
+            schools = [].concat(_toConsumableArray(schools), [school]);
+
+          case 11:
+            i++;
+            _context.next = 3;
+            break;
+
+          case 14:
+            return _context.abrupt('return', [err, schools]);
+
+          case 15:
+          case 'end':
+            return _context.stop();
+        }
+      }
+    }, _callee, undefined);
+  }));
+
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
+
+module.exports.getByUser = function () {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(userId, profile) {
+    var err, school, schools, supervisingSchools, joinedSchools, _ref5, _ref6, i, _ref7, _ref8;
+
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            err = void 0, school = void 0;
+            schools = [];
+            supervisingSchools = [];
+            joinedSchools = profile.joinedSchools;
+            _context2.next = 6;
+            return (0, _to2.default)(School.find({ admin: userId }));
+
+          case 6:
+            _ref5 = _context2.sent;
+            _ref6 = _slicedToArray(_ref5, 2);
+            err = _ref6[0];
+            schools = _ref6[1];
 
             if (!(err || schools === null)) {
-              _context.next = 12;
+              _context2.next = 12;
               break;
             }
 
-            return _context.abrupt('return', res.json({ result: "failed" }));
+            return _context2.abrupt('return', res.json({ result: "failed" }));
 
           case 12:
             for (i = 0; i < schools.length; i++) {
@@ -91,106 +141,30 @@ module.exports.getByUser = function () {
 
           case 14:
             if (!(i < joinedSchools.length)) {
-              _context.next = 25;
+              _context2.next = 25;
               break;
             }
 
-            _context.next = 17;
+            _context2.next = 17;
             return (0, _to2.default)(School.findById(joinedSchools[i]));
 
           case 17:
-            _ref4 = _context.sent;
-            _ref5 = _slicedToArray(_ref4, 2);
-            err = _ref5[0];
-            school = _ref5[1];
+            _ref7 = _context2.sent;
+            _ref8 = _slicedToArray(_ref7, 2);
+            err = _ref8[0];
+            school = _ref8[1];
 
             schools = [].concat(_toConsumableArray(schools), [school]);
 
           case 22:
             i++;
-            _context.next = 14;
+            _context2.next = 14;
             break;
 
           case 25:
-            return _context.abrupt('return', [err, schools, supervisingSchools]);
+            return _context2.abrupt('return', [err, schools, supervisingSchools]);
 
           case 26:
-          case 'end':
-            return _context.stop();
-        }
-      }
-    }, _callee, undefined);
-  }));
-
-  return function (_x, _x2) {
-    return _ref.apply(this, arguments);
-  };
-}();
-
-module.exports.leaveSchool = function () {
-  var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(data, cb) {
-    var err, schoolToLeave, updatedProfile, updatedUser, _ref7, _ref8, _ref9, _ref10, _ref11, _ref12;
-
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            err = void 0, schoolToLeave = void 0, updatedProfile = void 0, updatedUser = void 0;
-            _context2.next = 3;
-            return (0, _to2.default)(School.findOneAndUpdate({ code: data.code }, { $pull: {
-                joinedTeachers: data.userId
-              } }, { new: true }));
-
-          case 3:
-            _ref7 = _context2.sent;
-            _ref8 = _slicedToArray(_ref7, 2);
-            err = _ref8[0];
-            schoolToLeave = _ref8[1];
-
-            if (err || schoolToLeave === null) {
-              cb('failed');
-            };
-
-            _context2.next = 11;
-            return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $pull: {
-                joinedSchools: schoolToLeave._id
-              } }, { new: true }));
-
-          case 11:
-            _ref9 = _context2.sent;
-            _ref10 = _slicedToArray(_ref9, 2);
-            err = _ref10[0];
-            updatedProfile = _ref10[1];
-
-            if (err || updatedProfile === null) {
-              cb('failed');
-            };
-
-            if (!(updatedProfile.joinedSchools.length === 0)) {
-              _context2.next = 26;
-              break;
-            }
-
-            _context2.next = 20;
-            return (0, _to2.default)(User.findOneAndUpdate({ _id: data.userId }, { $set: {
-                type: 'student'
-              } }, { new: true }));
-
-          case 20:
-            _ref11 = _context2.sent;
-            _ref12 = _slicedToArray(_ref11, 2);
-            err = _ref12[0];
-            updatedUser = _ref12[1];
-
-            if (err || updatedUser === null) {
-              cb('failed');
-            };
-
-          case 26:
-
-            cb('success', schoolToLeave, updatedProfile, updatedUser);
-
-          case 27:
           case 'end':
             return _context2.stop();
         }
@@ -198,53 +172,65 @@ module.exports.leaveSchool = function () {
     }, _callee2, undefined);
   }));
 
-  return function (_x3, _x4) {
-    return _ref6.apply(this, arguments);
+  return function (_x2, _x3) {
+    return _ref4.apply(this, arguments);
   };
 }();
 
+/*module.exports.leaveSchool = async (data, cb)=>{
+  let err, schoolToLeave, updatedProfile, updatedUser;
+
+  [err, schoolToLeave] = await to(School.findOneAndUpdate({code: data.code}, { $pull: {
+    joinedTeachers: data.userId
+  }}, {new: true}))
+  if(err || schoolToLeave === null){ cb('failed'); };
+
+  [err, updatedProfile] = await to(Profile.findOneAndUpdate({belongTo: data.userId}, { $pull: {
+    joinedSchools: schoolToLeave._id
+  }}, {new: true}))
+  if(err || updatedProfile === null){ cb('failed'); };
+
+  if(updatedProfile.joinedSchools.length === 0){
+    [err, updatedUser] = await to(User.findOneAndUpdate({_id: data.userId}, { $set: {
+      type: 'student'
+    }}, {new: true}))
+    if(err || updatedUser === null){ cb('failed'); };
+  }
+
+  cb('success', schoolToLeave, updatedProfile, updatedUser)
+}*/
+
 module.exports.joinSchool = function () {
-  var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(data, cb) {
-    var err, schoolToJoin, updatedProfile, _ref14, _ref15, _ref16, _ref17;
+  var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(data) {
+    var err, schoolToJoin, updatedProfile, toPush, _ref10, _ref11, _ref12, _ref13;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             err = void 0, schoolToJoin = void 0, updatedProfile = void 0;
-            _context3.next = 3;
-            return (0, _to2.default)(School.findOneAndUpdate({ code: data.code }, { $push: {
-                joinedTeachers: data.userId
-              } }, { new: true }));
+            toPush = data.user.type === 'teacher' ? { joinedTeachers: data.user._id } : data.user.type === 'student' ? { joinedStudents: data.user._id } : {};
+            _context3.next = 4;
+            return (0, _to2.default)(School.findOneAndUpdate({ code: data.code }, { $push: toPush }, { new: true }));
 
-          case 3:
-            _ref14 = _context3.sent;
-            _ref15 = _slicedToArray(_ref14, 2);
-            err = _ref15[0];
-            schoolToJoin = _ref15[1];
-
-            if (err || schoolToJoin === null) {
-              cb('failed');
-            };
-
-            _context3.next = 11;
-            return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.userId }, { $push: {
+          case 4:
+            _ref10 = _context3.sent;
+            _ref11 = _slicedToArray(_ref10, 2);
+            err = _ref11[0];
+            schoolToJoin = _ref11[1];
+            _context3.next = 10;
+            return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: data.user._id }, { $push: {
                 joinedSchools: schoolToJoin._id
               } }, { new: true }));
 
-          case 11:
-            _ref16 = _context3.sent;
-            _ref17 = _slicedToArray(_ref16, 2);
-            err = _ref17[0];
-            updatedProfile = _ref17[1];
+          case 10:
+            _ref12 = _context3.sent;
+            _ref13 = _slicedToArray(_ref12, 2);
+            err = _ref13[0];
+            updatedProfile = _ref13[1];
+            return _context3.abrupt('return', [err, schoolToJoin, updatedProfile]);
 
-            if (err || updatedProfile === null) {
-              cb('failed');
-            };
-
-            cb('success', schoolToJoin, updatedProfile);
-
-          case 18:
+          case 15:
           case 'end':
             return _context3.stop();
         }
@@ -252,14 +238,14 @@ module.exports.joinSchool = function () {
     }, _callee3, undefined);
   }));
 
-  return function (_x5, _x6) {
-    return _ref13.apply(this, arguments);
+  return function (_x4) {
+    return _ref9.apply(this, arguments);
   };
 }();
 
 module.exports.addSchool = function () {
-  var _ref18 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(newSchool, cb) {
-    var err, school, newCode, i, _ref19, _ref20, _ref21, _ref22;
+  var _ref14 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(newSchool, cb) {
+    var err, school, newCode, i, _ref15, _ref16, _ref17, _ref18;
 
     return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
@@ -284,10 +270,10 @@ module.exports.addSchool = function () {
             return (0, _to2.default)(School.findOne({ code: newCode }));
 
           case 7:
-            _ref19 = _context4.sent;
-            _ref20 = _slicedToArray(_ref19, 2);
-            err = _ref20[0];
-            school = _ref20[1];
+            _ref15 = _context4.sent;
+            _ref16 = _slicedToArray(_ref15, 2);
+            err = _ref16[0];
+            school = _ref16[1];
 
             if (!(!err && school === null)) {
               _context4.next = 13;
@@ -307,28 +293,29 @@ module.exports.addSchool = function () {
           case 17:
 
             newSchool['code'] = newCode;
+            newSchool['createdAt'] = new Date();
 
-            _context4.next = 20;
+            _context4.next = 21;
             return (0, _to2.default)(School.create(newSchool));
 
-          case 20:
-            _ref21 = _context4.sent;
-            _ref22 = _slicedToArray(_ref21, 2);
-            err = _ref22[0];
-            school = _ref22[1];
+          case 21:
+            _ref17 = _context4.sent;
+            _ref18 = _slicedToArray(_ref17, 2);
+            err = _ref18[0];
+            school = _ref18[1];
 
             if (!err) {
-              _context4.next = 28;
+              _context4.next = 29;
               break;
             }
 
             cb('failed');console.log(err);return _context4.abrupt('return');
 
-          case 28:
+          case 29:
 
             cb('success', school);
 
-          case 29:
+          case 30:
           case 'end':
             return _context4.stop();
         }
@@ -336,14 +323,14 @@ module.exports.addSchool = function () {
     }, _callee4, undefined);
   }));
 
-  return function (_x7, _x8) {
-    return _ref18.apply(this, arguments);
+  return function (_x5, _x6) {
+    return _ref14.apply(this, arguments);
   };
 }();
 
 module.exports.codeExist = function () {
-  var _ref23 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(code) {
-    var err, school, _ref24, _ref25;
+  var _ref19 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(code) {
+    var err, school, _ref20, _ref21;
 
     return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
@@ -354,10 +341,10 @@ module.exports.codeExist = function () {
             return (0, _to2.default)(School.findOne({ code: code }));
 
           case 3:
-            _ref24 = _context5.sent;
-            _ref25 = _slicedToArray(_ref24, 2);
-            err = _ref25[0];
-            school = _ref25[1];
+            _ref20 = _context5.sent;
+            _ref21 = _slicedToArray(_ref20, 2);
+            err = _ref21[0];
+            school = _ref21[1];
 
             if (!(err || !school)) {
               _context5.next = 9;
@@ -377,8 +364,8 @@ module.exports.codeExist = function () {
     }, _callee5, undefined);
   }));
 
-  return function (_x9) {
-    return _ref23.apply(this, arguments);
+  return function (_x7) {
+    return _ref19.apply(this, arguments);
   };
 }();
 //# sourceMappingURL=School.js.map

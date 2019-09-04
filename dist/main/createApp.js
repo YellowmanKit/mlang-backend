@@ -42,6 +42,10 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
+var _mongoose = require('mongoose');
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
 var _app = require('./routers/app.js');
 
 var _app2 = _interopRequireDefault(_app);
@@ -86,6 +90,10 @@ var _lang = require('./routers/lang.js');
 
 var _lang2 = _interopRequireDefault(_lang);
 
+var _survey = require('./routers/survey.js');
+
+var _survey2 = _interopRequireDefault(_survey);
+
 var _mlanghku = require('./routers/mlanghku.js');
 
 var _mlanghku2 = _interopRequireDefault(_mlanghku);
@@ -127,7 +135,8 @@ var CreateApp = function () {
         var httpsOptions = {
           cert: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server.crt' : 'server.crt')),
           key: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server.key' : 'server.key')),
-          ca: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server-ca.crt' : 'server-ca.crt'))
+          ca: _fs2.default.readFileSync(_path2.default.join(__dirname, '../ssl', devMode ? 'dev-server-ca.crt' : 'server-ca.crt')),
+          passphrase: 'P@ssw0rd'
         };
         app.server = _https2.default.createServer(httpsOptions, app);
       } else {
@@ -159,10 +168,19 @@ var CreateApp = function () {
       new _lang2.default(app);
       new _subject2.default(app);
       new _group2.default(app);
+      new _survey2.default(app);
 
+      this.connectDb();
       app.server.listen(port, function () {
         console.log('App is running on port ' + app.server.address().port);
       });
+    }
+  }, {
+    key: 'connectDb',
+    value: function connectDb() {
+      var uri = 'mongodb://localhost/mlang';
+      _mongoose2.default.set('useFindAndModify', false);
+      _mongoose2.default.connect(uri, { useNewUrlParser: true });
     }
   }]);
 

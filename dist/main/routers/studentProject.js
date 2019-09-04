@@ -16,10 +16,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -54,8 +50,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ObjectId = require('mongoose').Types.ObjectId;
-
 var StudentProjectRouter = function (_Router) {
   _inherits(StudentProjectRouter, _Router);
 
@@ -75,8 +69,6 @@ var StudentProjectRouter = function (_Router) {
       var _this2 = this;
 
       var app = this.app;
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
 
       app.post('/studentProject/update', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {

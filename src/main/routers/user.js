@@ -18,6 +18,8 @@ import Lang from '../../models/Lang.js';
 import Questionnaire from '../../models/survey/Questionnaire.js';
 import Question from '../../models/survey/Question.js';
 import Publish from '../../models/survey/Publish.js';
+import Submit from '../../models/survey/Submit.js';
+import Answer from '../../models/survey/Answer.js';
 
 import Log from '../../models/Log.js';
 
@@ -129,6 +131,8 @@ class UserRouter extends Router {
       var questionnaires = [];
       var questions = [];
       var publishes = [];
+      var submits = [];
+      var answers = [];
 
       if(profile.joinedSchools.length === 0 && profile.joinedCourses.length > 0){
         [err, data] = await to(Course.findOne({ _id: profile.joinedCourses[0] }));
@@ -259,8 +263,20 @@ class UserRouter extends Router {
       [err, data, createdQuestionnaires] = await Questionnaire.getByAuthor(user._id);
       questionnaires = [...questionnaires, ...data];
 
-      var assignedQuestionnaires = [];
-      [err, data, assignedQuestionnaires] = await Questionnaire.getAssigned(profile);
+      var assignedPublishes = [];
+      [err, data, assignedPublishes] = await Publish.getAssigned(profile);
+      publishes = [...publishes, ...data];
+
+
+      var createdSubmits = [];
+      [err, data, createdSubmits] = await Submit.getByUserAndPublishesId(user._id, assignedPublishes);
+      submits = [...submits, ...data];
+
+      [err, data] = await Answer.getBySubmits(data);
+      answers = [...answers, ...data];
+
+
+      [err, data] = await Questionnaire.getByPublishes(publishes);
       questionnaires = [...questionnaires, ...data];
 
       [err, data] = await Question.getByQuestionnaires(questionnaires);
@@ -274,6 +290,7 @@ class UserRouter extends Router {
 
       [err, data] = await School.getByPublishes(publishes);
       schools = [...schools, ...data];
+
 
 
 
@@ -301,9 +318,10 @@ class UserRouter extends Router {
         teachingCards: teachingCards,
         joinedCards: joinedCards,
 
-        assignedQuestionnaires: assignedQuestionnaires,
+        assignedPublishes: assignedPublishes,
         createdQuestionnaires: createdQuestionnaires,
         createdPublishes: createdPublishes,
+        createdSubmits: createdSubmits,
 
         schools: schools,
         courses: courses,
@@ -316,7 +334,9 @@ class UserRouter extends Router {
 
         questionnaires: questionnaires,
         questions: questions,
-        publishes: publishes
+        publishes: publishes,
+        submits: submits,
+        answers: answers
       })
     });
 

@@ -41,8 +41,7 @@ var subjectSchema = _mongoose2.default.Schema({
     default: ''
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 });
 

@@ -18,25 +18,24 @@ var questionaireSchema = mongoose.Schema({
   createdAt: {
     type: Date
   },
+  published: {
+    type: Boolean
+  },
   questions: [ObjectId]
 })
 
 var Questionnaire = module.exports = mongoose.model('questionnaire',questionaireSchema);
 
-module.exports.getAssigned = async (profile)=>{
-  var err, quest, publishes;
+module.exports.getByPublishes = async (publishes)=>{
+  var err, quest;
   var quests = [];
   var questsId = [];
-
-  [err, publishes] = await to(Publish.find({ school: { $in: profile.joinedSchools }, endDate: { $gt: new Date() } }));
 
   for(var i=0;i<publishes.length;i++){
     [err, quest] = await to(Questionnaire.findOne({ _id: publishes[i].questionnaire }));
     quests = [...quests, quest];
+    questsId = [...questsId, quest._id];
   }
-
-  for(var i=0;i<quests.length;i++){ questsId.push(quests[i]._id); }
-
   return [err, quests, questsId];
 }
 

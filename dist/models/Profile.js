@@ -43,6 +43,9 @@ var profileSchema = _mongoose2.default.Schema({
   featuredCount: {
     type: Number,
     default: 0
+  },
+  lastLogin: {
+    type: Date
   }
 });
 
@@ -107,7 +110,7 @@ module.exports.getByStudentProjects = function () {
   };
 }();
 
-module.exports.getStudents = function () {
+module.exports.getStudentsByCoursesId = function () {
   var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(coursesId) {
     var err, profiles, profilesId, _ref5, _ref6, i;
 
@@ -146,7 +149,7 @@ module.exports.getStudents = function () {
   };
 }();
 
-module.exports.getTeachers = function () {
+module.exports.getTeachersBySchool = function () {
   var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(schoolId) {
     var err, profiles, profilesId, _ref8, _ref9, i;
 

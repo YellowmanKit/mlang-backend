@@ -11,11 +11,46 @@ import Card from '../models/Card';
 import Lang from '../models/Lang';
 import Log from '../models/Log';
 
+import Publish from '../models/survey/Publish';
+import Submit from '../models/survey/Submit';
+import Question from '../models/survey/Question';
+import Answer from '../models/survey/Answer';
 
 import Graph from './Graph';
 
+module.exports.getStatisticsByPublish = async (publishId)=>{
+  var err, answer, question;
+  var stat= {
+    submits: [],
+    answers: [],
+
+    answerOptionGraphData: {}
+  }
+
+  var submits = [];
+  [err, submits] = await to(Submit.find({ publish: publishId }));
+  stat['submits'] = submits;
+
+  var answers = [];
+  for(var i=0;i<submits.length;i++){
+    [err, answer] = await to(Answer.find({ _id: { $in: submits[i].answers }}));
+    answers = [...answers, ...answer];
+  }
+  stat['answers'] = answers;
+
+  var options = {};
+  for(var j=0;j<answers.length;j++){
+    [err, question] = await to(Question.findOne({ _id: answers[j].question }));
+    if(!options[question._id] && question.type === 'option'){ options[question._id] = question.options }
+  }
+
+  stat['answerOptionGraphData'] = Graph.answerOption(stat['answers'], options);
+
+  return [err, stat];
+}
+
 module.exports.getStatisticsByUser = async (userId)=>{
-  let err, data;
+  var err, data;
   var stat= {
     userStudentProjects: [],
     userCards: [],
@@ -42,43 +77,43 @@ module.exports.getStatisticsByUser = async (userId)=>{
     cardMonthGraphData: []
   };
 
-  let studentProjectsId = [];
+  var studentProjectsId = [];
   [err, data, studentProjectsId] = await StudentProject.getByUser(userId);
 
   stat['userStudentProjects'] = studentProjectsId;
   stat['studentProjects'] = data;
 
-  let cardsId = [];
+  var cardsId = [];
   [err, data, cardsId] = await Card.getByStudentProjects(stat['studentProjects']);
 
   stat['userCards'] = cardsId;
   stat['cards'] = data;
 
-  let langsId = [];
+  var langsId = [];
   [err, data, langsId] = await Lang.getByCards(stat['cards']);
 
   stat['userLangs'] = langsId;
   stat['langs'] = data;
 
-  let featuredLangsId = [];
+  var featuredLangsId = [];
   [err, data, featuredLangsId] = await Lang.getByCards(stat['cards'], true);
 
   stat['userFeaturedLangs'] = featuredLangsId;
   stat['featuredLangs'] = data;
 
-  let projectsId = [];
+  var projectsId = [];
   [err, data, projectsId] = await Project.getByStudentProjects(stat['studentProjects']);
 
   stat['userProjects'] = projectsId;
   stat['projects'] = data;
 
-  let subjectsId = [];
+  var subjectsId = [];
   [err, data, subjectsId] = await Subject.getByProjects(stat['projects']);
 
   stat['userSubjects'] = subjectsId;
   stat['subjects'] = data;
 
-  let coursesId = [];
+  var coursesId = [];
   [err, data, coursesId] = await Course.getBySubjects(stat['subjects']);
 
   stat['userCourses'] = coursesId;
@@ -104,7 +139,7 @@ module.exports.getStatisticsByUser = async (userId)=>{
 }
 
 module.exports.getStatisticsByCourse = async (courseId)=>{
-  let err, data, course;
+  var err, data, course;
   var stat= {
     course: null,
     courseStudents: [],
@@ -129,7 +164,7 @@ module.exports.getStatisticsByCourse = async (courseId)=>{
   [err, course] = await to(Course.findById(courseId));
   stat['course'] = course;
 
-  let profilesId = [];
+  var profilesId = [];
   [err, data, profilesId] = await Profile.getStudentsByCoursesId([courseId]);
 
   stat['courseStudents'] = profilesId;
@@ -138,27 +173,27 @@ module.exports.getStatisticsByCourse = async (courseId)=>{
   [err, data] = await to(Subject.find({ _id: { $in: course.subjects }}));
   stat['subjects'] = data;
 
-  let projectsId = [];
+  var projectsId = [];
   [err , data, projectsId] = await Project.getBySubjects(data);
 
   stat['courseProjects'] = projectsId;
   stat['projects'] = data;
 
-  let studentProjectsId = [];
+  var studentProjectsId = [];
   [err , data, studentProjectsId] = await StudentProject.getByProjects(data);
 
   stat['courseStudentProjects'] = studentProjectsId;
   stat['studentProjects'] = data;
 
-  let cardsId = [];
-  let featured = 0;
+  var cardsId = [];
+  var featured = 0;
   [err, data, cardsId, featured] = await Card.getByStudentProjects(stat['studentProjects']);
 
   stat['courseCards'] = cardsId;
   stat['cards'] = data;
   stat['featuredCount'] = featured;
 
-  let langsId = [];
+  var langsId = [];
   [err, data, langsId] = await Lang.getByCards(stat['cards']);
 
   stat['courseLangs'] = langsId;
@@ -174,7 +209,7 @@ module.exports.getStatisticsByCourse = async (courseId)=>{
 }
 
 module.exports.getStatisticsBySchool = async (schoolId)=>{
-  let err, data, school;
+  var err, data, school;
   var stat= {
     schoolTeachers: [],
     schoolStudents: [],
@@ -198,39 +233,39 @@ module.exports.getStatisticsBySchool = async (schoolId)=>{
   };
 
   [err, school] = await to(School.findById(schoolId));
-  let coursesId = [];
+  var coursesId = [];
   [err, data, coursesId] = await Course.getBySchool(school);
 
   stat['schoolCourses'] = coursesId;
   stat['courses'] = data;
 
-  let subjectsId = [];
+  var subjectsId = [];
   [err, data, subjectsId] = await Subject.getByCourses(data, true);
 
   stat['schoolSubjects'] = subjectsId;
   stat['subjects'] = data;
 
-  let projectsId = [];
+  var projectsId = [];
   [err, data, projectsId] = await Project.getBySubjects(data);
 
   stat['schoolProjects'] = projectsId;
   stat['projects'] = data;
 
-  let cardsId = [];
-  let featuredCount = 0;
+  var cardsId = [];
+  var featuredCount = 0;
   [err, data, cardsId, featuredCount] = await Card.getByProjects(data);
 
   stat['schoolCards'] = cardsId;
   stat['cards'] = data;
   stat['featuredCount'] = featuredCount;
 
-  let langsId = [];
+  var langsId = [];
   [err, data, langsId] = await Lang.getByCards(data);
 
   stat['schoolLangs'] = langsId;
   stat['langs'] = data;
 
-  let profilesId = [];
+  var profilesId = [];
   [err, data, profilesId] = await Profile.getTeachersBySchool(schoolId);
 
   stat['schoolTeachers'] = profilesId;

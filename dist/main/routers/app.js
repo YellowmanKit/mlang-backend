@@ -16,10 +16,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _fsExtra = require('fs-extra');
 
 var _fsExtra2 = _interopRequireDefault(_fsExtra);
@@ -57,16 +53,13 @@ var AppRouter = function (_Router) {
       var temp = app.get('temp');
       var storage = app.get('storage');
 
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
-
       app.get('/download/:type/:name', function (req, res, next) {
         var type = req.params.type;
         var append = _this2.getAppend(type);
         var fileName = req.params.name;
         var filePath = _path2.default.join(storage, append, fileName);
 
-        console.log('Donwloading ' + filePath);
+        //console.log('Donwloading ' + filePath)
 
         return res.download(filePath, fileName, function (err) {
           if (err) {

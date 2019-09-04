@@ -1,6 +1,31 @@
 
+module.exports.answerOption = (answers, options) =>{
+  //console.log(answers);
+  //console.log(options);
+  var data = {
+    //qid: [{ value: 3, option: A },]
+  }
+  for(var qid in options){
+    if(!data[qid]){ data[qid] = []; }
+    for(var i=0;i<options[qid].length;i++){
+      data[qid].push({ value: 0, option: options[qid][i] });
+    }
+    //console.log(data);
+    for(var j=0;j<answers.length;j++){
+      if(''+ answers[j].question === ''+ qid){
+        for(var k=0;k<data[qid].length;k++){
+          if(data[qid][k].option === answers[j].value){
+            data[qid][k] = { value: data[qid][k].value + 1, option: data[qid][k].option };
+          }
+        }
+      }
+    }
+  }
+  //console.log(data);
+  return data;
+}
+
 module.exports.loginDate = (logs) =>{
-  console.log(logs);
   var data = [
     //{ value: 3, date: new Date(2019, 7, 1) },
   ]

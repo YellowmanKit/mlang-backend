@@ -16,10 +16,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -61,8 +57,6 @@ var mlanghkuRouter = function (_Router) {
       var _this2 = this;
 
       var app = this.app;
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
 
       _node2.default.initialize(process.env.PARSE_APP_ID, process.env.DOTNET_KEY);
       _node2.default.serverURL = process.env.PARSE_SERVER;

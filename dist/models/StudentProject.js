@@ -26,10 +26,6 @@ var studentProjectSchema = _mongoose2.default.Schema({
     type: ObjectId,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: new Date()
-  },
   cards: [ObjectId]
 });
 

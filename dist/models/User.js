@@ -65,8 +65,7 @@ var schema = _mongoose2.default.Schema({
     default: 'student'
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   }
 });
 
@@ -216,7 +215,7 @@ module.exports.getUserAndProfile = function () {
 
           case 9:
             _context3.next = 11;
-            return (0, _to2.default)(_Profile2.default.findOne({ belongTo: user._id }));
+            return (0, _to2.default)(_Profile2.default.findOneAndUpdate({ belongTo: user._id }, { $set: { lastLogin: new Date() } }));
 
           case 11:
             _ref12 = _context3.sent;
@@ -346,7 +345,8 @@ module.exports.aquireNewAccountByAppAccount = function () {
               mlanghkuId: appUser.username,
               mlanghkuPw: appPw,
               email: appUser.email,
-              type: appUser.identity === 2 ? 'teacher' : 'student'
+              type: appUser.identity === 2 ? 'teacher' : 'student',
+              createdAt: new Date()
             };
             _context5.next = 9;
             return (0, _to2.default)(User.create(newUser));
@@ -401,14 +401,14 @@ module.exports.aquireNewAccountByAppAccount = function () {
 }();
 
 module.exports.acquireNewAccountByCode = function () {
-  var _ref24 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(code, codeType, cb) {
-    var err, result, exist, user, profile, _ref25, _ref26, _ref27, _ref28, newUser, _ref29, _ref30, newProfile, _ref31, _ref32;
+  var _ref24 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(code, codeType) {
+    var err, exist, user, profile, course, teacher, school, _ref25, _ref26, _ref27, _ref28, newUser, _ref29, _ref30, newProfile, _ref31, _ref32, _ref33, _ref34, _ref35, _ref36, _ref37, _ref38, _ref39, _ref40, _ref41, _ref42, _ref43, _ref44;
 
     return regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
-            err = void 0, result = void 0, exist = void 0, user = void 0, profile = void 0;
+            err = void 0, exist = void 0, user = void 0, profile = void 0, course = void 0, teacher = void 0, school = void 0;
 
             if (!(codeType === 'course')) {
               _context6.next = 10;
@@ -438,68 +438,100 @@ module.exports.acquireNewAccountByCode = function () {
 
           case 16:
             if (!(err || !exist)) {
-              _context6.next = 20;
+              _context6.next = 18;
               break;
             }
 
-            console.log('no such course');cb('failed');return _context6.abrupt('return');
+            return _context6.abrupt('return', ['failed - invalid code']);
 
-          case 20:
+          case 18:
             newUser = {
               id: 'DefaultId',
               pw: randomPassword(),
               email: '@',
-              type: codeType === 'course' ? 'student' : 'teacher'
+              type: codeType === 'course' ? 'student' : 'teacher',
+              createdAt: new Date()
             };
-            _context6.next = 23;
+            _context6.next = 21;
             return (0, _to2.default)(User.create(newUser));
 
-          case 23:
+          case 21:
             _ref29 = _context6.sent;
             _ref30 = _slicedToArray(_ref29, 2);
             err = _ref30[0];
             user = _ref30[1];
-
-            if (!err) {
-              _context6.next = 32;
-              break;
-            }
-
-            console.log('cant create user');cb('failed');console.log(err);return _context6.abrupt('return');
-
-          case 32:
-            newProfile = {
-              belongTo: user._id
-            };
-            _context6.next = 35;
+            newProfile = { belongTo: user._id };
+            _context6.next = 28;
             return (0, _to2.default)(_Profile2.default.create(newProfile));
 
-          case 35:
+          case 28:
             _ref31 = _context6.sent;
             _ref32 = _slicedToArray(_ref31, 2);
             err = _ref32[0];
             profile = _ref32[1];
 
-            if (!err) {
-              _context6.next = 44;
+            if (!(codeType === 'course')) {
+              _context6.next = 65;
               break;
             }
 
-            console.log('cant create profile');cb('failed');console.log(err);return _context6.abrupt('return');
+            _context6.next = 35;
+            return _Course2.default.joinCourse({ userId: user._id, code: code });
 
-          case 44:
+          case 35:
+            _ref33 = _context6.sent;
+            _ref34 = _slicedToArray(_ref33, 2);
+            err = _ref34[0];
+            course = _ref34[1];
+            _context6.next = 41;
+            return (0, _to2.default)(User.findOne({ _id: course.teacher }));
 
-            if (codeType === 'course') {
-              _Course2.default.joinCourse({ userId: user._id, code: code }, function (result) {
-                cb(result, user);
-              });
-            } else if (codeType === 'school') {
-              _School2.default.joinSchool({ userId: user._id, code: code }, function (result) {
-                cb(result, user);
-              });
+          case 41:
+            _ref35 = _context6.sent;
+            _ref36 = _slicedToArray(_ref35, 2);
+            err = _ref36[0];
+            teacher = _ref36[1];
+            _context6.next = 47;
+            return (0, _to2.default)(_Profile2.default.findOne({ belongTo: teacher._id }));
+
+          case 47:
+            _ref37 = _context6.sent;
+            _ref38 = _slicedToArray(_ref37, 2);
+            err = _ref38[0];
+            profile = _ref38[1];
+            _context6.next = 53;
+            return (0, _to2.default)(_School2.default.findOne({ _id: profile.joinedSchools[0] }));
+
+          case 53:
+            _ref39 = _context6.sent;
+            _ref40 = _slicedToArray(_ref39, 2);
+            err = _ref40[0];
+            school = _ref40[1];
+            _context6.next = 59;
+            return _School2.default.joinSchool({ user: user, code: school.code });
+
+          case 59:
+            _ref41 = _context6.sent;
+            _ref42 = _slicedToArray(_ref41, 1);
+            err = _ref42[0];
+            return _context6.abrupt('return', [err, user]);
+
+          case 65:
+            if (!(codeType === 'school')) {
+              _context6.next = 72;
+              break;
             }
 
-          case 45:
+            _context6.next = 68;
+            return _School2.default.joinSchool({ user: user, code: code });
+
+          case 68:
+            _ref43 = _context6.sent;
+            _ref44 = _slicedToArray(_ref43, 1);
+            err = _ref44[0];
+            return _context6.abrupt('return', [err, user]);
+
+          case 72:
           case 'end':
             return _context6.stop();
         }
@@ -507,14 +539,14 @@ module.exports.acquireNewAccountByCode = function () {
     }, _callee6, undefined);
   }));
 
-  return function (_x9, _x10, _x11) {
+  return function (_x9, _x10) {
     return _ref24.apply(this, arguments);
   };
 }();
 
 module.exports.acquireNewAccount = function () {
-  var _ref33 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(email, cb) {
-    var existUser, defaultId, newUser, mailOptions, err, info, user, profile, _ref34, _ref35, _ref36, _ref37, newProfile, _ref38, _ref39;
+  var _ref45 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(email, cb) {
+    var existUser, defaultId, newUser, mailOptions, err, info, user, profile, _ref46, _ref47, _ref48, _ref49, newProfile, _ref50, _ref51;
 
     return regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
@@ -551,10 +583,10 @@ module.exports.acquireNewAccount = function () {
             return (0, _to2.default)(transporter.sendMail(mailOptions));
 
           case 12:
-            _ref34 = _context7.sent;
-            _ref35 = _slicedToArray(_ref34, 2);
-            err = _ref35[0];
-            info = _ref35[1];
+            _ref46 = _context7.sent;
+            _ref47 = _slicedToArray(_ref46, 2);
+            err = _ref47[0];
+            info = _ref47[1];
 
             if (!err) {
               _context7.next = 21;
@@ -568,10 +600,10 @@ module.exports.acquireNewAccount = function () {
             return (0, _to2.default)(User.create(newUser));
 
           case 23:
-            _ref36 = _context7.sent;
-            _ref37 = _slicedToArray(_ref36, 2);
-            err = _ref37[0];
-            user = _ref37[1];
+            _ref48 = _context7.sent;
+            _ref49 = _slicedToArray(_ref48, 2);
+            err = _ref49[0];
+            user = _ref49[1];
 
             if (!err) {
               _context7.next = 31;
@@ -588,10 +620,10 @@ module.exports.acquireNewAccount = function () {
             return (0, _to2.default)(_Profile2.default.create(newProfile));
 
           case 34:
-            _ref38 = _context7.sent;
-            _ref39 = _slicedToArray(_ref38, 2);
-            err = _ref39[0];
-            profile = _ref39[1];
+            _ref50 = _context7.sent;
+            _ref51 = _slicedToArray(_ref50, 2);
+            err = _ref51[0];
+            profile = _ref51[1];
 
             if (!err) {
               _context7.next = 42;
@@ -611,8 +643,8 @@ module.exports.acquireNewAccount = function () {
     }, _callee7, undefined);
   }));
 
-  return function (_x12, _x13) {
-    return _ref33.apply(this, arguments);
+  return function (_x11, _x12) {
+    return _ref45.apply(this, arguments);
   };
 }();
 

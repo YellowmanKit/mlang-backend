@@ -15,6 +15,8 @@ var publishSchema = mongoose.Schema({
   school: {
     type: ObjectId
   },
+  submits: [ObjectId],
+  
   createdAt: {
     type: Date,
   },
@@ -28,6 +30,20 @@ var publishSchema = mongoose.Schema({
 
 var Publish = module.exports = mongoose.model('publish',publishSchema);
 
+
+module.exports.getAssigned = async (profile)=>{
+  var err, publishes;
+  var publishesId = [];
+
+  [err, publishes] = await to(Publish.find({ school: { $in: profile.joinedSchools }, endDate: { $gt: new Date() } }));
+
+  for(var i=0;i<publishes.length;i++){
+    publishesId = [...publishesId, publishes[i]._id];
+  }
+
+  return [err, publishes, publishesId];
+}
+
 module.exports.getByAuthor = async (userId)=>{
   var err, publishes;
   var publishesId = [];
@@ -40,20 +56,25 @@ module.exports.getByAuthor = async (userId)=>{
 }
 
 module.exports.edit = async (data)=>{
-  var err, publish;
+  var err, school, publish;
+  [err, school] = await to(School.findOne({ code: data.schoolCode }));
+  if(!school){ return ['Invalid school code!', null]}
+
   [err, publish] = await to(Publish.findOneAndUpdate(
     { _id: data.publish._id },
-    { $set: { title: data.title, questionnaire: data.questionnaire, schoolCode: data.schoolCode, endDate: data.endDate, author: data.author } },
+    { $set: { title: data.title, questionnaire: data.questionnaire, school: school._id,
+      endDate: data.endDate, author: data.author } },
     { new: true }));
   return [err, publish];
 }
 
 module.exports.add = async (data)=>{
   var err, school, publish;
-  const schoolCode = data.schoolCode;
-  [err, school] = await to(School.findOne({ code: schoolCode }));
+  [err, school] = await to(School.findOne({ code: data.schoolCode }));
   if(!school){ return ['Invalid school code!', null]}
 
-  [err, publish] = await to(Publish.create({ title: data.title, questionnaire: data.questionnaire, school: school, endDate: data.endDate, author: data.author, createdAt: new Date()}));
+  [err, publish] = await to(Publish.create({
+    title: data.title, questionnaire: data.questionnaire, school: school._id,
+    endDate: data.endDate, author: data.author, createdAt: new Date()}));
   return [err, publish, school];
 }

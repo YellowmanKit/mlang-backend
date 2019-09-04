@@ -45,8 +45,7 @@ var cardSchema = _mongoose2.default.Schema({
     required: true
   },
   createdAt: {
-    type: Date,
-    default: new Date()
+    type: Date
   },
   resubmitted: {
     type: Boolean,
@@ -56,14 +55,19 @@ var cardSchema = _mongoose2.default.Schema({
     type: Boolean,
     default: false
   },
-  langs: [ObjectId]
+  langs: [ObjectId],
+
+  likeCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 var Card = module.exports = _mongoose2.default.model('card', cardSchema);
 
 module.exports.getByStudentProjects = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(studentProjects) {
-    var err, card, cardsId, cards, i, _ref2, _ref3;
+    var err, card, cardsId, cards, featured, i, _ref2, _ref3;
 
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -72,6 +76,7 @@ module.exports.getByStudentProjects = function () {
             err = void 0, card = void 0;
             cardsId = [];
             cards = [];
+            featured = 0;
 
 
             for (i = 0; i < studentProjects.length; i++) {
@@ -80,32 +85,35 @@ module.exports.getByStudentProjects = function () {
 
             i = 0;
 
-          case 5:
+          case 6:
             if (!(i < cardsId.length)) {
-              _context.next = 16;
+              _context.next = 18;
               break;
             }
 
-            _context.next = 8;
+            _context.next = 9;
             return (0, _to2.default)(Card.findById(cardsId[i]));
 
-          case 8:
+          case 9:
             _ref2 = _context.sent;
             _ref3 = _slicedToArray(_ref2, 2);
             err = _ref3[0];
             card = _ref3[1];
 
             cards.push(card);
+            if (card.grade === 'featured') {
+              featured++;
+            }
 
-          case 13:
+          case 15:
             i++;
-            _context.next = 5;
+            _context.next = 6;
             break;
 
-          case 16:
-            return _context.abrupt('return', [err, cards, cardsId]);
+          case 18:
+            return _context.abrupt('return', [err, cards, cardsId, featured]);
 
-          case 17:
+          case 19:
           case 'end':
             return _context.stop();
         }

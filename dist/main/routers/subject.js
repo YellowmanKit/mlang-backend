@@ -16,10 +16,6 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
@@ -81,8 +77,6 @@ var SubjectRouter = function (_Router) {
       var _this2 = this;
 
       var app = this.app;
-      _mongoose2.default.connect('mongodb://localhost/mlang');
-      var db = _mongoose2.default.connection;
 
       app.post('/subject/getAllOfUser', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res) {
@@ -379,29 +373,32 @@ var SubjectRouter = function (_Router) {
                   //console.log(subject);
 
                   err = void 0, newSubject = void 0, updatedCourse = void 0;
-                  _context4.next = 4;
+
+
+                  subject['createdAt'] = new Date();
+                  _context4.next = 5;
                   return (0, _to2.default)(_Subject2.default.create(subject));
 
-                case 4:
+                case 5:
                   _ref17 = _context4.sent;
                   _ref18 = _slicedToArray(_ref17, 2);
                   err = _ref18[0];
                   newSubject = _ref18[1];
 
                   if (!err) {
-                    _context4.next = 10;
+                    _context4.next = 11;
                     break;
                   }
 
                   return _context4.abrupt('return', res.json({ result: 'failed' }));
 
-                case 10:
-                  _context4.next = 12;
+                case 11:
+                  _context4.next = 13;
                   return (0, _to2.default)(_Course2.default.findOneAndUpdate({ _id: subject.course }, { $push: {
                       subjects: newSubject._id
                     } }, { new: true }));
 
-                case 12:
+                case 13:
                   _ref19 = _context4.sent;
                   _ref20 = _slicedToArray(_ref19, 2);
                   err = _ref20[0];
@@ -419,7 +416,7 @@ var SubjectRouter = function (_Router) {
                     updatedCourse: updatedCourse
                   }));
 
-                case 19:
+                case 20:
                 case 'end':
                   return _context4.stop();
               }

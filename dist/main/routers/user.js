@@ -16,15 +16,11 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mongoose = require('mongoose');
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
 var _to = require('../../to');
 
 var _to2 = _interopRequireDefault(_to);
 
-var _Query = require('../../models/Query.js');
+var _Query = require('../../functions/Query.js');
 
 var _Query2 = _interopRequireDefault(_Query);
 
@@ -68,6 +64,26 @@ var _Lang = require('../../models/Lang.js');
 
 var _Lang2 = _interopRequireDefault(_Lang);
 
+var _Questionnaire = require('../../models/survey/Questionnaire.js');
+
+var _Questionnaire2 = _interopRequireDefault(_Questionnaire);
+
+var _Question = require('../../models/survey/Question.js');
+
+var _Question2 = _interopRequireDefault(_Question);
+
+var _Publish = require('../../models/survey/Publish.js');
+
+var _Publish2 = _interopRequireDefault(_Publish);
+
+var _Submit = require('../../models/survey/Submit.js');
+
+var _Submit2 = _interopRequireDefault(_Submit);
+
+var _Answer = require('../../models/survey/Answer.js');
+
+var _Answer2 = _interopRequireDefault(_Answer);
+
 var _Log = require('../../models/Log.js');
 
 var _Log2 = _interopRequireDefault(_Log);
@@ -83,8 +99,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ObjectId = require('mongoose').Types.ObjectId;
 
 var UserRouter = function (_Router) {
       _inherits(UserRouter, _Router);
@@ -107,8 +121,6 @@ var UserRouter = function (_Router) {
 
                   var app = this.app;
                   var mlanghku = this.mlanghku;
-                  _mongoose2.default.connect('mongodb://localhost/mlang');
-                  var db = _mongoose2.default.connection;
 
                   app.post('/user/addAdmin', function () {
                         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
@@ -121,30 +133,29 @@ var UserRouter = function (_Router) {
                                                       userId = req.body.data.userId;
                                                       //console.log(userId);
 
-                                                      err = void 0, updatedUser = void 0;
-                                                      _context.next = 4;
+                                                      _context.next = 3;
                                                       return (0, _to2.default)(_User2.default.findOneAndUpdate({ id: userId }, { $set: { type: 'admin' } }, { new: true }));
 
-                                                case 4:
+                                                case 3:
                                                       _ref2 = _context.sent;
                                                       _ref3 = _slicedToArray(_ref2, 2);
                                                       err = _ref3[0];
                                                       updatedUser = _ref3[1];
 
                                                       if (!err) {
-                                                            _context.next = 11;
+                                                            _context.next = 10;
                                                             break;
                                                       }
 
                                                       console.log(err);return _context.abrupt('return', res.json({ result: 'failed' }));
 
-                                                case 11:
+                                                case 10:
                                                       profiles = [];
                                                       admins = [];
-                                                      _context.next = 15;
+                                                      _context.next = 14;
                                                       return _User2.default.getProfilesByUsers([updatedUser]);
 
-                                                case 15:
+                                                case 14:
                                                       _ref4 = _context.sent;
                                                       _ref5 = _slicedToArray(_ref4, 3);
                                                       err = _ref5[0];
@@ -152,13 +163,13 @@ var UserRouter = function (_Router) {
                                                       admins = _ref5[2];
 
                                                       if (!err) {
-                                                            _context.next = 23;
+                                                            _context.next = 22;
                                                             break;
                                                       }
 
                                                       console.log(err);return _context.abrupt('return', res.json({ result: 'failed' }));
 
-                                                case 23:
+                                                case 22:
                                                       return _context.abrupt('return', res.json({
                                                             result: 'success',
                                                             updatedUser: updatedUser,
@@ -166,7 +177,7 @@ var UserRouter = function (_Router) {
                                                             admins: admins
                                                       }));
 
-                                                case 24:
+                                                case 23:
                                                 case 'end':
                                                       return _context.stop();
                                           }
@@ -188,32 +199,31 @@ var UserRouter = function (_Router) {
                                           switch (_context2.prev = _context2.next) {
                                                 case 0:
                                                       data = req.body.data;
-                                                      err = void 0, existedUser = void 0;
-                                                      _context2.next = 4;
+                                                      _context2.next = 3;
                                                       return (0, _to2.default)(_User2.default.findOne({ id: data.id, pw: data.pw }));
 
-                                                case 4:
+                                                case 3:
                                                       _ref7 = _context2.sent;
                                                       _ref8 = _slicedToArray(_ref7, 2);
                                                       err = _ref8[0];
                                                       existedUser = _ref8[1];
 
                                                       if (!err) {
-                                                            _context2.next = 11;
+                                                            _context2.next = 10;
                                                             break;
                                                       }
 
                                                       console.log(err);return _context2.abrupt('return', res.json({ result: 'failed' }));
 
-                                                case 11:
+                                                case 10:
                                                       if (!(existedUser && existedUser._id.toString() !== data._id)) {
-                                                            _context2.next = 14;
+                                                            _context2.next = 13;
                                                             break;
                                                       }
 
                                                       console.log('user id/pw already used');return _context2.abrupt('return', res.json({ result: 'failed' }));
 
-                                                case 14:
+                                                case 13:
 
                                                       _User2.default.findOneAndUpdate({ _id: data._id }, { $set: data }, { new: true }, function (err, updatedUser) {
                                                             return res.json({
@@ -222,7 +232,7 @@ var UserRouter = function (_Router) {
                                                             });
                                                       });
 
-                                                case 15:
+                                                case 14:
                                                 case 'end':
                                                       return _context2.stop();
                                           }
@@ -262,18 +272,47 @@ var UserRouter = function (_Router) {
                         };
                   }());
 
-                  app.get('/user/getNewAccountByCode/', function (req, res, next) {
-                        var code = req.headers.code;
-                        var codeType = req.headers.type;
+                  app.get('/user/getNewAccountByCode/', function () {
+                        var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+                              var code, codeType, err, user, _ref11, _ref12;
 
-                        _User2.default.acquireNewAccountByCode(code, codeType, function (result, user) {
-                              console.log(result);
-                              if (result === 'failed') {
-                                    return res.json({ result: result });
-                              }
-                              return res.json({ result: result, id: user.id, pw: user.pw });
-                        });
-                  });
+                              return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                                    while (1) {
+                                          switch (_context4.prev = _context4.next) {
+                                                case 0:
+                                                      code = req.headers.code;
+                                                      codeType = req.headers.type;
+                                                      _context4.next = 4;
+                                                      return _User2.default.acquireNewAccountByCode(code, codeType);
+
+                                                case 4:
+                                                      _ref11 = _context4.sent;
+                                                      _ref12 = _slicedToArray(_ref11, 2);
+                                                      err = _ref12[0];
+                                                      user = _ref12[1];
+
+                                                      if (!err) {
+                                                            _context4.next = 10;
+                                                            break;
+                                                      }
+
+                                                      return _context4.abrupt('return', res.json({ result: 'failed' }));
+
+                                                case 10:
+                                                      return _context4.abrupt('return', res.json({ result: 'success', id: user.id, pw: user.pw }));
+
+                                                case 11:
+                                                case 'end':
+                                                      return _context4.stop();
+                                          }
+                                    }
+                              }, _callee4, _this2);
+                        }));
+
+                        return function (_x10, _x11, _x12) {
+                              return _ref10.apply(this, arguments);
+                        };
+                  }());
 
                   app.get('/user/getNewAccount/', function (req, res, next) {
                         var email = req.headers.email;
@@ -284,68 +323,65 @@ var UserRouter = function (_Router) {
                   });
 
                   app.get('/user/login/', function () {
-                        var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
-                              var id, pw, err, data, user, profile, appUser, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, profiles, schools, courses, subjects, projects, studentProjects, groups, cards, langs, teacherProfiles, _ref17, _ref18, joinedSubjects, _ref19, _ref20, joinedProjects, _ref21, _ref22, joinedStudentProjects, _ref23, _ref24, joinedCards, _ref25, _ref26, joinedGroups, _ref27, _ref28, teachingCourses, _ref29, _ref30, teachingSubjects, _ref31, _ref32, teachingProjects, _ref33, _ref34, teachingStudentProjects, _ref35, _ref36, teachingCards, _ref37, _ref38, teachingGroups, _ref39, _ref40, supervisingSchools, _ref41, _ref42, adminUsers, _ref43, _ref44, admins, _ref45, _ref46, profilesId, _ref47, _ref48, langsId, _ref49, _ref50;
+                        var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
+                              var id, pw, err, data, user, profile, appUser, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, profiles, schools, courses, subjects, projects, studentProjects, groups, cards, langs, questionnaires, questions, publishes, submits, answers, _ref20, _ref21, _ref22, _ref23, _ref24, _ref25, _ref26, _ref27, _ref28, _ref29, teacherProfiles, _ref30, _ref31, joinedSubjects, _ref32, _ref33, joinedProjects, _ref34, _ref35, joinedStudentProjects, _ref36, _ref37, joinedCards, _ref38, _ref39, joinedGroups, _ref40, _ref41, teachingCourses, _ref42, _ref43, teachingSubjects, _ref44, _ref45, teachingProjects, _ref46, _ref47, teachingStudentProjects, _ref48, _ref49, teachingCards, _ref50, _ref51, teachingGroups, _ref52, _ref53, supervisingSchools, _ref54, _ref55, adminUsers, _ref56, _ref57, admins, _ref58, _ref59, profilesId, _ref60, _ref61, langsId, _ref62, _ref63, createdQuestionnaires, _ref64, _ref65, assignedPublishes, _ref66, _ref67, createdSubmits, _ref68, _ref69, _ref70, _ref71, _ref72, _ref73, _ref74, _ref75, createdPublishes, _ref76, _ref77, _ref78, _ref79;
 
-                              return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                              return regeneratorRuntime.wrap(function _callee5$(_context5) {
                                     while (1) {
-                                          switch (_context4.prev = _context4.next) {
+                                          switch (_context5.prev = _context5.next) {
                                                 case 0:
                                                       id = req.headers.id;
                                                       pw = req.headers.pw;
 
                                                       //console.log(id + ' ' + pw);
 
-                                                      err = void 0, data = void 0, user = void 0, profile = void 0, appUser = void 0;
-                                                      _context4.next = 5;
+                                                      _context5.next = 4;
                                                       return _User2.default.getUserAndProfile(id, pw);
 
-                                                case 5:
-                                                      _ref11 = _context4.sent;
-                                                      _ref12 = _slicedToArray(_ref11, 3);
-                                                      err = _ref12[0];
-                                                      user = _ref12[1];
-                                                      profile = _ref12[2];
+                                                case 4:
+                                                      _ref14 = _context5.sent;
+                                                      _ref15 = _slicedToArray(_ref14, 3);
+                                                      err = _ref15[0];
+                                                      user = _ref15[1];
+                                                      profile = _ref15[2];
 
                                                       if (!err) {
-                                                            _context4.next = 27;
+                                                            _context5.next = 26;
                                                             break;
                                                       }
 
-                                                      _context4.next = 13;
+                                                      _context5.next = 12;
                                                       return mlanghku.login(id, pw);
 
-                                                case 13:
-                                                      _ref13 = _context4.sent;
-                                                      _ref14 = _slicedToArray(_ref13, 2);
-                                                      err = _ref14[0];
-                                                      appUser = _ref14[1];
+                                                case 12:
+                                                      _ref16 = _context5.sent;
+                                                      _ref17 = _slicedToArray(_ref16, 2);
+                                                      err = _ref17[0];
+                                                      appUser = _ref17[1];
 
                                                       if (!err) {
-                                                            _context4.next = 20;
+                                                            _context5.next = 19;
                                                             break;
                                                       }
 
-                                                      console.log(err);return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      console.log(err);return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 20:
-                                                      _context4.next = 22;
+                                                case 19:
+                                                      _context5.next = 21;
                                                       return _User2.default.aquireNewAccountByAppAccount(appUser.attributes, pw);
 
-                                                case 22:
-                                                      _ref15 = _context4.sent;
-                                                      _ref16 = _slicedToArray(_ref15, 3);
-                                                      err = _ref16[0];
-                                                      user = _ref16[1];
-                                                      profile = _ref16[2];
+                                                case 21:
+                                                      _ref18 = _context5.sent;
+                                                      _ref19 = _slicedToArray(_ref18, 3);
+                                                      err = _ref19[0];
+                                                      user = _ref19[1];
+                                                      profile = _ref19[2];
 
-                                                case 27:
+                                                case 26:
                                                       //console.log(user);
                                                       //console.log(profile);
 
                                                       _Log2.default.createLoginLog(user._id);
-
-                                                      profiles = [profile];
 
                                                       profiles = [];
                                                       schools = [];
@@ -356,355 +392,509 @@ var UserRouter = function (_Router) {
                                                       groups = [];
                                                       cards = [];
                                                       langs = [];
-                                                      teacherProfiles = void 0;
-                                                      _context4.next = 41;
-                                                      return _Course2.default.getJoined(profile.joinedCourses);
+                                                      questionnaires = [];
+                                                      questions = [];
+                                                      publishes = [];
+                                                      submits = [];
+                                                      answers = [];
 
-                                                case 41:
-                                                      _ref17 = _context4.sent;
-                                                      _ref18 = _slicedToArray(_ref17, 3);
-                                                      err = _ref18[0];
-                                                      data = _ref18[1];
-                                                      teacherProfiles = _ref18[2];
-
-                                                      if (!err) {
-                                                            _context4.next = 48;
+                                                      if (!(profile.joinedSchools.length === 0 && profile.joinedCourses.length > 0)) {
+                                                            _context5.next = 74;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      _context5.next = 44;
+                                                      return (0, _to2.default)(_Course2.default.findOne({ _id: profile.joinedCourses[0] }));
 
-                                                case 48:
+                                                case 44:
+                                                      _ref20 = _context5.sent;
+                                                      _ref21 = _slicedToArray(_ref20, 2);
+                                                      err = _ref21[0];
+                                                      data = _ref21[1];
+                                                      _context5.next = 50;
+                                                      return (0, _to2.default)(_User2.default.findOne({ _id: data.teacher }));
+
+                                                case 50:
+                                                      _ref22 = _context5.sent;
+                                                      _ref23 = _slicedToArray(_ref22, 2);
+                                                      err = _ref23[0];
+                                                      data = _ref23[1];
+                                                      _context5.next = 56;
+                                                      return (0, _to2.default)(_Profile2.default.findOne({ belongTo: data._id }));
+
+                                                case 56:
+                                                      _ref24 = _context5.sent;
+                                                      _ref25 = _slicedToArray(_ref24, 2);
+                                                      err = _ref25[0];
+                                                      data = _ref25[1];
+                                                      _context5.next = 62;
+                                                      return (0, _to2.default)(_School2.default.findOne({ _id: data.joinedSchools[0] }));
+
+                                                case 62:
+                                                      _ref26 = _context5.sent;
+                                                      _ref27 = _slicedToArray(_ref26, 2);
+                                                      err = _ref27[0];
+                                                      data = _ref27[1];
+
+                                                      schools = [].concat(_toConsumableArray(schools), [data]);
+                                                      _context5.next = 69;
+                                                      return _School2.default.joinSchool({ user: user, code: data.code });
+
+                                                case 69:
+                                                      _ref28 = _context5.sent;
+                                                      _ref29 = _slicedToArray(_ref28, 3);
+                                                      err = _ref29[0];
+                                                      data = _ref29[1];
+                                                      profile = _ref29[2];
+
+                                                case 74:
+
+                                                      profiles = [profile];
+
+                                                      _context5.next = 77;
+                                                      return _Course2.default.getJoined(profile.joinedCourses);
+
+                                                case 77:
+                                                      _ref30 = _context5.sent;
+                                                      _ref31 = _slicedToArray(_ref30, 3);
+                                                      err = _ref31[0];
+                                                      data = _ref31[1];
+                                                      teacherProfiles = _ref31[2];
+
+                                                      if (!err) {
+                                                            _context5.next = 84;
+                                                            break;
+                                                      }
+
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
+
+                                                case 84:
 
                                                       courses = [].concat(_toConsumableArray(courses), _toConsumableArray(data));
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(teacherProfiles));
 
-                                                      _context4.next = 52;
+                                                      _context5.next = 88;
                                                       return _Subject2.default.getByCourses(data);
 
-                                                case 52:
-                                                      _ref19 = _context4.sent;
-                                                      _ref20 = _slicedToArray(_ref19, 3);
-                                                      err = _ref20[0];
-                                                      data = _ref20[1];
-                                                      joinedSubjects = _ref20[2];
+                                                case 88:
+                                                      _ref32 = _context5.sent;
+                                                      _ref33 = _slicedToArray(_ref32, 3);
+                                                      err = _ref33[0];
+                                                      data = _ref33[1];
+                                                      joinedSubjects = _ref33[2];
 
                                                       if (!err) {
-                                                            _context4.next = 59;
+                                                            _context5.next = 95;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 59:
+                                                case 95:
 
                                                       subjects = [].concat(_toConsumableArray(subjects), _toConsumableArray(data));
 
-                                                      _context4.next = 62;
+                                                      _context5.next = 98;
                                                       return _Project2.default.getBySubjects(data);
 
-                                                case 62:
-                                                      _ref21 = _context4.sent;
-                                                      _ref22 = _slicedToArray(_ref21, 3);
-                                                      err = _ref22[0];
-                                                      data = _ref22[1];
-                                                      joinedProjects = _ref22[2];
+                                                case 98:
+                                                      _ref34 = _context5.sent;
+                                                      _ref35 = _slicedToArray(_ref34, 3);
+                                                      err = _ref35[0];
+                                                      data = _ref35[1];
+                                                      joinedProjects = _ref35[2];
 
                                                       if (!err) {
-                                                            _context4.next = 69;
+                                                            _context5.next = 105;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 69:
+                                                case 105:
 
                                                       projects = [].concat(_toConsumableArray(projects), _toConsumableArray(data));
 
-                                                      _context4.next = 72;
+                                                      _context5.next = 108;
                                                       return _StudentProject2.default.getByProjects(data);
 
-                                                case 72:
-                                                      _ref23 = _context4.sent;
-                                                      _ref24 = _slicedToArray(_ref23, 3);
-                                                      err = _ref24[0];
-                                                      data = _ref24[1];
-                                                      joinedStudentProjects = _ref24[2];
+                                                case 108:
+                                                      _ref36 = _context5.sent;
+                                                      _ref37 = _slicedToArray(_ref36, 3);
+                                                      err = _ref37[0];
+                                                      data = _ref37[1];
+                                                      joinedStudentProjects = _ref37[2];
 
                                                       if (!err) {
-                                                            _context4.next = 79;
+                                                            _context5.next = 115;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 79:
+                                                case 115:
 
                                                       studentProjects = [].concat(_toConsumableArray(studentProjects), _toConsumableArray(data));
 
-                                                      _context4.next = 82;
+                                                      _context5.next = 118;
                                                       return _Card2.default.getByStudentProjects(data);
 
-                                                case 82:
-                                                      _ref25 = _context4.sent;
-                                                      _ref26 = _slicedToArray(_ref25, 3);
-                                                      err = _ref26[0];
-                                                      data = _ref26[1];
-                                                      joinedCards = _ref26[2];
+                                                case 118:
+                                                      _ref38 = _context5.sent;
+                                                      _ref39 = _slicedToArray(_ref38, 3);
+                                                      err = _ref39[0];
+                                                      data = _ref39[1];
+                                                      joinedCards = _ref39[2];
 
                                                       if (!err) {
-                                                            _context4.next = 89;
+                                                            _context5.next = 125;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 89:
+                                                case 125:
 
                                                       cards = [].concat(_toConsumableArray(cards), _toConsumableArray(data));
 
-                                                      _context4.next = 92;
+                                                      _context5.next = 128;
                                                       return _Group2.default.getByUserAndProjects(user._id, joinedProjects);
 
-                                                case 92:
-                                                      _ref27 = _context4.sent;
-                                                      _ref28 = _slicedToArray(_ref27, 3);
-                                                      err = _ref28[0];
-                                                      data = _ref28[1];
-                                                      joinedGroups = _ref28[2];
+                                                case 128:
+                                                      _ref40 = _context5.sent;
+                                                      _ref41 = _slicedToArray(_ref40, 3);
+                                                      err = _ref41[0];
+                                                      data = _ref41[1];
+                                                      joinedGroups = _ref41[2];
 
                                                       if (!err) {
-                                                            _context4.next = 99;
+                                                            _context5.next = 135;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 99:
+                                                case 135:
 
                                                       groups = [].concat(_toConsumableArray(groups), _toConsumableArray(data));
 
-                                                      _context4.next = 102;
+                                                      _context5.next = 138;
                                                       return _Course2.default.getTeaching(user._id);
 
-                                                case 102:
-                                                      _ref29 = _context4.sent;
-                                                      _ref30 = _slicedToArray(_ref29, 3);
-                                                      err = _ref30[0];
-                                                      data = _ref30[1];
-                                                      teachingCourses = _ref30[2];
+                                                case 138:
+                                                      _ref42 = _context5.sent;
+                                                      _ref43 = _slicedToArray(_ref42, 3);
+                                                      err = _ref43[0];
+                                                      data = _ref43[1];
+                                                      teachingCourses = _ref43[2];
 
                                                       if (!err) {
-                                                            _context4.next = 109;
+                                                            _context5.next = 145;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 109:
+                                                case 145:
 
                                                       courses = [].concat(_toConsumableArray(courses), _toConsumableArray(data));
 
-                                                      _context4.next = 112;
+                                                      _context5.next = 148;
                                                       return _Subject2.default.getByCourses(data.slice(0).reverse());
 
-                                                case 112:
-                                                      _ref31 = _context4.sent;
-                                                      _ref32 = _slicedToArray(_ref31, 3);
-                                                      err = _ref32[0];
-                                                      data = _ref32[1];
-                                                      teachingSubjects = _ref32[2];
+                                                case 148:
+                                                      _ref44 = _context5.sent;
+                                                      _ref45 = _slicedToArray(_ref44, 3);
+                                                      err = _ref45[0];
+                                                      data = _ref45[1];
+                                                      teachingSubjects = _ref45[2];
 
                                                       if (!err) {
-                                                            _context4.next = 119;
+                                                            _context5.next = 155;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 119:
+                                                case 155:
 
                                                       subjects = [].concat(_toConsumableArray(subjects), _toConsumableArray(data));
 
-                                                      _context4.next = 122;
+                                                      _context5.next = 158;
                                                       return _Project2.default.getBySubjects(data);
 
-                                                case 122:
-                                                      _ref33 = _context4.sent;
-                                                      _ref34 = _slicedToArray(_ref33, 3);
-                                                      err = _ref34[0];
-                                                      data = _ref34[1];
-                                                      teachingProjects = _ref34[2];
+                                                case 158:
+                                                      _ref46 = _context5.sent;
+                                                      _ref47 = _slicedToArray(_ref46, 3);
+                                                      err = _ref47[0];
+                                                      data = _ref47[1];
+                                                      teachingProjects = _ref47[2];
 
                                                       if (!err) {
-                                                            _context4.next = 129;
+                                                            _context5.next = 165;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 129:
+                                                case 165:
 
                                                       projects = [].concat(_toConsumableArray(projects), _toConsumableArray(data));
 
-                                                      _context4.next = 132;
+                                                      _context5.next = 168;
                                                       return _StudentProject2.default.getByProjects(data);
 
-                                                case 132:
-                                                      _ref35 = _context4.sent;
-                                                      _ref36 = _slicedToArray(_ref35, 3);
-                                                      err = _ref36[0];
-                                                      data = _ref36[1];
-                                                      teachingStudentProjects = _ref36[2];
+                                                case 168:
+                                                      _ref48 = _context5.sent;
+                                                      _ref49 = _slicedToArray(_ref48, 3);
+                                                      err = _ref49[0];
+                                                      data = _ref49[1];
+                                                      teachingStudentProjects = _ref49[2];
 
                                                       if (!err) {
-                                                            _context4.next = 139;
+                                                            _context5.next = 175;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 139:
+                                                case 175:
 
                                                       studentProjects = [].concat(_toConsumableArray(studentProjects), _toConsumableArray(data));
 
-                                                      _context4.next = 142;
+                                                      _context5.next = 178;
                                                       return _Card2.default.getByStudentProjects(data);
 
-                                                case 142:
-                                                      _ref37 = _context4.sent;
-                                                      _ref38 = _slicedToArray(_ref37, 3);
-                                                      err = _ref38[0];
-                                                      data = _ref38[1];
-                                                      teachingCards = _ref38[2];
+                                                case 178:
+                                                      _ref50 = _context5.sent;
+                                                      _ref51 = _slicedToArray(_ref50, 3);
+                                                      err = _ref51[0];
+                                                      data = _ref51[1];
+                                                      teachingCards = _ref51[2];
 
                                                       if (!err) {
-                                                            _context4.next = 149;
+                                                            _context5.next = 185;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 149:
+                                                case 185:
 
                                                       cards = [].concat(_toConsumableArray(cards), _toConsumableArray(data));
 
-                                                      _context4.next = 152;
+                                                      _context5.next = 188;
                                                       return _Group2.default.getByProjects(teachingProjects);
 
-                                                case 152:
-                                                      _ref39 = _context4.sent;
-                                                      _ref40 = _slicedToArray(_ref39, 3);
-                                                      err = _ref40[0];
-                                                      data = _ref40[1];
-                                                      teachingGroups = _ref40[2];
+                                                case 188:
+                                                      _ref52 = _context5.sent;
+                                                      _ref53 = _slicedToArray(_ref52, 3);
+                                                      err = _ref53[0];
+                                                      data = _ref53[1];
+                                                      teachingGroups = _ref53[2];
 
                                                       if (!err) {
-                                                            _context4.next = 159;
+                                                            _context5.next = 195;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 159:
+                                                case 195:
 
                                                       groups = [].concat(_toConsumableArray(groups), _toConsumableArray(data));
 
-                                                      _context4.next = 162;
+                                                      _context5.next = 198;
                                                       return _School2.default.getByUser(user._id, profile);
 
-                                                case 162:
-                                                      _ref41 = _context4.sent;
-                                                      _ref42 = _slicedToArray(_ref41, 3);
-                                                      err = _ref42[0];
-                                                      data = _ref42[1];
-                                                      supervisingSchools = _ref42[2];
+                                                case 198:
+                                                      _ref54 = _context5.sent;
+                                                      _ref55 = _slicedToArray(_ref54, 3);
+                                                      err = _ref55[0];
+                                                      data = _ref55[1];
+                                                      supervisingSchools = _ref55[2];
 
                                                       if (!err) {
-                                                            _context4.next = 169;
+                                                            _context5.next = 205;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 169:
+                                                case 205:
 
                                                       schools = [].concat(_toConsumableArray(schools), _toConsumableArray(data));
 
-                                                      _context4.next = 172;
+                                                      _context5.next = 208;
                                                       return _User2.default.getByType('admin');
 
-                                                case 172:
-                                                      _ref43 = _context4.sent;
-                                                      _ref44 = _slicedToArray(_ref43, 3);
-                                                      err = _ref44[0];
-                                                      data = _ref44[1];
-                                                      adminUsers = _ref44[2];
+                                                case 208:
+                                                      _ref56 = _context5.sent;
+                                                      _ref57 = _slicedToArray(_ref56, 3);
+                                                      err = _ref57[0];
+                                                      data = _ref57[1];
+                                                      adminUsers = _ref57[2];
                                                       admins = [];
-                                                      _context4.next = 180;
+                                                      _context5.next = 216;
                                                       return _User2.default.getProfilesByUsers(data);
 
-                                                case 180:
-                                                      _ref45 = _context4.sent;
-                                                      _ref46 = _slicedToArray(_ref45, 3);
-                                                      err = _ref46[0];
-                                                      data = _ref46[1];
-                                                      admins = _ref46[2];
+                                                case 216:
+                                                      _ref58 = _context5.sent;
+                                                      _ref59 = _slicedToArray(_ref58, 3);
+                                                      err = _ref59[0];
+                                                      data = _ref59[1];
+                                                      admins = _ref59[2];
 
                                                       if (!err) {
-                                                            _context4.next = 187;
+                                                            _context5.next = 223;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 187:
+                                                case 223:
 
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(data));
 
-                                                      _context4.next = 190;
+                                                      _context5.next = 226;
                                                       return _Profile2.default.getByStudentProjects(studentProjects);
 
-                                                case 190:
-                                                      _ref47 = _context4.sent;
-                                                      _ref48 = _slicedToArray(_ref47, 3);
-                                                      err = _ref48[0];
-                                                      data = _ref48[1];
-                                                      profilesId = _ref48[2];
+                                                case 226:
+                                                      _ref60 = _context5.sent;
+                                                      _ref61 = _slicedToArray(_ref60, 3);
+                                                      err = _ref61[0];
+                                                      data = _ref61[1];
+                                                      profilesId = _ref61[2];
 
                                                       if (!err) {
-                                                            _context4.next = 197;
+                                                            _context5.next = 233;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 197:
+                                                case 233:
 
                                                       profiles = [].concat(_toConsumableArray(profiles), _toConsumableArray(data));
 
-                                                      _context4.next = 200;
+                                                      _context5.next = 236;
                                                       return _Lang2.default.getByCards(cards);
 
-                                                case 200:
-                                                      _ref49 = _context4.sent;
-                                                      _ref50 = _slicedToArray(_ref49, 3);
-                                                      err = _ref50[0];
-                                                      data = _ref50[1];
-                                                      langsId = _ref50[2];
+                                                case 236:
+                                                      _ref62 = _context5.sent;
+                                                      _ref63 = _slicedToArray(_ref62, 3);
+                                                      err = _ref63[0];
+                                                      data = _ref63[1];
+                                                      langsId = _ref63[2];
 
                                                       if (!err) {
-                                                            _context4.next = 207;
+                                                            _context5.next = 243;
                                                             break;
                                                       }
 
-                                                      return _context4.abrupt('return', res.json({ result: "failed" }));
+                                                      return _context5.abrupt('return', res.json({ result: "failed" }));
 
-                                                case 207:
+                                                case 243:
 
                                                       langs = [].concat(_toConsumableArray(langs), _toConsumableArray(data));
 
-                                                      return _context4.abrupt('return', res.json({
+                                                      createdQuestionnaires = [];
+                                                      _context5.next = 247;
+                                                      return _Questionnaire2.default.getByAuthor(user._id);
+
+                                                case 247:
+                                                      _ref64 = _context5.sent;
+                                                      _ref65 = _slicedToArray(_ref64, 3);
+                                                      err = _ref65[0];
+                                                      data = _ref65[1];
+                                                      createdQuestionnaires = _ref65[2];
+
+                                                      questionnaires = [].concat(_toConsumableArray(questionnaires), _toConsumableArray(data));
+
+                                                      assignedPublishes = [];
+                                                      _context5.next = 256;
+                                                      return _Publish2.default.getAssigned(profile);
+
+                                                case 256:
+                                                      _ref66 = _context5.sent;
+                                                      _ref67 = _slicedToArray(_ref66, 3);
+                                                      err = _ref67[0];
+                                                      data = _ref67[1];
+                                                      assignedPublishes = _ref67[2];
+
+                                                      publishes = [].concat(_toConsumableArray(publishes), _toConsumableArray(data));
+
+                                                      createdSubmits = [];
+                                                      _context5.next = 265;
+                                                      return _Submit2.default.getByUserAndPublishesId(user._id, assignedPublishes);
+
+                                                case 265:
+                                                      _ref68 = _context5.sent;
+                                                      _ref69 = _slicedToArray(_ref68, 3);
+                                                      err = _ref69[0];
+                                                      data = _ref69[1];
+                                                      createdSubmits = _ref69[2];
+
+                                                      submits = [].concat(_toConsumableArray(submits), _toConsumableArray(data));
+
+                                                      _context5.next = 273;
+                                                      return _Answer2.default.getBySubmits(data);
+
+                                                case 273:
+                                                      _ref70 = _context5.sent;
+                                                      _ref71 = _slicedToArray(_ref70, 2);
+                                                      err = _ref71[0];
+                                                      data = _ref71[1];
+
+                                                      answers = [].concat(_toConsumableArray(answers), _toConsumableArray(data));
+
+                                                      _context5.next = 280;
+                                                      return _Questionnaire2.default.getByPublishes(publishes);
+
+                                                case 280:
+                                                      _ref72 = _context5.sent;
+                                                      _ref73 = _slicedToArray(_ref72, 2);
+                                                      err = _ref73[0];
+                                                      data = _ref73[1];
+
+                                                      questionnaires = [].concat(_toConsumableArray(questionnaires), _toConsumableArray(data));
+
+                                                      _context5.next = 287;
+                                                      return _Question2.default.getByQuestionnaires(questionnaires);
+
+                                                case 287:
+                                                      _ref74 = _context5.sent;
+                                                      _ref75 = _slicedToArray(_ref74, 2);
+                                                      err = _ref75[0];
+                                                      data = _ref75[1];
+
+                                                      questions = [].concat(_toConsumableArray(questions), _toConsumableArray(data));
+
+                                                      createdPublishes = [];
+                                                      _context5.next = 295;
+                                                      return _Publish2.default.getByAuthor(user._id);
+
+                                                case 295:
+                                                      _ref76 = _context5.sent;
+                                                      _ref77 = _slicedToArray(_ref76, 3);
+                                                      err = _ref77[0];
+                                                      data = _ref77[1];
+                                                      createdPublishes = _ref77[2];
+
+                                                      publishes = [].concat(_toConsumableArray(publishes), _toConsumableArray(data));
+
+                                                      _context5.next = 303;
+                                                      return _School2.default.getByPublishes(publishes);
+
+                                                case 303:
+                                                      _ref78 = _context5.sent;
+                                                      _ref79 = _slicedToArray(_ref78, 2);
+                                                      err = _ref79[0];
+                                                      data = _ref79[1];
+
+                                                      schools = [].concat(_toConsumableArray(schools), _toConsumableArray(data));
+
+                                                      return _context5.abrupt('return', res.json({
                                                             result: "success",
                                                             user: user,
                                                             profile: profile,
@@ -728,6 +918,11 @@ var UserRouter = function (_Router) {
                                                             teachingCards: teachingCards,
                                                             joinedCards: joinedCards,
 
+                                                            assignedPublishes: assignedPublishes,
+                                                            createdQuestionnaires: createdQuestionnaires,
+                                                            createdPublishes: createdPublishes,
+                                                            createdSubmits: createdSubmits,
+
                                                             schools: schools,
                                                             courses: courses,
                                                             subjects: subjects,
@@ -735,19 +930,25 @@ var UserRouter = function (_Router) {
                                                             studentProjects: studentProjects,
                                                             groups: groups,
                                                             cards: cards,
-                                                            langs: langs
+                                                            langs: langs,
+
+                                                            questionnaires: questionnaires,
+                                                            questions: questions,
+                                                            publishes: publishes,
+                                                            submits: submits,
+                                                            answers: answers
                                                       }));
 
-                                                case 209:
+                                                case 309:
                                                 case 'end':
-                                                      return _context4.stop();
+                                                      return _context5.stop();
                                           }
                                     }
-                              }, _callee4, _this2);
+                              }, _callee5, _this2);
                         }));
 
-                        return function (_x10, _x11, _x12) {
-                              return _ref10.apply(this, arguments);
+                        return function (_x13, _x14, _x15) {
+                              return _ref13.apply(this, arguments);
                         };
                   }());
             }
