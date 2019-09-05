@@ -68,7 +68,7 @@ var SchoolRouter = function (_Router) {
 
       app.post('/school/getStatistics', function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(req, res, next) {
-          var schoolId, err, statistics, card, _ref2, _ref3, cards, i, timestamp, _ref4, _ref5;
+          var schoolId, err, statistics, card, _ref2, _ref3;
 
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
@@ -86,51 +86,9 @@ var SchoolRouter = function (_Router) {
                   _ref3 = _slicedToArray(_ref2, 2);
                   err = _ref3[0];
                   statistics = _ref3[1];
+                  return _context.abrupt('return', res.json({ result: err ? 'failed' : 'success', statistics: statistics }));
 
-                  if (!err) {
-                    _context.next = 10;
-                    break;
-                  }
-
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
-
-                case 10:
-                  cards = statistics.cards;
-                  i = 0;
-
-                case 12:
-                  if (!(i < cards.length)) {
-                    _context.next = 23;
-                    break;
-                  }
-
-                  timestamp = cards[i]._id.getTimestamp();
-                  _context.next = 16;
-                  return (0, _to2.default)(_Card2.default.findOneAndUpdate({ _id: cards[i]._id }, { $set: { createdAt: new Date(timestamp) } }, { new: true }));
-
-                case 16:
-                  _ref4 = _context.sent;
-                  _ref5 = _slicedToArray(_ref4, 2);
-                  err = _ref5[0];
-                  card = _ref5[1];
-
-                case 20:
-                  i++;
-                  _context.next = 12;
-                  break;
-
-                case 23:
-                  if (!err) {
-                    _context.next = 25;
-                    break;
-                  }
-
-                  return _context.abrupt('return', res.json({ result: 'failed' }));
-
-                case 25:
-                  return _context.abrupt('return', res.json({ result: 'success', statistics: statistics }));
-
-                case 26:
+                case 9:
                 case 'end':
                   return _context.stop();
               }
@@ -144,8 +102,8 @@ var SchoolRouter = function (_Router) {
       }());
 
       app.post('/school/getMultiple', function () {
-        var _ref6 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
-          var list, err, school, schools, i, _ref7, _ref8;
+        var _ref4 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(req, res) {
+          var list, err, school, schools, i, _ref5, _ref6;
 
           return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
@@ -168,10 +126,10 @@ var SchoolRouter = function (_Router) {
                   return (0, _to2.default)(_School2.default.findById(list[i]));
 
                 case 7:
-                  _ref7 = _context2.sent;
-                  _ref8 = _slicedToArray(_ref7, 2);
-                  err = _ref8[0];
-                  school = _ref8[1];
+                  _ref5 = _context2.sent;
+                  _ref6 = _slicedToArray(_ref5, 2);
+                  err = _ref6[0];
+                  school = _ref6[1];
 
                   if (!err) {
                     _context2.next = 13;
@@ -190,7 +148,7 @@ var SchoolRouter = function (_Router) {
 
                 case 17:
                   return _context2.abrupt('return', res.json({
-                    result: 'success',
+                    result: err ? 'failed' : 'success',
                     schools: schools
                   }));
 
@@ -203,7 +161,7 @@ var SchoolRouter = function (_Router) {
         }));
 
         return function (_x4, _x5) {
-          return _ref6.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       }());
 
@@ -221,8 +179,8 @@ var SchoolRouter = function (_Router) {
       });*/
 
       app.post('/school/join', function () {
-        var _ref9 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
-          var data, err, joinedSchool, updatedProfile, _ref10, _ref11;
+        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(req, res, next) {
+          var data, err, joinedSchool, updatedProfile, _ref8, _ref9;
 
           return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
@@ -236,11 +194,11 @@ var SchoolRouter = function (_Router) {
                   return _School2.default.joinSchool(data);
 
                 case 4:
-                  _ref10 = _context3.sent;
-                  _ref11 = _slicedToArray(_ref10, 3);
-                  err = _ref11[0];
-                  joinedSchool = _ref11[1];
-                  updatedProfile = _ref11[2];
+                  _ref8 = _context3.sent;
+                  _ref9 = _slicedToArray(_ref8, 3);
+                  err = _ref9[0];
+                  joinedSchool = _ref9[1];
+                  updatedProfile = _ref9[2];
                   return _context3.abrupt('return', res.json({
                     result: err ? 'failed' : 'success',
                     joinedSchool: joinedSchool,
@@ -256,13 +214,13 @@ var SchoolRouter = function (_Router) {
         }));
 
         return function (_x6, _x7, _x8) {
-          return _ref9.apply(this, arguments);
+          return _ref7.apply(this, arguments);
         };
       }());
 
       app.post('/school/edit', function () {
-        var _ref12 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
-          var school, err, editedSchool, _ref13, _ref14;
+        var _ref10 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(req, res, next) {
+          var school, err, editedSchool, _ref11, _ref12;
 
           return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
@@ -276,10 +234,10 @@ var SchoolRouter = function (_Router) {
                   return (0, _to2.default)(_School2.default.findOneAndUpdate({ _id: school._id }, { $set: school }, { new: true }));
 
                 case 4:
-                  _ref13 = _context4.sent;
-                  _ref14 = _slicedToArray(_ref13, 2);
-                  err = _ref14[0];
-                  editedSchool = _ref14[1];
+                  _ref11 = _context4.sent;
+                  _ref12 = _slicedToArray(_ref11, 2);
+                  err = _ref12[0];
+                  editedSchool = _ref12[1];
                   return _context4.abrupt('return', res.json({
                     result: err ? 'failed' : 'success',
                     editedSchool: editedSchool
@@ -294,12 +252,12 @@ var SchoolRouter = function (_Router) {
         }));
 
         return function (_x9, _x10, _x11) {
-          return _ref12.apply(this, arguments);
+          return _ref10.apply(this, arguments);
         };
       }());
 
       app.post('/school/add', function () {
-        var _ref15 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
+        var _ref13 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(req, res, next) {
           var data;
           return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
@@ -324,7 +282,7 @@ var SchoolRouter = function (_Router) {
         }));
 
         return function (_x12, _x13, _x14) {
-          return _ref15.apply(this, arguments);
+          return _ref13.apply(this, arguments);
         };
       }());
     }

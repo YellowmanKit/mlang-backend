@@ -49,6 +49,27 @@ module.exports.loginDate = function (logs) {
   return data;
 };
 
+module.exports.loginMonth = function (logs) {
+  var data = [
+    //{ value: 3, date: new Date(2019, 7, 1) },
+  ];
+  var temp = {};
+  for (var i = 0; i < logs.length; i++) {
+    var createdAt = new Date(logs[i].createdAt);
+    //console.log(createdAt);
+    var createdAtMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 2);
+    if (!temp[createdAtMonth]) {
+      temp[createdAtMonth] = 1;
+    } else {
+      temp[createdAtMonth]++;
+    };
+  }
+  for (var key in temp) {
+    data.push({ value: temp[key], month: key });
+  }
+  return data;
+};
+
 module.exports.cardDate = function (cards) {
   var data = [
     //{ value: 3, date: new Date(2019, 7, 1) },
@@ -78,7 +99,6 @@ module.exports.cardMonth = function (cards) {
   for (var i = 0; i < cards.length; i++) {
     var createdAt = new Date(cards[i].createdAt);
     var createdAtMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 2);
-    //console.log(createdAtMonth);
     if (!temp[createdAtMonth]) {
       temp[createdAtMonth] = 1;
     } else {

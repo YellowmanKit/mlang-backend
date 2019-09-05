@@ -25,16 +25,14 @@ class SchoolRouter extends Router {
 
       let err, statistics, card;
       [err, statistics] = await Query.getStatisticsBySchool(schoolId);
-      if(err){ return res.json({result: 'failed'})}
 
-      var cards = statistics.cards;
+      /*var cards = statistics.cards;
       for(var i=0;i<cards.length;i++){
         const timestamp = cards[i]._id.getTimestamp();
         [err, card] = await to(Card.findOneAndUpdate({ _id:cards[i]._id }, {$set:{ createdAt: new Date(timestamp) } },{ new: true }));
-      }
-      if(err){ return res.json({result: 'failed'}) }
+      }*/
 
-      return res.json({result: 'success', statistics: statistics})
+      return res.json({result: err? 'failed': 'success', statistics: statistics})
     });
 
     app.post('/school/getMultiple', async(req, res)=>{
@@ -48,7 +46,7 @@ class SchoolRouter extends Router {
         schools.splice(0,0,school);
       }
       return res.json({
-        result:'success',
+        result: err? 'failed': 'success',
         schools: schools
       })
     });

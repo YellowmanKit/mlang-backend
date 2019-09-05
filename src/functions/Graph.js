@@ -43,6 +43,24 @@ module.exports.loginDate = (logs) =>{
   return data;
 }
 
+module.exports.loginMonth = (logs) =>{
+  var data = [
+    //{ value: 3, date: new Date(2019, 7, 1) },
+  ]
+  var temp = {};
+  for(var i=0;i<logs.length;i++){
+    const createdAt = new Date(logs[i].createdAt);
+    //console.log(createdAt);
+    const createdAtMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 2);
+    if(!temp[createdAtMonth]){ temp[createdAtMonth] = 1; }
+    else{ temp[createdAtMonth]++; };
+  }
+  for(var key in temp){
+    data.push({ value: temp[key], month: key });
+  }
+  return data;
+}
+
 module.exports.cardDate = (cards) =>{
   var data = [
     //{ value: 3, date: new Date(2019, 7, 1) },
@@ -69,7 +87,6 @@ module.exports.cardMonth = (cards) =>{
   for(var i=0;i<cards.length;i++){
     const createdAt = new Date(cards[i].createdAt);
     const createdAtMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 2);
-    //console.log(createdAtMonth);
     if(!temp[createdAtMonth]){ temp[createdAtMonth] = 1; }
     else{ temp[createdAtMonth]++; };
   }

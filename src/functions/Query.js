@@ -229,7 +229,8 @@ module.exports.getStatisticsBySchool = async (schoolId)=>{
     featuredCount: 0,
     cardDateGraphData: [],
     cardMonthGraphData: [],
-    loginDateGraphData: []
+    loginDateGraphData: [],
+    loginMonthGraphData: []
   };
 
   [err, school] = await to(School.findById(schoolId));
@@ -282,6 +283,7 @@ module.exports.getStatisticsBySchool = async (schoolId)=>{
   [err, data] = await Log.getMultipleByProfiles(stat.profiles);
 
   stat['loginDateGraphData'] = Graph.loginDate(data);
+  stat['loginMonthGraphData'] = Graph.loginMonth(data);
 
   return [err, stat];
 }

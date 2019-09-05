@@ -518,7 +518,8 @@ module.exports.getStatisticsBySchool = function () {
               featuredCount: 0,
               cardDateGraphData: [],
               cardMonthGraphData: [],
-              loginDateGraphData: []
+              loginDateGraphData: [],
+              loginMonthGraphData: []
             };
             _context4.next = 3;
             return (0, _to2.default)(_School2.default.findById(schoolId));
@@ -649,10 +650,11 @@ module.exports.getStatisticsBySchool = function () {
 
 
             stat['loginDateGraphData'] = _Graph2.default.loginDate(data);
+            stat['loginMonthGraphData'] = _Graph2.default.loginMonth(data);
 
             return _context4.abrupt('return', [err, stat]);
 
-          case 89:
+          case 90:
           case 'end':
             return _context4.stop();
         }
