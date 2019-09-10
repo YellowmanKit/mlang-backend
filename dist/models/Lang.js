@@ -27,8 +27,7 @@ var langSchema = _mongoose2.default.Schema({
     required: true
   },
   text: {
-    type: String,
-    required: true
+    type: String
   },
   audio: {
     type: String
