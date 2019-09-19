@@ -172,7 +172,7 @@ var CreateApp = function () {
 
       this.connectDb();
       app.server.listen(port, function () {
-        console.log('App is running on port ' + app.server.address().port);
+        console.log(appName + ' is running on port ' + app.server.address().port);
       });
     }
   }, {

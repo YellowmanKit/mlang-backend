@@ -90,9 +90,9 @@ class CreateApp {
     new SubjectRouter(app);
     new GroupRouter(app);
     new SurveyRouter(app);
-    
+
     this.connectDb();
-    app.server.listen(port, ()=>{console.log('App is running on port ' + app.server.address().port);});
+    app.server.listen(port, ()=>{console.log(appName + ' is running on port ' + app.server.address().port);});
   }
 
   connectDb(){

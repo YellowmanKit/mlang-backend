@@ -15,6 +15,6 @@ var _createApp2 = _interopRequireDefault(_createApp);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var app = new _createApp2.default('mlang', 443, true, true, false);
-//const app = new CreateApp('mlang', 3001, false, false, false);
+//const app = new CreateApp('dev-mlang', 443, true, false, true);
 exports.default = app;
 //# sourceMappingURL=index.js.map
