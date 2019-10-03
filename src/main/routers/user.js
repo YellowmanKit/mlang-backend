@@ -1,6 +1,7 @@
 import Router from './Router';
 import path from 'path';
 import to from '../../to';
+import Excel from 'exceljs';
 
 import Query from '../../functions/Query.js';
 import User from '../../models/User.js';
@@ -35,6 +36,59 @@ class UserRouter extends Router {
   init(){
     const app = this.app;
     const mlanghku = this.mlanghku;
+    const upload = app.get('upload');
+    app.post('/user/excel', upload.single('file'),async(req, res, next)=>{
+
+      const excel = new Excel.Workbook();
+
+      excel.xlsx.readFile(temp + req.file.originalname).then(workbook => {
+        workbook.eachSheet((sheet, id) => {
+          sheet.eachRow(async (row, rowIndex) => {
+            if(rowIndex != 1){
+              var id = row.getCell(1).value;
+              var pw = row.getCell(2).value;
+              var codeType = row.getCell(3).value;
+              var code = row.getCell(4).value;
+
+              //console.log("id: " + id);
+              //console.log("pw: " + pw);
+              //console.log("codeType: " + codeType);
+              //console.log("code: " + code);
+
+              var err;
+              var user;
+
+              [err, user] = await User.acquireNewAccountByCode(code, codeType);
+              if(err){ console.log(err); return res.json({ result: 'failed'});}
+
+              //console.log(user);
+
+              var err, existedUser;
+              [err, existedUser] = await to(User.findOne({id: user.id}));
+
+              if(err){ console.log(err); return res.json({ result: 'failed'});}
+              //if(existedUser && existedUser._id.toString() !== user._id){ console.log('user id/pw already used'); }
+
+              User.findOneAndUpdate({_id: user._id}, { $set: {"id": id} }, {new: true}, (err, updatedUser)=>{
+                if(err){
+                  console.log("something wrong when updating user");
+                  return res.json({ result: 'update user failed'});
+                }
+              });
+
+              Profile.findOneAndUpdate({belongTo: user._id}, { $set: {"name": id, "icon": "0-profileIcon.png"}}, (err, updateProfile) =>{
+                if(err){
+                  console.log("something wrong when updating profile");
+                  return res.json({ result: 'update profile failed'});
+                }
+              });
+            }
+          })
+        })
+      })
+
+      return res.json({result: 'success'});
+    });
 
     app.post('/user/addAdmin', async(req, res, next)=>{
       const userId = req.body.data.userId;
