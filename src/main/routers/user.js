@@ -36,7 +36,10 @@ class UserRouter extends Router {
   init(){
     const app = this.app;
     const mlanghku = this.mlanghku;
+    
     const upload = app.get('upload');
+    const temp = app.get('temp');
+
     app.post('/user/excel', upload.single('file'),async(req, res, next)=>{
 
       const excel = new Excel.Workbook();
