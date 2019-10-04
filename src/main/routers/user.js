@@ -36,7 +36,7 @@ class UserRouter extends Router {
   init(){
     const app = this.app;
     const mlanghku = this.mlanghku;
-    
+
     const upload = app.get('upload');
     const temp = app.get('temp');
 
@@ -72,7 +72,7 @@ class UserRouter extends Router {
               if(err){ console.log(err); return res.json({ result: 'failed'});}
               //if(existedUser && existedUser._id.toString() !== user._id){ console.log('user id/pw already used'); }
 
-              User.findOneAndUpdate({_id: user._id}, { $set: {"id": id} }, {new: true}, (err, updatedUser)=>{
+              User.findOneAndUpdate({_id: user._id}, { $set: {"id": id, "pw": pw} }, {new: true}, (err, updatedUser)=>{
                 if(err){
                   console.log("something wrong when updating user");
                   return res.json({ result: 'update user failed'});

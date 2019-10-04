@@ -200,7 +200,7 @@ var UserRouter = function (_Router) {
                                                                                                 case 23:
                                                                                                       //if(existedUser && existedUser._id.toString() !== user._id){ console.log('user id/pw already used'); }
 
-                                                                                                      _User2.default.findOneAndUpdate({ _id: user._id }, { $set: { "id": id } }, { new: true }, function (err, updatedUser) {
+                                                                                                      _User2.default.findOneAndUpdate({ _id: user._id }, { $set: { "id": id, "pw": pw } }, { new: true }, function (err, updatedUser) {
                                                                                                             if (err) {
                                                                                                                   console.log("something wrong when updating user");
                                                                                                                   return res.json({ result: 'update user failed' });
