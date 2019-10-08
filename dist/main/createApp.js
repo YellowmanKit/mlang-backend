@@ -124,7 +124,7 @@ var CreateApp = function () {
         },
         filename: function filename(req, file, cb) {
           console.log(file);
-          cb(null, Date.now() + '-' + file.originalname);
+          if (file.originalname.includes("xlsx")) cb(null, file.originalname);else cb(null, Date.now() + '-' + file.originalname);
         }
       });
 
