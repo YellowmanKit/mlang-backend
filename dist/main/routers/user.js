@@ -376,12 +376,13 @@ var UserRouter = function (_Router) {
                                                 case 0:
                                                       email = req.headers.email;
 
+                                                      console.log(email);
 
                                                       _User2.default.resetPassword(email, function (result) {
                                                             return res.json({ result: result });
                                                       });
 
-                                                case 2:
+                                                case 3:
                                                 case 'end':
                                                       return _context5.stop();
                                           }
@@ -404,26 +405,30 @@ var UserRouter = function (_Router) {
                                                 case 0:
                                                       code = req.headers.code;
                                                       codeType = req.headers.type;
-                                                      _context6.next = 4;
+
+                                                      console.log(code);
+                                                      console.log(codeType);
+
+                                                      _context6.next = 6;
                                                       return _User2.default.acquireNewAccountByCode(code, codeType);
 
-                                                case 4:
+                                                case 6:
                                                       _ref17 = _context6.sent;
                                                       _ref18 = _slicedToArray(_ref17, 2);
                                                       err = _ref18[0];
                                                       user = _ref18[1];
 
                                                       if (!err) {
-                                                            _context6.next = 10;
+                                                            _context6.next = 12;
                                                             break;
                                                       }
 
                                                       return _context6.abrupt('return', res.json({ result: 'failed' }));
 
-                                                case 10:
+                                                case 12:
                                                       return _context6.abrupt('return', res.json({ result: 'success', id: user.id, pw: user.pw }));
 
-                                                case 11:
+                                                case 13:
                                                 case 'end':
                                                       return _context6.stop();
                                           }

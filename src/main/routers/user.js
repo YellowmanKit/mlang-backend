@@ -131,6 +131,7 @@ class UserRouter extends Router {
 
     app.get('/user/resetPassword/', async (req, res, next)=>{
       const email = req.headers.email;
+      console.log(email);
 
       User.resetPassword(email, result=>{
         return res.json({ result: result });
@@ -140,6 +141,8 @@ class UserRouter extends Router {
     app.get('/user/getNewAccountByCode/', async (req, res, next)=>{
       const code = req.headers.code;
       const codeType = req.headers.type;
+      console.log(code);
+      console.log(codeType);
 
       var err, user;
 
