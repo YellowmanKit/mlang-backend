@@ -43,7 +43,7 @@
     "morgan": "^1.9.1",
     "multer": "^1.3.1",
     "multer-s3": "^2.7.0",
-    "nodemailer": "^4.6.7",
+    "nodemailer": "^6.4.16",
     "parse": "^2.1.0",
     "randomstring": "^1.1.5",
     "request": "^2.88.0"
